@@ -3,9 +3,7 @@ const cheerio = require("cheerio");
 
 const fetchShelves = async () => {
   try {
-    const response = await axios.get(
-      "https://www.amazon.com/s?crid=36QNR0DBY6M7J&k=shelves&ref=glow_cls&refresh=1&sprefix=s%2Caps%2C309"
-    );
+    const response = await axios.get("https://www.amazon.in/s?k=beardo");
 
     const html = response.data;
 
@@ -37,7 +35,7 @@ const fetchShelves = async () => {
         .find("div.a-section.a-spacing-none.a-spacing-top-micro > div > span")
         .attr("aria-label");
 
-      const price = shelf.find("span.a-price > span.a-offscreen").text();
+      const price = shelf.find("span.a-price-whole").text();
 
       let element = {
         title,

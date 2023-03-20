@@ -20,7 +20,6 @@ app.use(express.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
   let arr = await fetchShelves();
-  // console.log(arr);
   res.render("index", { arr: arr });
 });
 
