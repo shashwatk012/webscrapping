@@ -1,8 +1,9 @@
-// const cheerio = require("cheerio");
+// const { fetchShelves } = require("../api");
 
-const webscrap = async () => {
-  const response = await fetch(url);
-  console.log(response);
-};
+// console.log("hell");
+// const api = async () => {
+//   let arr = await fetchShelves();
+//   console.log(arr);
+// };
 
-webscrap();
+// api();
