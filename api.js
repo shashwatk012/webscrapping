@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 
-const fetchShelves = async () => {
+const fetchBeards = async () => {
   try {
     const response = await axios.get("https://www.amazon.in/s?k=beardo");
 
@@ -9,21 +9,21 @@ const fetchShelves = async () => {
 
     const $ = cheerio.load(html);
 
-    const shelves = [];
+    const beards = [];
 
     $(
       "div.sg-col-4-of-12.s-result-item.s-asin.sg-col-4-of-16.sg-col.sg-col-4-of-20"
     ).each((_idx, el) => {
-      const shelf = $(el);
-      const title = shelf
+      const beardo = $(el);
+      const title = beardo
         .find("span.a-size-base-plus.a-color-base.a-text-normal")
         .text();
 
-      const image = shelf.find("img.s-image").attr("src");
+      const image = beardo.find("img.s-image").attr("src");
 
-      const link = shelf.find("a.a-link-normal.a-text-normal").attr("href");
+      const link = beardo.find("a.a-link-normal.a-text-normal").attr("href");
 
-      const reviews = shelf
+      const reviews = beardo
         .find(
           "div.a-section.a-spacing-none.a-spacing-top-micro > div.a-row.a-size-small"
         )
@@ -31,11 +31,11 @@ const fetchShelves = async () => {
         .last()
         .attr("aria-label");
 
-      const stars = shelf
+      const stars = beardo
         .find("div.a-section.a-spacing-none.a-spacing-top-micro > div > span")
         .attr("aria-label");
 
-      const price = shelf.find("span.a-price-whole").text();
+      const price = beardo.find("span.a-price-whole").text();
 
       let element = {
         title,
@@ -51,12 +51,12 @@ const fetchShelves = async () => {
       if (stars) {
         element.stars = stars;
       }
-      shelves.push(element);
+      beards.push(element);
     });
-    return shelves;
+    return beards;
   } catch (error) {
     throw error;
   }
 };
 
-module.exports = { fetchShelves };
+module.exports = { fetchBeards };
