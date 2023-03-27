@@ -42,13 +42,19 @@ const fetchBeards = async (url) => {
 
       const stars = beardo
         .find("div.a-section.a-spacing-none.a-spacing-top-micro > div > span")
-        .attr("aria-label");
+        .attr("aria-label")
+        .substring(0, 3);
 
       const price = beardo.find("span.a-price-whole").text();
 
-      const maxretailprice = beardo
+      let maxretailprice = beardo
         .find("span.a-price.a-text-price>span.a-offscreen")
-        .text();
+        .text()
+        .substring(1);
+
+      if (maxretailprice === "") {
+        maxretailprice = price;
+      }
 
       let element = {
         title,
@@ -59,7 +65,7 @@ const fetchBeards = async (url) => {
       };
 
       if (reviews) {
-        element.reviews = reviews;
+        element.totalRatings = reviews;
       }
 
       if (stars) {
