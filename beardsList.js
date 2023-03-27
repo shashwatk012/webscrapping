@@ -1,9 +1,14 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 
-const fetchBeards = async () => {
+const fetchBeards = async (url) => {
   try {
-    const response = await axios.get("https://www.amazon.in/s?k=beardo");
+    const response = await axios.get(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36",
+      },
+    });
 
     const html = response.data;
 
@@ -13,7 +18,7 @@ const fetchBeards = async () => {
 
     $(
       "div.sg-col-4-of-12.s-result-item.s-asin.sg-col-4-of-16.sg-col.sg-col-4-of-20"
-    ).each((_idx, el) => {
+    ).each(async (_idx, el) => {
       const beardo = $(el);
       const title = beardo
         .find("span.a-size-base-plus.a-color-base.a-text-normal")
@@ -21,7 +26,11 @@ const fetchBeards = async () => {
 
       const image = beardo.find("img.s-image").attr("src");
 
-      const link = beardo.find("a.a-link-normal.a-text-normal").attr("href");
+      const link = beardo
+        .find(
+          "a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
+        )
+        .attr("href");
 
       const reviews = beardo
         .find(
@@ -37,11 +46,16 @@ const fetchBeards = async () => {
 
       const price = beardo.find("span.a-price-whole").text();
 
+      const maxretailprice = beardo
+        .find("span.a-price.a-text-price>span.a-offscreen")
+        .text();
+
       let element = {
         title,
         image,
-        link: `https://amazon.com${link}`,
+        link: `https://amazon.in${link}`,
         price,
+        maxretailprice,
       };
 
       if (reviews) {

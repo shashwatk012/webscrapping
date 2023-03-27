@@ -15,8 +15,8 @@ body {
   text-align: center;
 } */
 .outside {
-  display: inline-grid;
-  grid-template-columns: auto auto auto auto;
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto;
   background-color: #2196f3;
   padding: 10px;
 }

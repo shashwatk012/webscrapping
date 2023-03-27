@@ -1,28 +1,47 @@
-const express = require("express");
-const app = express();
-const path = require("path");
-const hbs = require("hbs");
 const axios = require("axios");
 const cheerio = require("cheerio");
-const { fetchBeards } = require("./api");
+const { fetchBeards } = require("./beardsList");
+const { fetchReviews } = require("./reviews");
+const { fetchLink } = require("./link");
+const { convertJSONtoCSV } = require("./csv");
 
-const staticpath = path.join(__dirname, "./static");
-app.use("/static", express.static(staticpath));
+const data = async () => {
+  try {
+    let url =
+      "https://www.amazon.in/s?k=beardo&crid=1GEOQD3CN5U5L&sprefix=beardo%2Caps%2C228&ref=nb_sb_noss_1";
+    let arr = [];
+    for (let i = 0; i < 5; i++) {
+      url = `https://www.amazon.in/s?k=beardo&crid=1GEOQD3CN5U5L&sprefix=beardo%2Caps%2C228&ref=nb_sb_noss_${
+        i + 1
+      }`;
+      const data = await fetchBeards(url);
+      arr = [...arr, ...data];
+    }
+    for (let i = 0; i < 2; i++) {
+      let links = await fetchLink(arr[i].link);
+      const arr1 = [
+        "positive",
+        "critical",
+        "five_star",
+        "four_star",
+        "three_star",
+        "two_star",
+        "one_star",
+      ];
+      const totalReviewsandratings = await fetchReviews(links[0]);
+      arr[i][`total Reviews and Ratings`] = totalReviewsandratings[0];
+      arr[i][`top10reviews`] = totalReviewsandratings[1];
 
-const partialspath = path.join(__dirname, "./views/templates");
-hbs.registerPartials(partialspath);
-
-app.set("views", "./views");
-app.set("view engine", "hbs");
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-app.get("/", async (req, res) => {
-  let arr = await fetchBeards();
-  res.render("index", { arr: arr });
-});
-
-app.listen(8000, () => {
-  console.log("listening at 8000");
-});
+      for (const element of arr1) {
+        const str = links[0] + `&pageNumber=1&filterByStar=${element}`;
+        const data = await fetchReviews(str);
+        arr[i][`${element} reviews and ratings`] = data[0];
+        arr[i][`top 10 ${element} reviews`] = data[1];
+      }
+    }
+    convertJSONtoCSV(arr);
+  } catch (e) {
+    console.log(e);
+  }
+};
+data();
