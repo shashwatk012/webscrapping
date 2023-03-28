@@ -20,7 +20,7 @@ const fetchBeards = async (url) => {
       "div.sg-col-4-of-12.s-result-item.s-asin.sg-col-4-of-16.sg-col.sg-col-4-of-20"
     ).each(async (_idx, el) => {
       const beardo = $(el);
-      const title = beardo
+      const ProductName = beardo
         .find("span.a-size-base-plus.a-color-base.a-text-normal")
         .text();
 
@@ -40,36 +40,37 @@ const fetchBeards = async (url) => {
         .last()
         .attr("aria-label");
 
-      const stars = beardo
+      let stars = beardo
         .find("div.a-section.a-spacing-none.a-spacing-top-micro > div > span")
-        .attr("aria-label")
-        .substring(0, 3);
+        .attr("aria-label");
 
       const price = beardo.find("span.a-price-whole").text();
 
       let maxretailprice = beardo
         .find("span.a-price.a-text-price>span.a-offscreen")
-        .text()
-        .substring(1);
+        .text();
 
       if (maxretailprice === "") {
         maxretailprice = price;
+      } else {
+        maxretailprice = maxretailprice.substring(1);
       }
 
       let element = {
-        title,
+        ProductName,
         image,
         link: `https://amazon.in${link}`,
         price,
         maxretailprice,
       };
 
-      if (reviews) {
-        element.totalRatings = reviews;
+      if (stars) {
+        stars = stars.substring(0, 3);
+        element.stars = stars;
       }
 
-      if (stars) {
-        element.stars = stars;
+      if (reviews) {
+        element.GlobalRatings = reviews;
       }
       beards.push(element);
     });
