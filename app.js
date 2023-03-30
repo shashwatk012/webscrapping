@@ -1,66 +1,23 @@
-const axios = require("axios");
-const cheerio = require("cheerio");
-const { fetchBeards } = require("./beardsList");
-const { fetchReviews } = require("./reviews");
-const { fetchLink } = require("./link");
-const { convertJSONtoCSV } = require("./csv");
+const express = require("express");
+const app = express();
+const hbs = require("hbs");
+const path = require("path");
+const { router } = require("./router");
 
-const data = async () => {
-  try {
-    let url =
-      "https://www.amazon.in/s?k=beardo&page=1&crid=1GEOQD3CN5U5L&qid=1679935172&sprefix=beardo%2Caps%2C228&ref=sr_pg_1";
-    let arr = [];
-    for (let i = 0; i < 1; i++) {
-      url = `https://www.amazon.in/s?k=beardo&page=${
-        i + 1
-      }&crid=1GEOQD3CN5U5L&qid=1679935172&sprefix=beardo%2Caps%2C228&ref=sr_pg_${
-        i + 1
-      }`;
-      const result = await fetchBeards(url);
-      arr = [...arr, ...result];
-    }
-    console.log(arr.length);
-    const uniqueKeys = new Set();
-    for (let i = 0; i < arr.length; i++) {
-      let links = await fetchLink(arr[i].link);
-      for (const key in links) {
-        uniqueKeys.add(key);
-        arr[i][key] = links[key];
-      }
+app.use(router); //Creating router to make main file neat and clean
 
-      //   //   // const arr1 = [
-      //   //   //   "positive",
-      //   //   //   "critical",
-      //   //   //   "five_star",
-      //   //   //   "four_star",
-      //   //   //   "three_star",
-      //   //   //   "two_star",
-      //   //   //   "one_star",
-      //   //   // ];
-      //   //   // if (links.length !== 0) {
-      //   //   //   const totalReviewsandratings = await fetchReviews(links[0]);
-      //   //   //   arr[i][`total Reviews and Ratings`] = totalReviewsandratings[0];
-      //   //   //   arr[i][`top10reviews`] = totalReviewsandratings[1];
+// EXPRESS SPECIFIC STUFF
+const staticpath = path.join(__dirname, "./static");
+app.use("/static", express.static(staticpath)); // For serving static files
 
-      //   //   //   for (const element of arr1) {
-      //   //   //     const str = links[0] + `&pageNumber=1&filterByStar=${element}`;
-      //   //   //     const data = await fetchReviews(str);
-      //   //   //     arr[i][`${element} reviews and ratings`] = data[0];
-      //   //   //     arr[i][`top 10 ${element} reviews`] = data[1];
-      //   //   //   }
-      //   //   // }
-      console.log(i);
-    }
-    for (let i = 0; i < arr.length; i++) {
-      uniqueKeys.forEach(function (value) {
-        if (arr[i][value] === undefined) {
-          arr[i][value] = "Not available";
-        }
-      });
-    }
-    convertJSONtoCSV(arr);
-  } catch (e) {
-    console.log(e);
-  }
-};
-setTimeout(data, 5000);
+// PUG SPECIFIC STUFF
+app.set("view engine", "hbs"); // Set the template engine as pug
+app.set("views", path.join(__dirname, "views")); // Set the views directory
+
+//Registering the partials
+const partialPath = path.join(__dirname, "./views/templates");
+hbs.registerPartials(partialPath);
+
+app.listen(3000, () => {
+  console.log(`Server running at ${3000}`);
+});

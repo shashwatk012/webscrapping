@@ -1,14 +1,10 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
+const { headers } = require("./text");
 
-const fetchBeards = async (url) => {
+const fetchUrlDetails = async (url) => {
   try {
-    const response = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36",
-      },
-    });
+    const response = await axios.get(url, headers);
 
     const html = response.data;
 
@@ -17,22 +13,22 @@ const fetchBeards = async (url) => {
     const beards = [];
 
     $(
-      "div.sg-col-4-of-12.s-result-item.s-asin.sg-col-4-of-16.sg-col.sg-col-4-of-20"
+      "div.sg-col-4-of-12.s-result-item.s-asin.sg-col-4-of-16.sg-col.sg-col-4-of-20" // selecting the elements to be scrapped
     ).each(async (_idx, el) => {
       const beardo = $(el);
-      const ProductName = beardo
+      const ProductName = beardo // scraping the product name
         .find("span.a-size-base-plus.a-color-base.a-text-normal")
         .text();
 
-      const image = beardo.find("img.s-image").attr("src");
+      const image = beardo.find("img.s-image").attr("src"); // scraping the image
 
-      const link = beardo
+      const link = beardo // scraping the link of the product
         .find(
           "a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
         )
         .attr("href");
 
-      const reviews = beardo
+      const reviews = beardo // scraping the number of global ratings
         .find(
           "div.a-section.a-spacing-none.a-spacing-top-micro > div.a-row.a-size-small"
         )
@@ -40,7 +36,7 @@ const fetchBeards = async (url) => {
         .last()
         .attr("aria-label");
 
-      let stars = beardo
+      let stars = beardo // scraping the ratings
         .find("div.a-section.a-spacing-none.a-spacing-top-micro > div > span")
         .attr("aria-label");
 
@@ -72,7 +68,7 @@ const fetchBeards = async (url) => {
       if (reviews) {
         element.GlobalRatings = reviews;
       }
-      beards.push(element);
+      beards.push(element); //storing the details in an array
     });
     return beards;
   } catch (error) {
@@ -80,4 +76,4 @@ const fetchBeards = async (url) => {
   }
 };
 
-module.exports = { fetchBeards };
+module.exports = { fetchUrlDetails };
