@@ -13,7 +13,7 @@ const fetchIndividualDetails = async (url) => {
     let obj = {};
 
     $("tr.a-histogram-row.a-align-center").each(async (_idx, el) => {
-      // selecting the product details element and the looping to get the complete product details
+      // selecting the ratings element and the looping to get the different ratings
       const x = $(el);
       let key = x.find("td.aok-nowrap>span.a-size-base>a.a-link-normal").text();
       let value = x
@@ -35,6 +35,7 @@ const fetchIndividualDetails = async (url) => {
     obj["packageSize"] = packageSize !== null ? packageSize : "Not available"; //scraping the package size
 
     $("tr.a-spacing-small").each(async (_idx, el) => {
+      //selecting the product details element and the looping to get the complete product details
       const x = $(el);
       const key = x.find("td.a-span3>span.a-size-base.a-text-bold").text();
       const value = x.find("td.a-span9>span.a-size-base.po-break-word").text();
@@ -44,7 +45,7 @@ const fetchIndividualDetails = async (url) => {
     });
     $(
       ".a-section.feature.detail-bullets-wrapper.bucket>div#detailBullets_feature_div>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
-    )
+    ) //selecting the product details element and the looping to get the complete product details
       .children()
       .each(async (_idx, el) => {
         const x = $(el);
@@ -60,10 +61,20 @@ const fetchIndividualDetails = async (url) => {
           obj[key] = value;
         }
       });
-    const key = $(
-      ".a-section.feature.detail-bullets-wrapper.bucket>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list>li>span.a-list-item>span.a-text-bold"
-    ).html();
-
+    $(
+      ".a-section.feature.detail-bullets-wrapper.bucket>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
+    ).each(async (_idx, el) => {
+      const x = $(el);
+      if (_idx === 0) {
+        const key = x.find("span.a-list-item").text().trim();
+        for(let i=key.length-1;i>=0;i--) {
+          if(key[i]==='#') {
+            p=key.substring(i,key.length-i);
+          }
+        }
+        console.log(key.trim());
+      }
+    });
     return obj;
   } catch (error) {
     throw error;

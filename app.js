@@ -11,7 +11,7 @@ const staticpath = path.join(__dirname, "./static");
 app.use("/static", express.static(staticpath)); // For serving static files
 
 // PUG SPECIFIC STUFF
-app.set("view engine", "hbs"); // Set the template engine as pug
+app.set("view engine", "hbs"); // Set the template engine as hbs
 app.set("views", path.join(__dirname, "views")); // Set the views directory
 
 //Registering the partials
