@@ -1,15 +1,41 @@
 <div>
   <div class="big">
-    <h2>Inputs for scrapping data</h2>
-    <form action="/details" method="post" id="form">
+    <h1>{{site}}</h1>
+    <h1>Inputs for scrapping data</h1>
+    <form action="{{site}}details" method="post" id="form">
+      <div class="div">
+        <label for="category">Choose a category:</label>
+        <select onchange="change()" name="category" id="category">
+          <option value="select">Select</option>
+          <option value="Mobiles">Mobiles</option>
+          <option value="Laptops">Laptops</option>
+          <option value="Mobile Accessories">Mobile Accessories</option>
+          <option value="Television">Television</option>
+          <option value="Footwear">Footwear</option>
+          <option value="Baby Care">Baby Care</option>
+          <option value="Men Clothing">Men Clothing</option>
+          <option value="Washing Machine">Washing Machine</option>
+          <option value="Men's grooming">Men's grooming</option>
+          <option value="Enter your own category or sub-category">Enter your own
+            category or sub-category</option>
+        </select>
+      </div>
+      <div class="div" id="select"></div>
+      <h2 style="text-align:center">Or</h2>
       <div class="div">
         <label for="links">Link:</label>
         <input type="link" id="links" name="link" />
       </div>
       <div class="div">
-        <label for="daTa">Number of data(Between 1 to 70):</label>
-        <input type="number" id="daTa" name="data" min="1" max="70" /></div>
-
-      <input type="submit" id="submit" /></form>
+        <label for="daTa">Number of data:</label>
+        <input type="number" id="daTa" name="data" min="1" required /></div>
+      <div id="bigger">
+      </div>
+      <div class="div"><input
+          type="submit"
+          onclick="wait()"
+          id="submit"
+        /></div></form>
+    <div class="div hidden"></div>
   </div>
 </div>

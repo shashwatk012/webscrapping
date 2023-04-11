@@ -15,4 +15,8 @@ const headers = {
     "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
   },
 };
-module.exports = { headers };
+const allProducts =
+  "div._1YokD2._2GoDe3>div._1YokD2._3Mn1Gg>div._1AtVbE.col-12-12>div._13oc-S>div";
+const imglink = "img._396cs4";
+
+module.exports = { headers, allProducts, imglink };

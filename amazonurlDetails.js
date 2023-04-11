@@ -2,7 +2,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const { headers } = require("./text");
 
-const fetchUrlDetails = async (url) => {
+const amazonfetchUrlDetails = async (url) => {
   try {
     const response = await axios.get(url, headers);
 
@@ -10,25 +10,25 @@ const fetchUrlDetails = async (url) => {
 
     const $ = cheerio.load(html);
 
-    const beards = [];
+    const products = [];
 
     $(
-      "div.sg-col-4-of-12.s-result-item.s-asin.sg-col-4-of-16.sg-col.sg-col-4-of-20" // selecting the elements to be scrapped
+      "div.s-result-item.s-asin.sg-col.s-widget-spacing-small" // selecting the elements to be scrapped
     ).each(async (_idx, el) => {
-      const beardo = $(el);
-      const ProductName = beardo // scraping the product name
-        .find("span.a-size-base-plus.a-color-base.a-text-normal")
+      const product = $(el);
+      let ProductName = product // scraping the product name
+        .find("span.a-color-base.a-text-normal")
         .text();
 
-      const image = beardo.find("img.s-image").attr("src"); // scraping the image
+      const image = product.find("img.s-image").attr("src"); // scraping the image
 
-      const link = beardo // scraping the link of the product
+      let link = product // scraping the link of the product
         .find(
           "a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
         )
         .attr("href");
 
-      const reviews = beardo // scraping the number of global ratings
+      let reviews = product // scraping the number of global ratings
         .find(
           "div.a-section.a-spacing-none.a-spacing-top-micro > div.a-row.a-size-small"
         )
@@ -36,13 +36,13 @@ const fetchUrlDetails = async (url) => {
         .last()
         .attr("aria-label");
 
-      let stars = beardo // scraping the ratings
+      let stars = product // scraping the ratings
         .find("div.a-section.a-spacing-none.a-spacing-top-micro > div > span")
         .attr("aria-label");
 
-      const price = beardo.find("span.a-price-whole").text();
+      let price = product.find("span.a-price-whole").text();
 
-      let maxretailprice = beardo
+      let maxretailprice = product
         .find("span.a-price.a-text-price>span.a-offscreen")
         .text();
 
@@ -68,12 +68,12 @@ const fetchUrlDetails = async (url) => {
       if (reviews) {
         element.GlobalRatings = reviews;
       }
-      beards.push(element); //storing the details in an array
+      products.push(element); //storing the details in an array
     });
-    return beards;
+    return products;
   } catch (error) {
     throw error;
   }
 };
 
-module.exports = { fetchUrlDetails };
+module.exports = { amazonfetchUrlDetails };

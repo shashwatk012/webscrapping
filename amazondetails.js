@@ -2,7 +2,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const { headers } = require("./text");
 
-const fetchIndividualDetails = async (url) => {
+const amazonfetchIndividualDetails = async (url) => {
   // function to scrap complete data about ane product
   try {
     const response = await axios.get(url, headers); // api to get html of the required page
@@ -12,6 +12,23 @@ const fetchIndividualDetails = async (url) => {
     const $ = cheerio.load(html); // cheerio nodejs module to load html
     let obj = {};
 
+    $(
+      ".a-section.feature.detail-bullets-wrapper.bucket>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
+    ).each(async (_idx, el) => {
+      const x = $(el);
+      if (_idx === 0) {
+        let p = x.find("span.a-list-item").text();
+        if (p) {
+          p = p.trim();
+        }
+        let ranks = p.replace("Best Sellers Rank:", "");
+        ranks = ranks.replace("(See Top 100 in Beauty)", "");
+        if (ranks) {
+          obj["Best Sellers Rank"] = ranks;
+        }
+      }
+    });
+
     $("tr.a-histogram-row.a-align-center").each(async (_idx, el) => {
       // selecting the ratings element and the looping to get the different ratings
       const x = $(el);
@@ -19,8 +36,12 @@ const fetchIndividualDetails = async (url) => {
       let value = x
         .find("td.a-text-right.a-nowrap>span.a-size-base>a.a-link-normal")
         .text();
-      key = key.trim();
-      value = value.trim(); // triming to trim the spaces in the string
+      if (key) {
+        key = key.trim();
+      }
+      if (value) {
+        value = value.trim(); // triming to trim the spaces in the string
+      }
       if (key !== "" && value !== "") {
         obj[`${key} ratings`] = value; // saving the scraped data in an object
       }
@@ -61,24 +82,10 @@ const fetchIndividualDetails = async (url) => {
           obj[key] = value;
         }
       });
-    $(
-      ".a-section.feature.detail-bullets-wrapper.bucket>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
-    ).each(async (_idx, el) => {
-      const x = $(el);
-      if (_idx === 0) {
-        const key = x.find("span.a-list-item").text().trim();
-        for(let i=key.length-1;i>=0;i--) {
-          if(key[i]==='#') {
-            p=key.substring(i,key.length-i);
-          }
-        }
-        console.log(key.trim());
-      }
-    });
     return obj;
   } catch (error) {
     throw error;
   }
 };
 
-module.exports = { fetchIndividualDetails };
+module.exports = { amazonfetchIndividualDetails };
