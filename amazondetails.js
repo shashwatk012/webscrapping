@@ -1,15 +1,27 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const { headers } = require("./text");
+const { headers } = require("./flipkarttext");
+const scrapingbee = require("scrapingbee");
 
 const amazonfetchIndividualDetails = async (url) => {
   // function to scrap complete data about ane product
   try {
-    const response = await axios.get(url, headers); // api to get html of the required page
+    // const response = await axios.get(url, headers); // api to get html of the required page
 
-    const html = response.data;
+    // const html = response.data;
 
-    const $ = cheerio.load(html); // cheerio nodejs module to load html
+    // const $ = cheerio.load(html); // cheerio nodejs module to load html
+    var client = new scrapingbee.ScrapingBeeClient(
+      "XBILYKDTAJTJB46IRUBREAX4QQ6M1746J3N4MM6JCDZKWSRDSWWVST7KTS63B48NDYM06TGLT3XLCB21"
+    );
+    var response = await client.get({
+      url: url,
+      params: {},
+    });
+
+    var decoder = new TextDecoder();
+    var text = decoder.decode(response.data);
+    const $ = cheerio.load(text);
     let obj = {};
 
     $(

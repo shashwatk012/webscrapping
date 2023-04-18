@@ -1,4 +1,5 @@
 const express = require("express");
+const scrapingbee = require("scrapingbee");
 const router = new express.Router();
 const axios = require("axios");
 const cheerio = require("cheerio");
@@ -9,6 +10,7 @@ const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { convertJSONtoCSV } = require("./csv");
+const { typesOfRatings, urlmaking } = require("./flipkarttext");
 
 //Calling middleware to identify the incoming JSON from the front end
 router.use(express.json());
@@ -37,13 +39,14 @@ router.post("/flipkartdetails", async (req, res) => {
     if (req.body.link === "" && req.body.category === "select") {
       return res.send("Choose any category or provide any link");
     }
+
     //getting the link to be scrapped
     if (req.body.link !== "") {
       url = req.body.link;
     } else if (req.body.SubCategory === "Select") {
-      url = `https://www.flipkart.com/search?q=${req.body.category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
+      url = urlmaking(req.body.category);
     } else {
-      url = `https://www.flipkart.com/search?q=${req.body.SubCategory}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
+      url = urlmaking(req.body.SubCategory);
     }
 
     //Number of products to be scrapped
@@ -90,18 +93,22 @@ router.post("/flipkartdetails", async (req, res) => {
           uniqueKeys.add(key);
           data[i][key] = details[key];
         }
-        const typesOfRatings = [
-          "MOST_RECENT",
-          "POSITIVE_FIRST",
-          "NEGATIVE_FIRST",
-        ];
         if (details.reviewsLink !== undefined) {
-          const totalReviewsandratings = await flipkartfetchReviews(
-            details.reviewsLink
+          let url = details.reviewsLink;
+          url = url.replace(
+            "&marketplace=FLIPKART",
+            "&aid=overall&certifiedBuyer=false&sortOrder="
           );
-          for (const key in totalReviewsandratings) {
-            uniqueKeys.add(key);
-            data[i][key] = totalReviewsandratings[key];
+          for (const key of typesOfRatings) {
+            let urls = url + `${key}`;
+            const totalReviewsandratings = await flipkartfetchReviews(
+              urls,
+              key
+            );
+            for (const key in totalReviewsandratings) {
+              uniqueKeys.add(key);
+              data[i][key] = totalReviewsandratings[key];
+            }
           }
         }
         console.log(i);

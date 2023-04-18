@@ -1,14 +1,26 @@
 const axios = require("axios");
+const scrapingbee = require("scrapingbee");
 const cheerio = require("cheerio");
-const { headers, allProducts, imglink } = require("./text");
+const { headers, allProducts, imglink } = require("./flipkarttext");
 
 const flipkartfetchUrlDetails = async (url) => {
   try {
-    const response = await axios.get(url, headers);
+    var client = new scrapingbee.ScrapingBeeClient(
+      "XBILYKDTAJTJB46IRUBREAX4QQ6M1746J3N4MM6JCDZKWSRDSWWVST7KTS63B48NDYM06TGLT3XLCB21"
+    );
+    var response = await client.get({
+      url: url,
+      params: {},
+    });
 
-    const html = response.data;
+    var decoder = new TextDecoder();
+    var text = decoder.decode(response.data);
+    const $ = cheerio.load(text);
+    // const response = await axios.get(url, headers);
 
-    const $ = cheerio.load(html);
+    // const html = response.data;
+
+    // const $ = cheerio.load(html);
 
     const beards = [];
     $(allProducts).each(async (_idx, el) => {

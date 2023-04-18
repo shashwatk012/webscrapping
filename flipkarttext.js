@@ -19,4 +19,16 @@ const allProducts =
   "div._1YokD2._2GoDe3>div._1YokD2._3Mn1Gg>div._1AtVbE.col-12-12>div._13oc-S>div";
 const imglink = "img._396cs4";
 
-module.exports = { headers, allProducts, imglink };
+const typesOfRatings = [
+  "MOST_RECENT",
+  "MOST_HELPFUL",
+  "POSITIVE_FIRST",
+  "NEGATIVE_FIRST",
+];
+
+const urlmaking = (category) => {
+  const url = `https://www.flipkart.com/search?q=${category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
+  return url;
+};
+
+module.exports = { headers, allProducts, imglink, typesOfRatings, urlmaking };
