@@ -25,10 +25,41 @@ const typesOfRatings = [
   "POSITIVE_FIRST",
   "NEGATIVE_FIRST",
 ];
-
 const urlmaking = (category) => {
   const url = `https://www.flipkart.com/search?q=${category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
   return url;
 };
+const apikey =
+  "7C8IRHI1B3TTAEEIW3EBXXX698NT9DUT8F0MRVPHM43O5C0LMJXHUCLAOB9W4M2Z2FBHHRLDCF1Q8YN3";
 
-module.exports = { headers, allProducts, imglink, typesOfRatings, urlmaking };
+const fields = [
+  "imagelink",
+  "productlink",
+  "ProductName",
+  "Brand",
+  "price",
+  "maxretailprice",
+  "stars",
+  "Ratings",
+  "Reviews",
+  "Mother Category",
+  "Category",
+  "5 star ratings",
+  "4 star ratings",
+  "3 star ratings",
+  "2 star ratings",
+  "1 star ratings",
+  "Platform",
+  "Quantity",
+  "SellersNumbers",
+];
+
+module.exports = {
+  headers,
+  allProducts,
+  imglink,
+  typesOfRatings,
+  urlmaking,
+  apikey,
+  fields,
+};

@@ -1,20 +1,14 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const { headers } = require("./flipkarttext");
+const { headers, apikey } = require("./flipkarttext");
 const scrapingbee = require("scrapingbee");
 
 const amazonfetchUrlDetails = async (url) => {
   try {
-    // const response = await axios.get(url, headers);
-
-    // const html = response.data;
-
-    // const $ = cheerio.load(html);
-    var client = new scrapingbee.ScrapingBeeClient(
-      "XBILYKDTAJTJB46IRUBREAX4QQ6M1746J3N4MM6JCDZKWSRDSWWVST7KTS63B48NDYM06TGLT3XLCB21"
-    );
+    var client = new scrapingbee.ScrapingBeeClient(apikey);
     var response = await client.get({
       url: url,
+      headers,
       params: {},
     });
 
@@ -32,15 +26,15 @@ const amazonfetchUrlDetails = async (url) => {
         .find("span.a-color-base.a-text-normal")
         .text();
 
-      const image = product.find("img.s-image").attr("src"); // scraping the image
+      const imagelink = product.find("img.s-image").attr("src"); // scraping the image
 
-      let link = product // scraping the link of the product
+      let productlink = product // scraping the link of the product
         .find(
           "a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
         )
         .attr("href");
 
-      let reviews = product // scraping the number of global ratings
+      let Ratings = product // scraping the number of global ratings
         .find(
           "div.a-section.a-spacing-none.a-spacing-top-micro > div.a-row.a-size-small"
         )
@@ -66,8 +60,8 @@ const amazonfetchUrlDetails = async (url) => {
 
       let element = {
         ProductName,
-        image,
-        link: `https://amazon.in${link}`,
+        imagelink,
+        productlink: `https://amazon.in${productlink}`,
         price,
         maxretailprice,
       };
@@ -77,14 +71,15 @@ const amazonfetchUrlDetails = async (url) => {
         element.stars = stars;
       }
 
-      if (reviews) {
-        element.GlobalRatings = reviews;
+      if (Ratings) {
+        const result = Ratings.replace(/\D/g, "");
+        element.Ratings = result;
       }
       products.push(element); //storing the details in an array
     });
     return products;
   } catch (error) {
-    throw error;
+    return {};
   }
 };
 

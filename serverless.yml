@@ -1,0 +1,17 @@
+service: flip-amazon-scrapping-copy-copy-copy
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 3008
+  timeout: 50
+  stage: dev
+  region: us-east-1
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http: ANY /{proxy+}
+      - http: ANY /

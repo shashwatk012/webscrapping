@@ -1,29 +1,32 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const { headers } = require("./flipkarttext");
+const { headers, apikey } = require("./flipkarttext");
 const scrapingbee = require("scrapingbee");
 
 const amazonfetchIndividualDetails = async (url) => {
-  // function to scrap complete data about ane product
+  // function to scrap complete data about one product
   try {
-    // const response = await axios.get(url, headers); // api to get html of the required page
-
-    // const html = response.data;
-
-    // const $ = cheerio.load(html); // cheerio nodejs module to load html
-    var client = new scrapingbee.ScrapingBeeClient(
-      "XBILYKDTAJTJB46IRUBREAX4QQ6M1746J3N4MM6JCDZKWSRDSWWVST7KTS63B48NDYM06TGLT3XLCB21"
-    );
+    // fetching the html page through scraping bee
+    var client = new scrapingbee.ScrapingBeeClient(apikey);
     var response = await client.get({
       url: url,
-      params: {},
+      headers,
+      params: {
+        premium_proxy: "True",
+        wait_for: "td.a-text-right.a-nowrap>span.a-size-base>a.a-link-normal",
+      },
     });
 
     var decoder = new TextDecoder();
     var text = decoder.decode(response.data);
+
+    // cheerio nodejs module to load html
     const $ = cheerio.load(text);
+
+    // Declaration of object to store the product details
     let obj = {};
 
+    //Scraping the Best Sellers Rank in different Sub-Categories
     $(
       ".a-section.feature.detail-bullets-wrapper.bucket>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
     ).each(async (_idx, el) => {
@@ -35,14 +38,36 @@ const amazonfetchIndividualDetails = async (url) => {
         }
         let ranks = p.replace("Best Sellers Rank:", "");
         ranks = ranks.replace("(See Top 100 in Beauty)", "");
-        if (ranks) {
-          obj["Best Sellers Rank"] = ranks;
+        const num = ranks.split("  ");
+        let st = [];
+        for (let i = 0; i < num.length; i++) {
+          if (num[i] != "") {
+            let q = num[i].split(" ");
+            let s = "";
+            if (!st.length) {
+              for (let j = 2; j < q.length; j++) {
+                s += q[j];
+              }
+            } else {
+              for (let j = 3; j < q.length; j++) {
+                s += q[j];
+              }
+            }
+            st.push(s);
+          }
+        }
+        console.log(st);
+
+        // saving the scraped data in an object
+        if (st.length) {
+          obj["Mother Category"] = st[0];
+          obj["Category"] = st[1];
         }
       }
     });
 
+    // selecting the ratings element and the looping to get the different ratings percentage
     $("tr.a-histogram-row.a-align-center").each(async (_idx, el) => {
-      // selecting the ratings element and the looping to get the different ratings
       const x = $(el);
       let key = x.find("td.aok-nowrap>span.a-size-base>a.a-link-normal").text();
       let value = x
@@ -54,31 +79,41 @@ const amazonfetchIndividualDetails = async (url) => {
       if (value) {
         value = value.trim(); // triming to trim the spaces in the string
       }
+
       if (key !== "" && value !== "") {
-        obj[`${key} ratings`] = value; // saving the scraped data in an object
+        const result = value.replace(/\D/g, "");
+        obj[`${key} ratings`] = result; // saving the scraped data in an object
       }
     });
 
+    //scraping the pagelink for the reviews
     const reviewsLink = $("a.a-link-emphasis.a-text-bold").attr("href");
-    obj["reviewsLink"] = `https://amazon.in${reviewsLink}`; //scraping the link for the reviews
+    obj["reviewsLink"] = `https://amazon.in${reviewsLink}`;
 
+    // Scraping the package size
     const packageSize = $(
       "div.a-row.a-spacing-micro.singleton>span.selection"
     ).html();
-    obj["packageSize"] = packageSize !== null ? packageSize : "Not available"; //scraping the package size
+    if (packageSize) {
+      obj["packageSize"] = packageSize;
+    } else {
+      obj["packageSize"] = "Not available";
+    }
 
+    //selecting the product details element and the looping to get the complete product details
     $("tr.a-spacing-small").each(async (_idx, el) => {
-      //selecting the product details element and the looping to get the complete product details
       const x = $(el);
       const key = x.find("td.a-span3>span.a-size-base.a-text-bold").text();
       const value = x.find("td.a-span9>span.a-size-base.po-break-word").text();
-      if (key !== "" && value !== "") {
+      if (key && value) {
         obj[key] = value;
       }
     });
+
+    //selecting the product details element and the looping to get the complete product details
     $(
       ".a-section.feature.detail-bullets-wrapper.bucket>div#detailBullets_feature_div>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
-    ) //selecting the product details element and the looping to get the complete product details
+    )
       .children()
       .each(async (_idx, el) => {
         const x = $(el);
@@ -90,13 +125,15 @@ const amazonfetchIndividualDetails = async (url) => {
           }
         }
         const value = x.find("span.a-list-item").children("span").last().text();
-        if (key !== "" && value !== "") {
+        if (key && value) {
           obj[key] = value;
         }
       });
+    console.log(obj);
     return obj;
   } catch (error) {
-    throw error;
+    console.log("Some thing Went Wrong on details.js");
+    return {};
   }
 };
 

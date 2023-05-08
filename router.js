@@ -1,116 +1,120 @@
 const express = require("express");
-const scrapingbee = require("scrapingbee");
 const router = new express.Router();
-const axios = require("axios");
-const cheerio = require("cheerio");
 const { flipkartfetchUrlDetails } = require("./flipkarturlDetails");
 const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
+const { flipkartsellerslist } = require("./flipkartsellerslist");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { convertJSONtoCSV } = require("./csv");
-const { typesOfRatings, urlmaking } = require("./flipkarttext");
+const { typesOfRatings, urlmaking, fields } = require("./flipkarttext");
 
 //Calling middleware to identify the incoming JSON from the front end
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
 
-//Router to serve index file
-router.get("/", async (req, res) => {
-  res.render("options");
-});
-
-router.get("/flipkart", async (req, res) => {
-  res.render("index", {
-    site: "Flipkart",
-  });
-});
-
-router.get("/amazon", async (req, res) => {
-  res.render("index", {
-    site: "Amazon",
-  });
-});
-
+// Router to handle post request made by flipkart scraping page
 router.post("/flipkartdetails", async (req, res) => {
   try {
     console.log(req.body);
-    if (req.body.link === "" && req.body.category === "select") {
-      return res.send("Choose any category or provide any link");
-    }
+    // Storing the category to be scraped in Categories variable
+    const Categories = req["body"];
+    // Declaration of an array to store all the product details
+    let listofproducts = [];
 
-    //getting the link to be scrapped
-    if (req.body.link !== "") {
-      url = req.body.link;
-    } else if (req.body.SubCategory === "Select") {
-      url = urlmaking(req.body.category);
-    } else {
-      url = urlmaking(req.body.SubCategory);
-    }
+    // Running a loop to scrap each product
+    for (let i = 0; i < Categories.length; i++) {
+      // Storing the number of data to be scraped in numData variable
+      let numOfData = Categories[i].data;
 
-    //Number of products to be scrapped
-    let numOfData = req.body.data;
-    let arr = [],
-      data = [];
-    for (let i = 0; i < 100; i++) {
-      //Scrapping the data from the provided url from all the pages
-      let urls = url;
+      //Creating the link to be scrapped
+      let url = urlmaking(Categories[i].category);
 
-      //Changing the page number to scrap data from the next page
-      urls += `&page=${i + 1}`;
+      let arr = [],
+        data = [];
+      for (let i = 0; i < 100; i++) {
+        //Scrapping the data from the provided url from all the pages
+        let urls = url;
 
-      //function to scrap the data
-      const allProductDetails = await flipkartfetchUrlDetails(urls);
-      if (allProductDetails.length === 0) {
-        break;
+        //Changing the page number to scrap data from the next page
+        urls += `&page=${i + 1}`;
+
+        //function to scrap the data from the main page
+        const allProductDetails = await flipkartfetchUrlDetails(urls);
+
+        if (allProductDetails.length === 0) {
+          break;
+        }
+
+        //storing the coming data in arr
+        arr = [...arr, ...allProductDetails];
+        if (arr.length >= numOfData) {
+          break;
+        }
       }
 
-      //storing the coming data in arr
-      arr = [...arr, ...allProductDetails];
-      if (arr.length >= numOfData) {
-        break;
+      //arr contains the whole product but we need only required number of data so pushing the required number of data in data array
+      for (let j = 0; j < Math.min(arr.length, numOfData); j++) {
+        data[j] = arr[j];
       }
-    }
-    if (numOfData > arr.length) {
-      //checking whether the number of required data is more than or less than available data
-      res.send("Number of required data is more than available data");
-    } else {
-      for (let i = 0; i < numOfData; i++) {
-        //arr contains the whole product but we need only required number of data so pushing the required number of data in data array
-        data = [...data, arr[i]];
-      }
+
+      // Declaration of set to take records of all the scrapped fields
       const uniqueKeys = new Set();
       data.forEach((element) => {
-        for (const key in element) {
+        for (let key in element) {
           uniqueKeys.add(key);
         }
       });
-      for (let i = 0; i < numOfData; i++) {
+
+      // looping to go inside the individual products
+      for (let i = 0; i < data.length; i++) {
         // scrapping all the required details by going inside every individual products
         let details = await flipkartfetchIndividualDetails(data[i].productlink);
-        for (const key in details) {
+        for (let key in details) {
           uniqueKeys.add(key);
           data[i][key] = details[key];
         }
+
+        // if (details.sellerslink !== undefined) {
+        //   const sellerNumbers = await flipkartsellerslist(details.sellerslink);
+        //   data[i]["SellersNumbers"] = sellerNumbers;
+        //   uniqueKeys.add("SellersNumbers");
+        // }
+
+        data[i]["Platform"] = "Flipkart";
+
+        // Checking whether reviews page is available on the site or not
         if (details.reviewsLink !== undefined) {
-          let url = details.reviewsLink;
-          url = url.replace(
+          let url1 = details.reviewsLink;
+          url1 = url1.replace(
             "&marketplace=FLIPKART",
             "&aid=overall&certifiedBuyer=false&sortOrder="
           );
-          for (const key of typesOfRatings) {
-            let urls = url + `${key}`;
+
+          // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
+          for (let key of typesOfRatings) {
+            let urls = url1 + `${key}`;
             const totalReviewsandratings = await flipkartfetchReviews(
               urls,
               key
             );
-            for (const key in totalReviewsandratings) {
+            for (let key in totalReviewsandratings) {
               uniqueKeys.add(key);
               data[i][key] = totalReviewsandratings[key];
             }
+            break;
           }
         }
+
+        // Making a new array of product with required fields
+        let obj = {};
+        for (let k = 0; k < fields.length; k++) {
+          obj[fields[k]] = data[i][fields[k]];
+        }
+        listofproducts.push(obj);
+        //converting into csv file
+        // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
         console.log(i);
       }
       for (let i = 0; i < data.length; i++) {
@@ -120,63 +124,67 @@ router.post("/flipkartdetails", async (req, res) => {
           }
         });
       }
-      let category = `flipkart${req.body.SubCategory}`;
-      if (req.body.SubCategory === "Select") {
-        category = `flipkart${req.body.category}`;
-      }
-      //converting into csv file
-      convertJSONtoCSV(data, category);
-      res.send("File has been saved");
     }
+    //converting into csv file
+    // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
+    res.send(listofproducts);
   } catch (e) {
-    console.log(e);
-    res.send(e);
+    res.send("Something went wrong on router");
   }
 });
 
 router.post("/amazondetails", async (req, res) => {
   try {
-    if (req.body.link === "" && req.body.category === "select") {
-      return res.send("Choose any category or provide any link");
-    }
-    //getting the link to be scrapped
-    if (req.body.link !== "") {
-      url = req.body.link;
-      url = url.replace("nb_sb_noss_2", "sr_pg_0"); //Replacing few substrings from the url to scrap the data from more than one page
-      url = url.replace("crid", "page=0&crid");
-    } else if (req.body.SubCategory === "Select") {
-      url = `https://www.amazon.in/s?k=${req.body.category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
-    } else {
-      url = `https://www.amazon.in/s?k=${req.body.SubCategory}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
-    }
-    let numOfData = req.body.data; //Number of products to be scrapped
-    let arr = [],
-      data = [];
-    for (let i = 0; i < 2; i++) {
+    console.log(req.body);
+    // Storing the category to be scraped in Categories variable
+    const Categories = req.body;
+
+    // Declaration of an array to store all the product details
+    let listofproducts = [];
+
+    // Running a loop to scrap each product
+    for (let i = 0; i < Categories.length; i++) {
+      //Creating the link to be scrapped
+      let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
+
+      // Storing the number of data to be scraped in numData variable
+      let numOfData = Categories[i].data;
+      let arr = [],
+        data = [];
+
       //Scrapping the data from the provided url from all the pages
-      url = url.replace(`page=${i}&crid`, `page=${i + 1}&crid`); //Changing the page number to scrap data from the next page
-      url = url.replace(`sr_pg_${i}`, `sr_pg_${i + 1}`);
-      const allProductDetails = await amazonfetchUrlDetails(url); //function to scrap the data
-      arr = [...arr, ...allProductDetails]; //storing the coming data in arr
-      if (arr.length >= numOfData) {
-        break;
+      for (let i = 0; i < 100; i++) {
+        //Changing the page number to scrap data from the next page
+        url = url.replace(`page=${i}&crid`, `page=${i + 1}&crid`);
+        url = url.replace(`sr_pg_${i}`, `sr_pg_${i + 1}`);
+
+        //function to scrap the data from the main page
+        const allProductDetails = await amazonfetchUrlDetails(url);
+
+        //storing the coming data in arr
+        arr = [...arr, ...allProductDetails];
+        if (arr.length >= numOfData) {
+          break;
+        }
       }
-    }
-    if (numOfData > arr.length) {
-      //checking whether the number of required data is more than or less than available data
-      res.send("Number of required data is more than available data");
-    } else {
-      for (let i = 0; i < numOfData; i++) {
-        data = [...data, arr[i]]; //arr contains the whole product but we need only required number of data so pushing the required number of data in data array
+
+      //arr contains the whole product but we need only required number of data so pushing the required number of data in data array
+      for (let i = 0; i < Math.min(arr.length, numOfData); i++) {
+        data = [...data, arr[i]];
       }
+
+      // Declaration of set to take records of all the scrapped fields
       const uniqueKeys = new Set();
       data.forEach((element) => {
         for (const key in element) {
           uniqueKeys.add(key);
         }
       });
-      for (let i = 0; i < numOfData; i++) {
-        let details = await amazonfetchIndividualDetails(data[i].link); // scrapping all the required details by going inside every individual products
+
+      // looping to go inside the individual products
+      for (let i = 0; i < data.length; i++) {
+        // scrapping all the required details by going inside every individual products
+        let details = await amazonfetchIndividualDetails(data[i].productlink);
         for (const key in details) {
           uniqueKeys.add(key);
           data[i][key] = details[key];
@@ -191,25 +199,57 @@ router.post("/amazondetails", async (req, res) => {
         //   "two_star",
         //   "one_star",
         // ];
-        // if (details.reviewsLink !== "https://amazon.inundefined") {
-        //   const totalReviewsandratings = await amazonfetchReviews(
-        //     details.reviewsLink
-        //   );
-        //   data[i][`total Reviews and Ratings`] = totalReviewsandratings[0];
-        //   data[i][`top10reviews`] = totalReviewsandratings[1];
 
-        // for (const element of typesOfRatings) {
-        //   const str =
-        //     details.reviewsLink + `&pageNumber=1&filterByStar=${element}`;
-        //   const data1 = await amazonfetchReviews(str);
-        //   if (data1[0]) {
-        //     data[i][`${element} reviews and ratings`] = data1[0];
-        //   }
-        //   if (data1[1]) {
-        //     data[i][`top 10 ${element} reviews`] = data1[1];
-        //   }
-        // }
-        // }
+        // Checking whether reviews page is available on the site or not
+        if (details.reviewsLink !== "https://amazon.inundefined") {
+          const totalReviewsandratings = await amazonfetchReviews(
+            details.reviewsLink
+          );
+          for (const key in totalReviewsandratings) {
+            uniqueKeys.add(key);
+            data[i][key] = totalReviewsandratings[key];
+          }
+
+          // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
+          // for (const element of typesOfRatings) {
+          //   const str =
+          //     details.reviewsLink + `&pageNumber=1&filterByStar=${element}`;
+          //   const data1 = await amazonfetchReviews(str);
+          //   if (data1[0]) {
+          //     data[i][`${element} reviews and ratings`] = data1[0];
+          //   }
+          //   if (data1[1]) {
+          //     data[i][`top 10 ${element} reviews`] = data1[1];
+          //   }
+          // }
+        }
+        data[i]["Platform"] = "Amazon";
+
+        // Number of reviews is in percentage so converting in the numbers
+        for (let j = 1; j <= 5; j++) {
+          data[i][`${j} star ratings`] = Math.floor(
+            (Number(data[i][`${j} star ratings`]) *
+              Number(data[i]["Ratings"])) /
+              100
+          );
+          if (data[i][`${j} star ratings`] === NaN) {
+            data[i][`${j} star ratings`] = "0";
+          }
+        }
+
+        // Making a new array of product with required fields
+        let obj = {};
+        for (let k = 0; k < fields.length; k++) {
+          if (fields[k] === "Quantity") {
+            obj[fields[k]] = data[i]["Net Quantity"];
+          } else {
+            obj[fields[k]] = data[i][fields[k]];
+          }
+        }
+        listofproducts.push(obj);
+
+        //converting into csv file
+        convertJSONtoCSV(listofproducts, "amazonProductdetails");
         console.log(i);
       }
       for (let i = 0; i < data.length; i++) {
@@ -219,16 +259,13 @@ router.post("/amazondetails", async (req, res) => {
           }
         });
       }
-      let category = `amazon${req.body.SubCategory}`;
-      if (req.body.SubCategory === "Select") {
-        category = `amazon${req.body.category}`;
-      }
-      //converting into csv file
-      convertJSONtoCSV(data, category);
-      res.send("File has been saved");
     }
+
+    //converting into csv file
+    convertJSONtoCSV(listofproducts, "amazonProductdetails");
+    res.send("File has been saved");
   } catch (e) {
-    console.log(e);
+    console.log("Something went wrong on router");
   }
 });
 
