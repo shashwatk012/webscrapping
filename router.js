@@ -15,6 +15,59 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
 
 // Router to handle post request made by flipkart scraping page
+router.post("/flipkartdetailsbylink", async (req, res) => {
+  try {
+    //Creating the link to be scrapped
+    let url = req["body"].link;
+
+    const data = {
+      productLink: url,
+    };
+
+    // scrapping all the required details by going inside every individual products
+    let details = await flipkartfetchIndividualDetails(data.productLink);
+    for (let key in details) {
+      data[key] = details[key];
+    }
+
+    // if (details.sellerslink !== undefined) {
+    //   const sellers = await flipkartsellerslist(details.sellerslink);
+    //   data["NumberofSellers"] = sellers.NumberofSellers;
+    //   data["sellerDetails"] = sellers.sellersDetails;
+    // }
+
+    data["Platform"] = "Flipkart";
+
+    // Checking whether reviews page is available on the site or not
+    if (details.reviewsLink !== undefined) {
+      let url1 = details.reviewsLink;
+      url1 = url1.replace(
+        "&marketplace=FLIPKART",
+        "&aid=overall&certifiedBuyer=false&sortOrder="
+      );
+
+      // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
+      for (let key of typesOfRatings) {
+        let urls = url1 + `${key}`;
+        const totalReviewsandratings = await flipkartfetchReviews(urls, key);
+        for (let key in totalReviewsandratings) {
+          data[key] = totalReviewsandratings[key];
+        }
+      }
+    }
+
+    // Making a new array of product with required fields
+    let obj = {};
+    for (let k = 0; k < fields.length; k++) {
+      obj[fields[k]] = data[fields[k]];
+    }
+    res.send(obj);
+  } catch (e) {
+    res.send("Something went wrong on router");
+  }
+});
+
+// Router to handle post request made by flipkart scraping page
 router.post("/flipkartdetails", async (req, res) => {
   try {
     console.log(req.body);
@@ -76,11 +129,11 @@ router.post("/flipkartdetails", async (req, res) => {
           data[i][key] = details[key];
         }
 
-        // if (details.sellerslink !== undefined) {
-        //   const sellerNumbers = await flipkartsellerslist(details.sellerslink);
-        //   data[i]["SellersNumbers"] = sellerNumbers;
-        //   uniqueKeys.add("SellersNumbers");
-        // }
+        if (details.sellerslink !== undefined) {
+          const sellers = await flipkartsellerslist(details.sellerslink);
+          data[i]["NumberofSellers"] = sellers.NumberofSellers;
+          data[i]["sellerDetails"] = sellers.sellersDetails;
+        }
 
         data[i]["Platform"] = "Flipkart";
 
@@ -135,9 +188,8 @@ router.post("/flipkartdetails", async (req, res) => {
 
 router.post("/amazondetails", async (req, res) => {
   try {
-    console.log(req.body);
     // Storing the category to be scraped in Categories variable
-    const Categories = req.body;
+    const Categories = req["body"];
 
     // Declaration of an array to store all the product details
     let listofproducts = [];
@@ -247,10 +299,6 @@ router.post("/amazondetails", async (req, res) => {
           }
         }
         listofproducts.push(obj);
-
-        //converting into csv file
-        convertJSONtoCSV(listofproducts, "amazonProductdetails");
-        console.log(i);
       }
       for (let i = 0; i < data.length; i++) {
         uniqueKeys.forEach(function (value) {
@@ -260,10 +308,7 @@ router.post("/amazondetails", async (req, res) => {
         });
       }
     }
-
-    //converting into csv file
-    convertJSONtoCSV(listofproducts, "amazonProductdetails");
-    res.send("File has been saved");
+    res.send(listofproducts);
   } catch (e) {
     console.log("Something went wrong on router");
   }

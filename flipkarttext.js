@@ -19,18 +19,13 @@ const allProducts =
   "div._1YokD2._2GoDe3>div._1YokD2._3Mn1Gg>div._1AtVbE.col-12-12>div._13oc-S>div";
 const imglink = "img._396cs4";
 
-const typesOfRatings = [
-  "MOST_RECENT",
-  "MOST_HELPFUL",
-  "POSITIVE_FIRST",
-  "NEGATIVE_FIRST",
-];
+const typesOfRatings = ["POSITIVE_FIRST", "NEGATIVE_FIRST"];
 const urlmaking = (category) => {
   const url = `https://www.flipkart.com/search?q=${category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
   return url;
 };
 const apikey =
-  "7C8IRHI1B3TTAEEIW3EBXXX698NT9DUT8F0MRVPHM43O5C0LMJXHUCLAOB9W4M2Z2FBHHRLDCF1Q8YN3";
+  "0H64DVKZ89G6MC6F0OVKPZ62C7LJQXGZ0WXDKPLU9G3R35CC90JZEQDD32BXP4836T5HT6UJAZJKD5AH";
 
 const fields = [
   "imagelink",
@@ -51,7 +46,10 @@ const fields = [
   "1 star ratings",
   "Platform",
   "Quantity",
-  "SellersNumbers",
+  "NumberofSellers",
+  "sellerDetails",
+  "POSITIVE_FIRST",
+  "NEGATIVE_FIRST",
 ];
 
 module.exports = {

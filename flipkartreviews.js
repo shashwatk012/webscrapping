@@ -44,11 +44,14 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
           flag = false;
         }
       );
-      if (flag) {
+      // if (flag) {
+      //   break;
+      // }
+      if (review.length > 10) {
         break;
       }
-      obj[typeofreviews] = review;
     }
+    obj[typeofreviews] = review;
     return obj;
   } catch (error) {
     console.log("review");
