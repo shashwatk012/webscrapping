@@ -5,8 +5,8 @@ const { router } = require("./router");
 
 app.use(router); //Creating router to make main file neat and clean
 
-app.listen(4000, () => {
-  console.log(`Server running at ${4000}`);
+app.listen(80, () => {
+  console.log(`Server running at ${80}`);
 });
 
 module.exports = app;
