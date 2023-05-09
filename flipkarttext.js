@@ -48,6 +48,8 @@ const fields = [
   "Quantity",
   "NumberofSellers",
   "sellerDetails",
+  "Description",
+  "Number of images",
   "POSITIVE_FIRST",
   "NEGATIVE_FIRST",
 ];

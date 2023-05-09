@@ -14,6 +14,14 @@ const { typesOfRatings, urlmaking, fields } = require("./flipkarttext");
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
 
+router.get("/", async (req, res) => {
+  try {
+    res.send("HII");
+  } catch {
+    res.send("fuss");
+  }
+});
+
 // Router to handle post request made by flipkart scraping page
 router.post("/flipkartdetailsbylink", async (req, res) => {
   try {

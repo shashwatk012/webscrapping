@@ -113,7 +113,14 @@ const flipkartfetchIndividualDetails = async (url) => {
     if (sellerslink) {
       obj["sellerslink"] = `https://www.flipkart.com${sellerslink}`;
     }
+    const description = $("div._1mXcCf.RmoJUa").text();
 
+    let count = 0;
+    $("li._20Gt85._1Y_A6W").each(async (_idx, el) => {
+      count++;
+    });
+    obj["Number of images"] = count;
+    obj["Description"] = description;
     return obj;
   } catch (error) {
     res.send("something wrong with details");
