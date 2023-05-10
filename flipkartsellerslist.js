@@ -2,9 +2,9 @@ const scrapingbee = require("scrapingbee");
 const cheerio = require("cheerio");
 const { headers, apikey } = require("./flipkarttext");
 
-const flipkartsellerslist = async (url) => {
+const flipkartsellerslist = async (url, index) => {
   try {
-    var client = new scrapingbee.ScrapingBeeClient(apikey);
+    var client = new scrapingbee.ScrapingBeeClient(apikey[index]);
     var response = await client.get({
       url: url,
       params: {
@@ -39,7 +39,7 @@ const flipkartsellerslist = async (url) => {
     });
     return { NumberofSellers: count, sellersDetails };
   } catch (error) {
-    res.send("Something wrong with sellers");
+    return { NumberofSellers: 0, sellersDetails: "limitover" };
   }
 };
 

@@ -10,6 +10,8 @@ const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { convertJSONtoCSV } = require("./csv");
 const { typesOfRatings, urlmaking, fields } = require("./flipkarttext");
 
+let index = 0;
+
 //Calling middleware to identify the incoming JSON from the front end
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
@@ -39,7 +41,11 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     }
 
     if (details.sellerslink !== undefined) {
-      const sellers = await flipkartsellerslist(details.sellerslink);
+      let sellers = await flipkartsellerslist(details.sellerslink, index);
+      while (sellers.sellersDetails === "limitover" && index <= 10) {
+        index++;
+        sellers = await flipkartsellerslist(details.sellerslink, index);
+      }
       data["NumberofSellers"] = sellers.NumberofSellers;
       data["sellerDetails"] = sellers.sellersDetails;
     }
@@ -137,11 +143,15 @@ router.post("/flipkartdetails", async (req, res) => {
           data[i][key] = details[key];
         }
 
-        // if (details.sellerslink !== undefined) {
-        //   const sellers = await flipkartsellerslist(details.sellerslink);
-        //   data[i]["NumberofSellers"] = sellers.NumberofSellers;
-        //   data[i]["sellerDetails"] = sellers.sellersDetails;
-        // }
+        if (details.sellerslink !== undefined) {
+          const sellers = await flipkartsellerslist(details.sellerslink, index);
+          while (sellers.sellersDetails === "limitover" && index <= 10) {
+            index++;
+            sellers = await flipkartsellerslist(details.sellerslink, index);
+          }
+          data[i]["NumberofSellers"] = sellers.NumberofSellers;
+          data[i]["sellerDetails"] = sellers.sellersDetails;
+        }
 
         data[i]["Platform"] = "Flipkart";
 
@@ -219,7 +229,7 @@ router.post("/amazondetails", async (req, res) => {
         url = url.replace(`sr_pg_${i}`, `sr_pg_${i + 1}`);
 
         //function to scrap the data from the main page
-        const allProductDetails = await amazonfetchUrlDetails(url);
+        const allProductDetails = await amazonfetchUrlDetails(url, index);
 
         //storing the coming data in arr
         arr = [...arr, ...allProductDetails];
@@ -244,7 +254,10 @@ router.post("/amazondetails", async (req, res) => {
       // looping to go inside the individual products
       for (let i = 0; i < data.length; i++) {
         // scrapping all the required details by going inside every individual products
-        let details = await amazonfetchIndividualDetails(data[i].productlink);
+        let details = await amazonfetchIndividualDetails(
+          data[i].productlink,
+          index
+        );
         for (const key in details) {
           uniqueKeys.add(key);
           data[i][key] = details[key];
@@ -263,7 +276,8 @@ router.post("/amazondetails", async (req, res) => {
         // Checking whether reviews page is available on the site or not
         if (details.reviewsLink !== "https://amazon.inundefined") {
           const totalReviewsandratings = await amazonfetchReviews(
-            details.reviewsLink
+            details.reviewsLink,
+            index
           );
           for (const key in totalReviewsandratings) {
             uniqueKeys.add(key);
@@ -307,6 +321,7 @@ router.post("/amazondetails", async (req, res) => {
           }
         }
         listofproducts.push(obj);
+        console.log(i);
       }
       for (let i = 0; i < data.length; i++) {
         uniqueKeys.forEach(function (value) {
