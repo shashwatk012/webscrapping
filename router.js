@@ -38,11 +38,11 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
       data[key] = details[key];
     }
 
-    // if (details.sellerslink !== undefined) {
-    //   const sellers = await flipkartsellerslist(details.sellerslink);
-    //   data["NumberofSellers"] = sellers.NumberofSellers;
-    //   data["sellerDetails"] = sellers.sellersDetails;
-    // }
+    if (details.sellerslink !== undefined) {
+      const sellers = await flipkartsellerslist(details.sellerslink);
+      data["NumberofSellers"] = sellers.NumberofSellers;
+      data["sellerDetails"] = sellers.sellersDetails;
+    }
 
     data["Platform"] = "Flipkart";
 
@@ -137,11 +137,11 @@ router.post("/flipkartdetails", async (req, res) => {
           data[i][key] = details[key];
         }
 
-        if (details.sellerslink !== undefined) {
-          const sellers = await flipkartsellerslist(details.sellerslink);
-          data[i]["NumberofSellers"] = sellers.NumberofSellers;
-          data[i]["sellerDetails"] = sellers.sellersDetails;
-        }
+        // if (details.sellerslink !== undefined) {
+        //   const sellers = await flipkartsellerslist(details.sellerslink);
+        //   data[i]["NumberofSellers"] = sellers.NumberofSellers;
+        //   data[i]["sellerDetails"] = sellers.sellersDetails;
+        // }
 
         data[i]["Platform"] = "Flipkart";
 
