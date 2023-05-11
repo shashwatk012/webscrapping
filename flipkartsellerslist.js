@@ -2,9 +2,9 @@ const scrapingbee = require("scrapingbee");
 const cheerio = require("cheerio");
 const { headers, apikey } = require("./flipkarttext");
 
-const flipkartsellerslist = async (url, index) => {
+const flipkartsellerslist = async (url) => {
   try {
-    var client = new scrapingbee.ScrapingBeeClient(apikey[index]);
+    var client = new scrapingbee.ScrapingBeeClient(apikey);
     var response = await client.get({
       url: url,
       params: {
