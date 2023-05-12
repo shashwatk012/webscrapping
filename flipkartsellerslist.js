@@ -5,8 +5,8 @@ const { headers, apikey, replce } = require("./flipkarttext");
 const flipkartsellerslist = async (url) => {
   try {
     const browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
+      headless: "new",
+      // headless: `true`,
       // `headless: 'new'` enables new Headless;
       // `headless: false` enables “headful” mode.
     });
