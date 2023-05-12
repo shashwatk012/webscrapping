@@ -1,6 +1,6 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const { headers } = require("./flipkarttext");
+const { headers, replce } = require("./flipkarttext");
 
 const flipkartfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
@@ -33,6 +33,7 @@ const flipkartfetchIndividualDetails = async (url) => {
     let stars = $("div._3LWZlK._138NNC").text();
 
     if (stars && ratings) {
+      stars = replce(stars);
       obj.stars = stars;
       let p = ratings.indexOf("and");
       if (p === -1) {
@@ -42,6 +43,9 @@ const flipkartfetchIndividualDetails = async (url) => {
       let review = ratings.substring(p);
       rating = rating.replace(/\D/g, "");
       review = review.replace(/\D/g, "");
+
+      rating = replce(rating);
+      review = replce(review);
       obj["Ratings"] = rating;
       obj["Reviews"] = review;
     } else {
@@ -50,6 +54,7 @@ const flipkartfetchIndividualDetails = async (url) => {
 
       // scraping the global ratings(i.e 4.1)
       stars = $("div._2d4LTz").text();
+      stars = replce(stars);
       obj.stars = stars;
       let p = ratings.indexOf("and");
       if (p === -1) {
@@ -59,6 +64,8 @@ const flipkartfetchIndividualDetails = async (url) => {
       let review = ratings.substring(p);
       rating = rating.replace(/\D/g, "");
       review = review.replace(/\D/g, "");
+      rating = replce(rating);
+      review = replce(review);
       obj["Ratings"] = rating;
       obj["Reviews"] = review;
     }

@@ -1,7 +1,7 @@
 const axios = require("axios");
 const scrapingbee = require("scrapingbee");
 const cheerio = require("cheerio");
-const { headers } = require("./flipkarttext");
+const { headers, replce } = require("./flipkarttext");
 
 const flipkartfetchReviews = async (url, typeofreviews) => {
   try {
@@ -20,13 +20,14 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
         .children("div")
         .last()
         .text();
+
       obj.globalReviews = globalReviews;
 
       // Scraping the number of all type of ratings such as 5 star, 4 star
       $("div._13sFCC.miQW6D>ul._36LmXx>li._28Xb_u>div._1uJVNT").each(
         async (_idx, el) => {
           const x = $(el);
-          obj[`${5 - _idx} star ratings`] = x.text();
+          obj[`${5 - _idx} star ratings`] = replce(x.text());
         }
       );
 

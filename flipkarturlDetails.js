@@ -1,7 +1,7 @@
 const axios = require("axios");
 const scrapingbee = require("scrapingbee");
 const cheerio = require("cheerio");
-const { headers, allProducts, imglink } = require("./flipkarttext");
+const { headers, allProducts, imglink, replce } = require("./flipkarttext");
 
 const flipkartfetchUrlDetails = async (url) => {
   try {
@@ -26,22 +26,14 @@ const flipkartfetchUrlDetails = async (url) => {
         .attr("href");
 
       let price = beardo.find("div._30jeq3").text();
-      for (let i = 0; i < price.length; i++) {
-        if (price[i] < "0" || price[i] > "9") {
-          price = price.replace(price[i], "");
-        }
-      }
+      price = replce(price);
 
       let maxretailprice = beardo.find("div._3I9_wc").text();
 
       if (maxretailprice === "") {
         maxretailprice = price;
       } else {
-        for (let i = 0; i < maxretailprice.length; i++) {
-          if (maxretailprice[i] < "0" || maxretailprice[i] > "9") {
-            maxretailprice = maxretailprice.replace(maxretailprice[i], "");
-          }
-        }
+        maxretailprice = replce(maxretailprice);
       }
       let element = {
         imagelink,

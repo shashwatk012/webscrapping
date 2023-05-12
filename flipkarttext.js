@@ -54,6 +54,12 @@ const fields = [
   "NEGATIVE_FIRST",
 ];
 
+const replce = (str) => {
+  str = str.replace(",", "");
+  str = str.replace("₹", "");
+  return Number(str);
+};
+
 module.exports = {
   headers,
   allProducts,
@@ -62,4 +68,5 @@ module.exports = {
   urlmaking,
   apikey,
   fields,
+  replce,
 };

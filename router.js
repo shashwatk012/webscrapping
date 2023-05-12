@@ -140,11 +140,7 @@ router.post("/flipkartdetails", async (req, res) => {
         }
 
         if (details.sellerslink !== undefined) {
-          const sellers = await flipkartsellerslist(details.sellerslink, index);
-          while (sellers.sellersDetails === "limitover" && index <= 10) {
-            index++;
-            sellers = await flipkartsellerslist(details.sellerslink, index);
-          }
+          const sellers = await flipkartsellerslist(details.sellerslink);
           data[i]["NumberofSellers"] = sellers.NumberofSellers;
           data[i]["sellerDetails"] = sellers.sellersDetails;
         }
@@ -170,7 +166,6 @@ router.post("/flipkartdetails", async (req, res) => {
               uniqueKeys.add(key);
               data[i][key] = totalReviewsandratings[key];
             }
-            break;
           }
         }
 
