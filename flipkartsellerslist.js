@@ -45,7 +45,7 @@ const flipkartsellerslist = async (url) => {
     await browser.close();
     return { NumberofSellers: count, sellersDetails };
   } catch (error) {
-    return { NumberofSellers: 0, sellersDetails: "limitover" };
+    return { NumberofSellers: error, sellersDetails: "limitover" };
   }
 };
 

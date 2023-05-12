@@ -31,11 +31,11 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     let url = req["body"].link;
 
     const data = {
-      productLink: url,
+      productlink: url,
     };
 
     // scrapping all the required details by going inside every individual products
-    let details = await flipkartfetchIndividualDetails(data.productLink);
+    let details = await flipkartfetchIndividualDetails(data.productlink);
     for (let key in details) {
       data[key] = details[key];
     }
