@@ -9,7 +9,6 @@ const flipkartsellerslist = async (url) => {
       headless: `true`,
       // `headless: 'new'` enables new Headless;
       // `headless: false` enables “headful” mode.
-      args: ["--no-sandbox"],
     });
 
     const page = await browser.newPage();

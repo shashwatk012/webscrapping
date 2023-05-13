@@ -8,9 +8,11 @@ const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { convertJSONtoCSV } = require("./csv");
-const { typesOfRatings, urlmaking, fields } = require("./flipkarttext");
+const { typesOfRatings, urlmaking, fields, arr } = require("./flipkarttext");
 
 let index = 0;
+
+// convertJSONtoCSV(arr, "flipkartProductdetails");
 
 //Calling middleware to identify the incoming JSON from the front end
 router.use(express.json());

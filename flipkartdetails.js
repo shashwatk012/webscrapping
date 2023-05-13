@@ -1,14 +1,22 @@
-const axios = require("axios");
 const cheerio = require("cheerio");
+const puppeteer = require("puppeteer");
 const { headers, replce } = require("./flipkarttext");
 
 const flipkartfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
     // api to get html of the required page
-    const response = await axios.get(url, headers);
+    const browser = await puppeteer.launch({
+      // headless: "new",
+      headless: `true`,
+      // `headless: 'new'` enables new Headless;
+      // `headless: false` enables “headful” mode.
+    });
 
-    const html = response.data;
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.waitForSelector("div.col.JOpGWq", { timeout: 30000 });
+    const html = await page.content();
 
     // cheerio nodejs module to load html
     const $ = cheerio.load(html);
@@ -128,8 +136,10 @@ const flipkartfetchIndividualDetails = async (url) => {
     });
     obj["Number of images"] = count;
     obj["Description"] = description;
+    await browser.close();
     return obj;
   } catch (error) {
+    console.log("wnjkhd");
     res.send("something wrong with details");
   }
 };

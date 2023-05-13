@@ -1,5 +1,5 @@
 const axios = require("axios");
-const scrapingbee = require("scrapingbee");
+const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const { headers, replce } = require("./flipkarttext");
 
@@ -9,9 +9,21 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
     let obj = {};
     for (let i = 0; i < 1; i++) {
       let urls = url + `&page=${i + 1}`;
-      const response = await axios.get(url, headers);
+      const browser = await puppeteer.launch({
+        // headless: "new",
+        headless: `true`,
+        // `headless: 'new'` enables new Headless;
+        // `headless: false` enables “headful” mode.
+      });
 
-      const html = response.data;
+      const page = await browser.newPage();
+      await page.goto(urls, { waitUntil: "load" });
+
+      await page.waitForSelector("div._1AtVbE", {
+        timeout: 30000,
+      });
+
+      const html = await page.content();
 
       const $ = cheerio.load(html);
 
@@ -51,6 +63,7 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       if (review.length > 10) {
         break;
       }
+      await browser.close();
     }
     obj[typeofreviews] = review;
     return obj;
