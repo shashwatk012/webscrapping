@@ -12,6 +12,7 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       const browser = await puppeteer.launch({
         // headless: "new",
         headless: `true`,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
         // `headless: 'new'` enables new Headless;
         // `headless: false` enables “headful” mode.
       });
