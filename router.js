@@ -7,10 +7,12 @@ const { flipkartsellerslist } = require("./flipkartsellerslist");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
+const { nykaafetchIndividualDetails } = require("./nykaadetails");
+const { meeshofetchReviews } = require("./meeshoreviews");
 const { convertJSONtoCSV } = require("./csv");
-const { typesOfRatings, urlmaking, fields, arr } = require("./flipkarttext");
+const { typesOfRatings, urlmaking, fields } = require("./flipkarttext");
 
-let index = 0;
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // convertJSONtoCSV(arr, "flipkartProductdetails");
 
@@ -41,6 +43,7 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     for (let key in details) {
       data[key] = details[key];
     }
+    wait(1000);
 
     if (details.sellerslink !== undefined) {
       let sellers = await flipkartsellerslist(details.sellerslink);
@@ -49,6 +52,8 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     }
 
     data["Platform"] = "Flipkart";
+
+    wait(1000);
 
     // Checking whether reviews page is available on the site or not
     if (details.reviewsLink !== undefined) {
@@ -65,6 +70,7 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
         for (let key in totalReviewsandratings) {
           data[key] = totalReviewsandratings[key];
         }
+        wait(1000);
       }
     }
 
@@ -131,6 +137,7 @@ router.post("/flipkartdetails", async (req, res) => {
           uniqueKeys.add(key);
         }
       });
+      wait(1000);
 
       // looping to go inside the individual products
       for (let i = 0; i < data.length; i++) {
@@ -141,6 +148,8 @@ router.post("/flipkartdetails", async (req, res) => {
           data[i][key] = details[key];
         }
 
+        wait(1000);
+
         if (details.sellerslink !== undefined) {
           const sellers = await flipkartsellerslist(details.sellerslink);
           data[i]["NumberofSellers"] = sellers.NumberofSellers;
@@ -148,6 +157,8 @@ router.post("/flipkartdetails", async (req, res) => {
         }
 
         data[i]["Platform"] = "Flipkart";
+
+        wait(1000);
 
         // Checking whether reviews page is available on the site or not
         if (details.reviewsLink !== undefined) {
@@ -168,7 +179,10 @@ router.post("/flipkartdetails", async (req, res) => {
               uniqueKeys.add(key);
               data[i][key] = totalReviewsandratings[key];
             }
+            wait(1000);
           }
+
+          wait(1000);
         }
 
         // Making a new array of product with required fields
@@ -193,6 +207,7 @@ router.post("/flipkartdetails", async (req, res) => {
     // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
     res.send(listofproducts);
   } catch (e) {
+    console.log(e);
     res.send("Something went wrong on router");
   }
 });
@@ -274,17 +289,17 @@ router.post("/amazondetails", async (req, res) => {
           }
 
           // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
-          // for (const element of typesOfRatings) {
-          //   const str =
-          //     details.reviewsLink + `&pageNumber=1&filterByStar=${element}`;
-          //   const data1 = await amazonfetchReviews(str);
-          //   if (data1[0]) {
-          //     data[i][`${element} reviews and ratings`] = data1[0];
-          //   }
-          //   if (data1[1]) {
-          //     data[i][`top 10 ${element} reviews`] = data1[1];
-          //   }
-          // }
+          for (const element of typesOfRatings) {
+            const str =
+              details.reviewsLink + `&pageNumber=1&filterByStar=${element}`;
+            const data1 = await amazonfetchReviews(str);
+            if (data1[0]) {
+              data[i][`${element} reviews and ratings`] = data1[0];
+            }
+            if (data1[1]) {
+              data[i][`${element}`] = data1[1];
+            }
+          }
         }
         data[i]["Platform"] = "Amazon";
 
@@ -323,6 +338,46 @@ router.post("/amazondetails", async (req, res) => {
     res.send(listofproducts);
   } catch (e) {
     console.log("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetailsbylink", async (req, res) => {
+  try {
+    //Creating the link to be scrapped
+    let url = req["body"].link;
+
+    const data = {
+      productlink: url,
+    };
+
+    // scrapping all the required details by going inside every individual products
+    let details = await nykaafetchIndividualDetails(data.productlink);
+    for (let key in details) {
+      data[key] = details[key];
+    }
+
+    data["Platform"] = "meesho";
+
+    // Checking whether reviews page is available on the site or not
+    // if (details.reviewsLink !== undefined) {
+    //   let url1 = details.reviewsLink;
+
+    //   // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
+    //   // const totalReviewsandratings = await meeshofetchReviews(urls, key);
+    //   // for (let key in totalReviewsandratings) {
+    //   //   data[key] = totalReviewsandratings[key];
+    //   // }
+    // }
+
+    // Making a new array of product with required fields
+    let obj = {};
+    for (let k = 0; k < fields.length; k++) {
+      obj[fields[k]] = data[fields[k]];
+    }
+    res.send(obj);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
   }
 });
 

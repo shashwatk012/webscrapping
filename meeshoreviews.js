@@ -2,7 +2,7 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, replce } = require("./flipkarttext");
 
-const flipkartfetchIndividualDetails = async (url) => {
+const meeshofetchReviews = async (url) => {
   // function to scrap complete data about one product
   try {
     // api to get html of the required page
@@ -16,20 +16,7 @@ const flipkartfetchIndividualDetails = async (url) => {
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded" });
-    // await page.waitForSelector("div.col.JOpGWq>a", { timeout: 30000 });
-
-    let lastHeight = await page.evaluate("document.body.scrollHeight");
-
-    while (true) {
-      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-      await page.waitForTimeout(2000); // sleep a bit
-      let newHeight = await page.evaluate("document.body.scrollHeight");
-      if (newHeight === lastHeight) {
-        break;
-      }
-      lastHeight = newHeight;
-    }
-
+    await page.waitForSelector("div.col.JOpGWq", { timeout: 30000 });
     const html = await page.content();
 
     // cheerio nodejs module to load html
@@ -39,58 +26,20 @@ const flipkartfetchIndividualDetails = async (url) => {
     let obj = {};
 
     // Scraping the ProductName
-    const ProductName = $(
-      "div._1AtVbE.col-12-12>div.aMaAEs>div>h1.yhB1nd>span.B_NuCI"
-    )
-      .text()
-      .trim();
+    const ProductName = $("span.sc-eDvSVe.eeUExD").text().trim();
     if (ProductName !== undefined) {
       obj["ProductName"] = ProductName;
     }
 
     // scraping the number of global ratings
-    let ratings = $("span._2_R_DZ._2IRzS8").text();
+    let ratings = $("span.sc-eDvSVe.fxzRYQ").text();
 
     // scraping the global rating(i.e 4.1)
-    let stars = $("div._3LWZlK._138NNC").text();
+    let stars = $("h1.sc-eDvSVe.iJVEKD").text();
 
-    if (stars && ratings) {
-      stars = replce(stars);
-      obj.stars = stars;
-      let p = ratings.indexOf("and");
-      if (p === -1) {
-        p = ratings.indexOf("&");
-      }
-      let rating = ratings.substring(0, p);
-      let review = ratings.substring(p);
-      rating = rating.replace(/\D/g, "");
-      review = review.replace(/\D/g, "");
-
-      rating = replce(rating);
-      review = replce(review);
-      obj["Ratings"] = rating;
-      obj["Reviews"] = review;
-    } else {
-      // scraping the number of global ratings
-      ratings = $("div.row._2afbiS>div.col-12-12>span").text();
-
-      // scraping the global ratings(i.e 4.1)
-      stars = $("div._2d4LTz").text();
-      stars = replce(stars);
-      obj.stars = stars;
-      let p = ratings.indexOf("and");
-      if (p === -1) {
-        p = ratings.indexOf("&");
-      }
-      let rating = ratings.substring(0, p);
-      let review = ratings.substring(p);
-      rating = rating.replace(/\D/g, "");
-      review = review.replace(/\D/g, "");
-      rating = replce(rating);
-      review = replce(review);
-      obj["Ratings"] = rating;
-      obj["Reviews"] = review;
-    }
+    obj.stars = stars;
+    obj["Ratings"] = ratings;
+    // obj["Reviews"] = review;
 
     // Declaration of an array to store the Category and Sub-Categories
     let Categories = [];
@@ -158,4 +107,4 @@ const flipkartfetchIndividualDetails = async (url) => {
   }
 };
 
-module.exports = { flipkartfetchIndividualDetails };
+module.exports = { meeshofetchReviews };

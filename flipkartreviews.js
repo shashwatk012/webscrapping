@@ -18,11 +18,23 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       });
 
       const page = await browser.newPage();
-      await page.goto(urls, { waitUntil: "load" });
+      await page.goto(urls, { waitUntil: "domcontentloaded" });
 
-      await page.waitForSelector("div._1AtVbE", {
-        timeout: 30000,
-      });
+      // await page.waitForSelector("div._1AtVbE", {
+      //   timeout: 30000,
+      // });
+
+      let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+      while (true) {
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+        await page.waitForTimeout(2000); // sleep a bit
+        let newHeight = await page.evaluate("document.body.scrollHeight");
+        if (newHeight === lastHeight) {
+          break;
+        }
+        lastHeight = newHeight;
+      }
 
       const html = await page.content();
 

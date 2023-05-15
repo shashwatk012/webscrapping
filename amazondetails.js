@@ -1,27 +1,38 @@
-const axios = require("axios");
 const cheerio = require("cheerio");
+const puppeteer = require("puppeteer");
 const { headers, apikey } = require("./flipkarttext");
-const scrapingbee = require("scrapingbee");
 
 const amazonfetchIndividualDetails = async (url, index) => {
   // function to scrap complete data about one product
   try {
     // fetching the html page through scraping bee
-    var client = new scrapingbee.ScrapingBeeClient(apikey[index]);
-    var response = await client.get({
-      url: url,
-      headers,
-      params: {
-        premium_proxy: "True",
-        wait_for: "td.a-text-right.a-nowrap>span.a-size-base>a.a-link-normal",
-      },
+    const browser = await puppeteer.launch({
+      // headless: "new",
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // `headless: 'new'` enables new Headless;
+      // `headless: false` enables “headful” mode.
     });
 
-    var decoder = new TextDecoder();
-    var text = decoder.decode(response.data);
+    const page = await browser.newPage();
+    await page.goto(url);
+
+    let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+    while (true) {
+      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      await page.waitForTimeout(2000); // sleep a bit
+      let newHeight = await page.evaluate("document.body.scrollHeight");
+      if (newHeight === lastHeight) {
+        break;
+      }
+      lastHeight = newHeight;
+    }
+
+    const html = await page.content();
 
     // cheerio nodejs module to load html
-    const $ = cheerio.load(text);
+    const $ = cheerio.load(html);
 
     // Declaration of object to store the product details
     let obj = {};

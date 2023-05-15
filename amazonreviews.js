@@ -1,20 +1,44 @@
-const axios = require("axios");
 const cheerio = require("cheerio");
 const { headers, apikey } = require("./flipkarttext");
 const scrapingbee = require("scrapingbee");
+const puppeteer = require("puppeteer");
 
 const amazonfetchReviews = async (url, index) => {
   try {
-    var client = new scrapingbee.ScrapingBeeClient(apikey[index]);
-    var response = await client.get({
-      url: url,
-      headers,
-      params: {},
+    // var client = new scrapingbee.ScrapingBeeClient(apikey[index]);
+    // var response = await client.get({
+    //   url: url,
+    //   headers,
+    //   params: {},
+    // });
+
+    // var decoder = new TextDecoder();
+    // var text = decoder.decode(response.data);
+    const browser = await puppeteer.launch({
+      // headless: "new",
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // `headless: 'new'` enables new Headless;
+      // `headless: false` enables “headful” mode.
     });
 
-    var decoder = new TextDecoder();
-    var text = decoder.decode(response.data);
-    const $ = cheerio.load(text);
+    const page = await browser.newPage();
+    await page.goto(url);
+
+    let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+    while (true) {
+      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      await page.waitForTimeout(2000); // sleep a bit
+      let newHeight = await page.evaluate("document.body.scrollHeight");
+      if (newHeight === lastHeight) {
+        break;
+      }
+      lastHeight = newHeight;
+    }
+
+    const html = await page.content();
+    const $ = cheerio.load(html);
 
     let obj = {};
     // Scraping the Global number of reviews
