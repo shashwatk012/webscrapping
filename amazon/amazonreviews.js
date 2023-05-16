@@ -1,5 +1,5 @@
 const cheerio = require("cheerio");
-const { headers, apikey } = require("./flipkarttext");
+const { headers, apikey } = require("../text");
 const scrapingbee = require("scrapingbee");
 const puppeteer = require("puppeteer");
 

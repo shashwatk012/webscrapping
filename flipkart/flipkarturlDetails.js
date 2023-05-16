@@ -1,7 +1,7 @@
 const axios = require("axios");
 const scrapingbee = require("scrapingbee");
 const cheerio = require("cheerio");
-const { headers, allProducts, imglink, replce } = require("./flipkarttext");
+const { headers, allProducts, imglink, replce } = require("../text");
 
 const flipkartfetchUrlDetails = async (url) => {
   try {
@@ -45,7 +45,7 @@ const flipkartfetchUrlDetails = async (url) => {
     });
     return beards;
   } catch (error) {
-    res.send("Something wrong with urldetails");
+    return [{ message: "Can not fetch" }];
   }
 };
 

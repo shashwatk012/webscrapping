@@ -1,7 +1,7 @@
 const axios = require("axios");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
-const { headers, replce } = require("./flipkarttext");
+const { headers, replce } = require("../text");
 
 const flipkartfetchReviews = async (url, typeofreviews) => {
   try {
@@ -18,23 +18,27 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       });
 
       const page = await browser.newPage();
-      await page.goto(urls, { waitUntil: "domcontentloaded" });
+      await page.goto(urls);
+      await page.evaluate(() => {
+        document
+          .querySelector(
+            "div._1AtVbE>div._27M-vq>div.col>div.col._2wzgFH.K0kLPL"
+          )
+          .scrollIntoView();
+      });
 
-      // await page.waitForSelector("div._1AtVbE", {
-      //   timeout: 30000,
-      // });
+      // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
-      let lastHeight = await page.evaluate("document.body.scrollHeight");
-
-      while (true) {
-        await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-        await page.waitForTimeout(2000); // sleep a bit
-        let newHeight = await page.evaluate("document.body.scrollHeight");
-        if (newHeight === lastHeight) {
-          break;
-        }
-        lastHeight = newHeight;
-      }
+      // while (true) {
+      //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      //   await page.waitForTimeout(3000); // sleep a bit
+      //   let newHeight = await page.evaluate("document.body.scrollHeight");
+      //   if (newHeight === lastHeight) {
+      //     break;
+      //   }
+      //   lastHeight = newHeight;
+      // }
+      await page.waitForTimeout(3000);
 
       const html = await page.content();
 
@@ -79,10 +83,10 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       await browser.close();
     }
     obj[typeofreviews] = review;
+
     return obj;
   } catch (error) {
-    console.log("review");
-    res.send("Something wrong with reviews");
+    return { message: "Can not fetch" };
   }
 };
 

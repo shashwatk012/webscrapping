@@ -1,6 +1,6 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { headers, apikey, replce } = require("./flipkarttext");
+const { headers, apikey, replce } = require("../text");
 
 const flipkartsellerslist = async (url) => {
   try {
@@ -18,6 +18,7 @@ const flipkartsellerslist = async (url) => {
     await page.waitForSelector("div._2Y3EWJ");
 
     const html = await page.content();
+
     const $ = cheerio.load(html);
 
     let count = 0;
@@ -46,7 +47,7 @@ const flipkartsellerslist = async (url) => {
     await browser.close();
     return { NumberofSellers: count, sellersDetails };
   } catch (error) {
-    return { NumberofSellers: error, sellersDetails: "limitover" };
+    return { message: "Can not fetch" };
   }
 };
 

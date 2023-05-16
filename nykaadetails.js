@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { headers, replce } = require("./flipkarttext");
+const { headers, replce } = require("./text");
 
 const nykaafetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product

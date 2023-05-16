@@ -1,8 +1,8 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { headers, replce } = require("./flipkarttext");
+const { headers, replce } = require("../text");
 
-const meeshofetchReviews = async (url) => {
+const flipkartfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
     // api to get html of the required page
@@ -15,8 +15,26 @@ const meeshofetchReviews = async (url) => {
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "domcontentloaded" });
-    await page.waitForSelector("div.col.JOpGWq", { timeout: 30000 });
+    await page.goto(url);
+    // await page.waitForSelector("div.col.JOpGWq>a", { timeout: 60000 });
+
+    // let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+    // while (true) {
+    //   console.log("hvbj");
+    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+    //   await page.waitForTimeout(5000); // sleep a bit
+    //   let newHeight = await page.evaluate("document.body.scrollHeight");
+    //   if (newHeight === lastHeight) {
+    //     break;
+    //   }
+    //   lastHeight = newHeight;
+    // }
+
+    await page.evaluate(() => {
+      document.querySelector("div.col.JOpGWq>a").scrollIntoView();
+    });
+    await page.waitForTimeout(3000);
     const html = await page.content();
 
     // cheerio nodejs module to load html
@@ -26,20 +44,58 @@ const meeshofetchReviews = async (url) => {
     let obj = {};
 
     // Scraping the ProductName
-    const ProductName = $("span.sc-eDvSVe.eeUExD").text().trim();
+    const ProductName = $(
+      "div._1AtVbE.col-12-12>div.aMaAEs>div>h1.yhB1nd>span.B_NuCI"
+    )
+      .text()
+      .trim();
     if (ProductName !== undefined) {
       obj["ProductName"] = ProductName;
     }
 
     // scraping the number of global ratings
-    let ratings = $("span.sc-eDvSVe.fxzRYQ").text();
+    let ratings = $("span._2_R_DZ._2IRzS8").text();
 
     // scraping the global rating(i.e 4.1)
-    let stars = $("h1.sc-eDvSVe.iJVEKD").text();
+    let stars = $("div._3LWZlK._138NNC").text();
 
-    obj.stars = stars;
-    obj["Ratings"] = ratings;
-    // obj["Reviews"] = review;
+    if (stars && ratings) {
+      stars = replce(stars);
+      obj.stars = stars;
+      let p = ratings.indexOf("and");
+      if (p === -1) {
+        p = ratings.indexOf("&");
+      }
+      let rating = ratings.substring(0, p);
+      let review = ratings.substring(p);
+      rating = rating.replace(/\D/g, "");
+      review = review.replace(/\D/g, "");
+
+      rating = replce(rating);
+      review = replce(review);
+      obj["Ratings"] = rating;
+      obj["Reviews"] = review;
+    } else {
+      // scraping the number of global ratings
+      ratings = $("div.row._2afbiS>div.col-12-12>span").text();
+
+      // scraping the global ratings(i.e 4.1)
+      stars = $("div._2d4LTz").text();
+      stars = replce(stars);
+      obj.stars = stars;
+      let p = ratings.indexOf("and");
+      if (p === -1) {
+        p = ratings.indexOf("&");
+      }
+      let rating = ratings.substring(0, p);
+      let review = ratings.substring(p);
+      rating = rating.replace(/\D/g, "");
+      review = review.replace(/\D/g, "");
+      rating = replce(rating);
+      review = replce(review);
+      obj["Ratings"] = rating;
+      obj["Reviews"] = review;
+    }
 
     // Declaration of an array to store the Category and Sub-Categories
     let Categories = [];
@@ -91,7 +147,7 @@ const meeshofetchReviews = async (url) => {
     if (sellerslink) {
       obj["sellerslink"] = `https://www.flipkart.com${sellerslink}`;
     }
-    const description = $("div._1mXcCf.RmoJUa").text();
+    const description = $("div._1mXcCf").text();
 
     let count = 0;
     $("li._20Gt85._1Y_A6W").each(async (_idx, el) => {
@@ -102,9 +158,8 @@ const meeshofetchReviews = async (url) => {
     await browser.close();
     return obj;
   } catch (error) {
-    console.log("wnjkhd");
-    res.send("something wrong with details");
+    return { message: "Can not fetch" };
   }
 };
 
-module.exports = { meeshofetchReviews };
+module.exports = { flipkartfetchIndividualDetails };
