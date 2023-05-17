@@ -1,6 +1,4 @@
 "use strict";
-
-require("events").EventEmitter.defaultMaxListeners = Infinity;
 const express = require("express");
 const router = new express.Router();
 const { flipkartfetchUrlDetails } = require("./flipkart/flipkarturlDetails");

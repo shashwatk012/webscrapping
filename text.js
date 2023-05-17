@@ -38,8 +38,13 @@ const fields = [
 ];
 
 const replce = (str) => {
-  str = str.replace(",", "");
-  str = str.replace("₹", "");
+  while (str.includes(",")) {
+    str = str.replace(",", "");
+  }
+  while (str.includes("₹")) {
+    str = str.replace("₹", "");
+  }
+  console.log(str);
   return Number(str);
 };
 
