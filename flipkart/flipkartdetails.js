@@ -2,11 +2,12 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, replce } = require("../text");
 
+let browser, page;
 const flipkartfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
     // api to get html of the required page
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       // headless: "new",
       headless: `true`,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -14,7 +15,7 @@ const flipkartfetchIndividualDetails = async (url) => {
       // `headless: false` enables “headful” mode.
     });
 
-    const page = await browser.newPage();
+    page = await browser.newPage();
     await page.goto(url);
     // await page.waitForSelector("div.col.JOpGWq>a");
 
@@ -23,6 +24,9 @@ const flipkartfetchIndividualDetails = async (url) => {
     });
     await page.waitForTimeout(3000);
     const html = await page.content();
+    await page.close();
+
+    await browser.close();
 
     // cheerio nodejs module to load html
     const $ = cheerio.load(html);
@@ -52,6 +56,11 @@ const flipkartfetchIndividualDetails = async (url) => {
 
     let discount = (maxprice - price) / maxprice;
     obj["Discount%"] = Math.floor(discount * 100);
+
+    let image = $("div.CXW8mj._3nMexc>img").attr("src");
+    console.log(image);
+    obj["imagelink"] = image;
+
     // scraping the number of global ratings
     let ratings = $("span._2_R_DZ._2IRzS8").text();
 
@@ -165,9 +174,10 @@ const flipkartfetchIndividualDetails = async (url) => {
     obj["Description"] = description;
     count = null;
     description = null;
-    await browser.close();
     return obj;
   } catch (error) {
+    await page.close();
+    await browser.close();
     return { message: "Can not fetch" };
   }
 };

@@ -2,19 +2,19 @@ const axios = require("axios");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const { headers, replce } = require("../text");
-
+let browser, page;
 const flipkartfetchReviews = async (url, typeofreviews) => {
   try {
     let review = [];
     let obj = {};
     for (let i = 0; i < 1; i++) {
       let urls = url + `&page=${i + 1}`;
-      const browser = await puppeteer.launch({
+      browser = await puppeteer.launch({
         headless: `true`,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
 
-      const page = await browser.newPage();
+      page = await browser.newPage();
       await page.goto(urls);
 
       // await page.waitForSelector(
@@ -43,6 +43,8 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       // }
 
       const html = await page.content();
+      await page.close();
+      await browser.close();
 
       const $ = cheerio.load(html);
 
@@ -85,12 +87,13 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       if (review.length > 10) {
         break;
       }
-      await browser.close();
     }
     obj[typeofreviews] = review;
 
     return obj;
   } catch (error) {
+    await page.close();
+    await browser.close();
     return { message: "Can not fetch" };
   }
 };

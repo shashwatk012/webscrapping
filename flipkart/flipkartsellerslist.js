@@ -3,9 +3,10 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, apikey, replce } = require("../text");
 
+let browser, page;
 const flipkartsellerslist = async (url) => {
   try {
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       // headless: "new",
       headless: `true`,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -13,12 +14,14 @@ const flipkartsellerslist = async (url) => {
       // `headless: false` enables “headful” mode.
     });
 
-    const page = await browser.newPage();
+    page = await browser.newPage();
     await page.goto(url, { timeout: 60000 });
 
     await page.waitForSelector("div._2Y3EWJ");
 
     const html = await page.content();
+    await page.close();
+    await browser.close();
 
     const $ = cheerio.load(html);
 
@@ -45,9 +48,10 @@ const flipkartsellerslist = async (url) => {
       });
       count++;
     });
-    await browser.close();
     return { NumberofSellers: count, sellersDetails };
   } catch (error) {
+    await page.close();
+    await browser.close();
     return { message: "Can not fetch" };
   }
 };

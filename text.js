@@ -44,7 +44,6 @@ const replce = (str) => {
   while (str.includes("₹")) {
     str = str.replace("₹", "");
   }
-  console.log(str);
   return Number(str);
 };
 
