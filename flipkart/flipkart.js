@@ -1,3 +1,5 @@
+"use strict";
+
 const { flipkartfetchUrlDetails } = require("./flipkarturlDetails");
 const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
@@ -6,6 +8,7 @@ const { typesOfRatings, urlmaking, fields } = require("../text");
 
 const flipkart = async (Categories) => {
   try {
+    console.log(Categories);
     // Declaration of an array to store all the product details
     let listofproducts = [];
 
@@ -17,15 +20,14 @@ const flipkart = async (Categories) => {
       //Creating the link to be scrapped
       let url = urlmaking(Categories[i].category);
 
-      let arr = [],
-        data = [];
+      let arr = [];
+      let data = [];
       for (let i = 0; i < 100; i++) {
         //Scrapping the data from the provided url from all the pages
         let urls = url;
 
         //Changing the page number to scrap data from the next page
         urls += `&page=${i + 1}`;
-
         //function to scrap the data from the main page
         const allProductDetails = await flipkartfetchUrlDetails(urls);
 
@@ -37,6 +39,7 @@ const flipkart = async (Categories) => {
         }
         //storing the coming data in arr
         arr = [...arr, ...allProductDetails];
+        allProductDetails.length = 0;
         if (arr.length >= numOfData) {
           break;
         }
@@ -92,10 +95,13 @@ const flipkart = async (Categories) => {
             for (let key in totalReviewsandratings) {
               data[i][key] = totalReviewsandratings[key];
             }
+            urls = null;
           }
           if (!flag) {
             continue;
           }
+          flag = null;
+          url1 = null;
         }
 
         // Making a new array of product with required fields
@@ -108,6 +114,10 @@ const flipkart = async (Categories) => {
         // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
         console.log(i);
       }
+      numOfData = null;
+      url = null;
+      arr.length = 0;
+      data.length = 0;
     }
     return listofproducts;
   } catch (e) {

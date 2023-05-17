@@ -1,3 +1,4 @@
+"use strict";
 const axios = require("axios");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
@@ -10,15 +11,16 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
     for (let i = 0; i < 1; i++) {
       let urls = url + `&page=${i + 1}`;
       const browser = await puppeteer.launch({
-        // headless: "new",
         headless: `true`,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        // `headless: 'new'` enables new Headless;
-        // `headless: false` enables “headful” mode.
       });
 
       const page = await browser.newPage();
       await page.goto(urls);
+
+      // await page.waitForSelector(
+      //   "div._1AtVbE>div._27M-vq>div.col>div.col._2wzgFH.K0kLPL"
+      // );
       await page.evaluate(() => {
         document
           .querySelector(
@@ -26,6 +28,7 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
           )
           .scrollIntoView();
       });
+      await page.waitForTimeout(3000);
 
       // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
@@ -38,19 +41,19 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       //   }
       //   lastHeight = newHeight;
       // }
-      await page.waitForTimeout(3000);
 
       const html = await page.content();
 
       const $ = cheerio.load(html);
 
       // Scraping the Global number of reviews
-      const globalReviews = $("div.col-4-12._17ETNY>div.col")
+      let globalReviews = $("div.col-4-12._17ETNY>div.col")
         .children("div")
         .last()
         .text();
 
       obj.globalReviews = globalReviews;
+      globalReviews = null;
 
       // Scraping the number of all type of ratings such as 5 star, 4 star
       $("div._13sFCC.miQW6D>ul._36LmXx>li._28Xb_u>div._1uJVNT").each(
@@ -65,12 +68,14 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       $("div._1AtVbE>div._27M-vq>div.col>div.col._2wzgFH.K0kLPL").each(
         async (_idx, el) => {
           const x = $(el);
-          const title = x.find("p._2-N8zT").text();
-          const summary = x.find("div.t-ZTKy>div>div").text();
+          let title = x.find("p._2-N8zT").text();
+          let summary = x.find("div.t-ZTKy>div>div").text();
           review.push({
             title: title,
             summary: summary,
           });
+          title = null;
+          summary = null;
           flag = false;
         }
       );
@@ -83,6 +88,7 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       await browser.close();
     }
     obj[typeofreviews] = review;
+    review.length = 0;
 
     return obj;
   } catch (error) {

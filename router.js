@@ -1,3 +1,6 @@
+"use strict";
+
+require("events").EventEmitter.defaultMaxListeners = Infinity;
 const express = require("express");
 const router = new express.Router();
 const { flipkartfetchUrlDetails } = require("./flipkart/flipkarturlDetails");
@@ -7,7 +10,7 @@ const {
 } = require("./flipkart/flipkartdetails");
 const { flipkartsellerslist } = require("./flipkart/flipkartsellerslist");
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
-const { convertJSONtoCSV } = require("./csv");
+// const { convertJSONtoCSV } = require("./csv");
 const { typesOfRatings, urlmaking, fields } = require("./text");
 const { amazon } = require("./amazon/amazon");
 const { flipkart } = require("./flipkart/flipkart");

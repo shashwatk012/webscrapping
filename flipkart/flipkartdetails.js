@@ -1,3 +1,4 @@
+"use strict";
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, replce } = require("../text");
@@ -16,20 +17,7 @@ const flipkartfetchIndividualDetails = async (url) => {
 
     const page = await browser.newPage();
     await page.goto(url);
-    // await page.waitForSelector("div.col.JOpGWq>a", { timeout: 60000 });
-
-    // let lastHeight = await page.evaluate("document.body.scrollHeight");
-
-    // while (true) {
-    //   console.log("hvbj");
-    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-    //   await page.waitForTimeout(5000); // sleep a bit
-    //   let newHeight = await page.evaluate("document.body.scrollHeight");
-    //   if (newHeight === lastHeight) {
-    //     break;
-    //   }
-    //   lastHeight = newHeight;
-    // }
+    // await page.waitForSelector("div.col.JOpGWq>a");
 
     await page.evaluate(() => {
       document.querySelector("div.col.JOpGWq>a").scrollIntoView();
@@ -44,7 +32,7 @@ const flipkartfetchIndividualDetails = async (url) => {
     let obj = {};
 
     // Scraping the ProductName
-    const ProductName = $(
+    let ProductName = $(
       "div._1AtVbE.col-12-12>div.aMaAEs>div>h1.yhB1nd>span.B_NuCI"
     )
       .text()
@@ -53,6 +41,7 @@ const flipkartfetchIndividualDetails = async (url) => {
       obj["ProductName"] = ProductName;
     }
 
+    ProductName = null;
     // scraping the number of global ratings
     let ratings = $("span._2_R_DZ._2IRzS8").text();
 
@@ -77,10 +66,10 @@ const flipkartfetchIndividualDetails = async (url) => {
       obj["Reviews"] = review;
     } else {
       // scraping the number of global ratings
-      ratings = $("div.row._2afbiS>div.col-12-12>span").text();
+      let ratings = $("div.row._2afbiS>div.col-12-12>span").text();
 
       // scraping the global ratings(i.e 4.1)
-      stars = $("div._2d4LTz").text();
+      let stars = $("div._2d4LTz").text();
       stars = replce(stars);
       obj.stars = stars;
       let p = ratings.indexOf("and");
@@ -96,6 +85,8 @@ const flipkartfetchIndividualDetails = async (url) => {
       obj["Ratings"] = rating;
       obj["Reviews"] = review;
     }
+    ratings = null;
+    stars = null;
 
     // Declaration of an array to store the Category and Sub-Categories
     let Categories = [];
@@ -103,20 +94,23 @@ const flipkartfetchIndividualDetails = async (url) => {
     //selecting the category element and the looping to get the category and sub-category
     $("div._1MR4o5>div._3GIHBu").each(async (_idx, el) => {
       const x = $(el);
-      const category = x.find("a._2whKao").text();
+      let category = x.find("a._2whKao").text();
       if (category) {
         Categories.push(category);
       }
+      category = null;
     });
     obj["Mother Category"] = Categories[1];
     obj["Category"] = Categories[2];
     obj["Brand"] = Categories[Categories.length - 1];
+    Categories.length = 0;
 
     //scraping the pagelink for the reviews
-    const reviewsLink = $("div.col.JOpGWq>a").attr("href");
+    let reviewsLink = $("div.col.JOpGWq>a").attr("href");
     if (reviewsLink !== undefined) {
       obj["reviewsLink"] = `https://www.flipkart.com${reviewsLink}`;
     }
+    reviewsLink = null;
 
     // Declaration of an array to store the highlights of products
     let highLits = [];
@@ -131,23 +125,27 @@ const flipkartfetchIndividualDetails = async (url) => {
         obj["HighLights"] = highLits;
       }
     });
+    highLits.length = 0;
 
     //selecting the product details element and the looping to get the complete product details
     $("table._14cfVK>tbody>tr._1s_Smc.row").each(async (_idx, el) => {
       const x = $(el);
-      const key = x.find("td._1hKmbr.col.col-3-12").text();
-      const value = x.find("li._21lJbe").text();
+      let key = x.find("td._1hKmbr.col.col-3-12").text();
+      let value = x.find("li._21lJbe").text();
       if (key !== "" && value !== "") {
         obj[key] = value;
       }
+      key = null;
+      value = null;
     });
 
     // Scraping the sellers page link
-    const sellerslink = $("li._38I6QT>a").attr("href");
+    let sellerslink = $("li._38I6QT>a").attr("href");
     if (sellerslink) {
       obj["sellerslink"] = `https://www.flipkart.com${sellerslink}`;
     }
-    const description = $("div._1mXcCf").text();
+    sellerslink = null;
+    let description = $("div._1mXcCf").text();
 
     let count = 0;
     $("li._20Gt85._1Y_A6W").each(async (_idx, el) => {
@@ -155,6 +153,8 @@ const flipkartfetchIndividualDetails = async (url) => {
     });
     obj["Number of images"] = count;
     obj["Description"] = description;
+    count = null;
+    description = null;
     await browser.close();
     return obj;
   } catch (error) {

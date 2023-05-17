@@ -1,3 +1,4 @@
+"use strict";
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, apikey, replce } = require("../text");
