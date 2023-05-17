@@ -1,4 +1,3 @@
-"use strict";
 const axios = require("axios");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
@@ -28,6 +27,7 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
           )
           .scrollIntoView();
       });
+
       await page.waitForTimeout(3000);
 
       // let lastHeight = await page.evaluate("document.body.scrollHeight");
@@ -88,7 +88,6 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
       await browser.close();
     }
     obj[typeofreviews] = review;
-    review.length = 0;
 
     return obj;
   } catch (error) {
