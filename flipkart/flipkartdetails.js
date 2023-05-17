@@ -41,6 +41,17 @@ const flipkartfetchIndividualDetails = async (url) => {
     }
 
     ProductName = null;
+
+    let price = $("div._30jeq3._16Jk6d").text();
+    price = replce(price);
+    obj["price"] = price;
+
+    let maxprice = $("div._3I9_wc._2p6lqe").text();
+    maxprice = replce(maxprice);
+    obj["maxretailprice"] = maxprice;
+
+    let discount = (maxprice - price) / maxprice;
+    obj["Discount%"] = Math.floor(discount * 100);
     // scraping the number of global ratings
     let ratings = $("span._2_R_DZ._2IRzS8").text();
 

@@ -16,6 +16,7 @@ const fields = [
   "Brand",
   "price",
   "maxretailprice",
+  "Discount%",
   "stars",
   "Ratings",
   "Reviews",
