@@ -12,6 +12,9 @@ const { nykaafetchIndividualDetails } = require("./nykaadetails");
 const { typesOfRatings, urlmaking, fields } = require("./text");
 const { amazon } = require("./amazon/amazon");
 const { flipkart } = require("./flipkart/flipkart");
+const { flipkart2 } = require("./flipkart2/flipkart");
+const { flipkart3 } = require("./flipkart3/flipkart");
+const { flipkart4 } = require("./flipkart4/flipkart");
 
 // convertJSONtoCSV(arr, "flipkartProductdetails");
 
@@ -109,9 +112,39 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
 });
 
 // Router to handle post request made by flipkart scraping page
-router.post("/flipkartdetails", async (req, res) => {
+router.post("/flipkartdetails1", async (req, res) => {
   try {
     const listofproducts = await flipkart(req["body"]);
+    res.send(listofproducts);
+  } catch (e) {
+    res.send("Check the input format");
+  }
+});
+
+// Router to handle post request made by flipkart scraping page
+router.post("/flipkartdetails2", async (req, res) => {
+  try {
+    const listofproducts = await flipkart2(req["body"]);
+    res.send(listofproducts);
+  } catch (e) {
+    res.send("Check the input format");
+  }
+});
+
+// Router to handle post request made by flipkart scraping page
+router.post("/flipkartdetails3", async (req, res) => {
+  try {
+    const listofproducts = await flipkart3(req["body"]);
+    res.send(listofproducts);
+  } catch (e) {
+    res.send("Check the input format");
+  }
+});
+
+// Router to handle post request made by flipkart scraping page
+router.post("/flipkartdetails4", async (req, res) => {
+  try {
+    const listofproducts = await flipkart4(req["body"]);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");

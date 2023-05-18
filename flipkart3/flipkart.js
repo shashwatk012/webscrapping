@@ -11,7 +11,7 @@ const urlmaking = (category) => {
   return url;
 };
 
-const flipkart = async (Categories) => {
+const flipkart3 = async (Categories) => {
   try {
     console.log(Categories);
     // Declaration of an array to store all the product details
@@ -141,4 +141,4 @@ const flipkart = async (Categories) => {
   }
 };
 
-module.exports = { flipkart };
+module.exports = { flipkart3 };
