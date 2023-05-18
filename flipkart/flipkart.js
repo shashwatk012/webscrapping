@@ -21,7 +21,7 @@ const flipkart = async (Categories) => {
     for (let i = 0; i < Categories.length; i++) {
       // Storing the number of data to be scraped in numData variable
       let numOfData = Categories[i].data;
-
+      let category = Categories[i].category;
       //Creating the link to be scrapped
       let url = urlmaking(Categories[i].category);
 
@@ -56,11 +56,11 @@ const flipkart = async (Categories) => {
       }
 
       // looping to go inside the individual products
-      for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data.length; j++) {
         let browser, page;
         // scrapping all the required details by going inside every individual products
         let details = await flipkartfetchIndividualDetails(
-          data[i].productlink,
+          data[j].productlink,
           browser,
           page
         );
@@ -68,23 +68,27 @@ const flipkart = async (Categories) => {
           continue;
         }
         for (let key in details) {
-          data[i][key] = details[key];
+          data[j][key] = details[key];
         }
 
         if (details.sellerslink !== undefined) {
           const sellers = await flipkartsellerslist(
             details.sellerslink,
             browser,
-            page
+            page,
+            data[j]["ProductName"]
           );
           if (sellers.message === "Can not fetch") {
             continue;
           }
-          data[i]["NumberofSellers"] = sellers.NumberofSellers;
-          data[i]["sellerDetails"] = sellers.sellersDetails;
+          data[j]["NumberofSellers"] = sellers.NumberofSellers;
+          data[j]["sellerDetails"] = sellers.sellersDetails;
+          data[j]["Max Price"] = sellers["Max Price"];
+          data[j]["Min Price"] = sellers["Min Price"];
+          data[j]["St-dev-Price"] = sellers["St-dev-Price"];
         }
 
-        data[i]["Platform"] = "Flipkart";
+        data[j]["Platform"] = "Flipkart";
 
         // Checking whether reviews page is available on the site or not
         if (details.reviewsLink !== undefined) {
@@ -102,14 +106,15 @@ const flipkart = async (Categories) => {
               urls,
               key,
               browser,
-              page
+              page,
+              data[j]["ProductName"]
             );
             if (totalReviewsandratings.message === "Can not fetch") {
               flag = false;
               break;
             }
             for (let key in totalReviewsandratings) {
-              data[i][key] = totalReviewsandratings[key];
+              data[j][key] = totalReviewsandratings[key];
             }
             urls = null;
           }
@@ -120,15 +125,44 @@ const flipkart = async (Categories) => {
           url1 = null;
         }
 
+        let NetRatingRank =
+          (data[j]["5 star ratings"] +
+            data[j]["4 star ratings"] -
+            (data[j]["2 star ratings"] + data[j]["1 star ratings"])) /
+          (data[j]["5 star ratings"] +
+            data[j]["4 star ratings"] +
+            data[j]["3 star ratings"] +
+            (data[j]["2 star ratings"] + data[j]["1 star ratings"]));
+
+        data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
+
+        data[j]["Title Length"] = data[j]["ProductName"].length;
+
+        data[j]["Description Length"] = data[j]["Description"].length;
+
+        const date = new Date();
+        const options = {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
+
+        data[j]["Date"] = date.toLocaleString("en-IN", options);
+
+        data[j]["Search Term"] = category;
+
+        data[j]["Position"] = i + 1;
+
         // Making a new array of product with required fields
         let obj = {};
         for (let k = 0; k < fields.length; k++) {
-          obj[fields[k]] = data[i][fields[k]];
+          obj[fields[k]] = data[j][fields[k]];
         }
         listofproducts.push(obj);
         //converting into csv file
         // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
-        console.log(i);
+        console.log(j);
       }
       numOfData = null;
       url = null;

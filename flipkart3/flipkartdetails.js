@@ -21,7 +21,7 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     await page.evaluate(() => {
       document.querySelector("div.col.JOpGWq>a").scrollIntoView();
     });
-    await page.waitForTimeout(1000);
+    // await page.waitForTimeout(1000);
     const html = await page.content();
     await page.close();
 
@@ -50,7 +50,11 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     obj["price"] = price;
 
     let maxprice = $("div._3I9_wc._2p6lqe").text();
-    maxprice = replce(maxprice);
+    if (maxprice === "") {
+      maxprice = price;
+    } else {
+      maxprice = replce(maxprice);
+    }
     obj["maxretailprice"] = maxprice;
 
     let discount = (maxprice - price) / maxprice;

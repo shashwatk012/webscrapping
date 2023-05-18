@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, apikey, replce } = require("../text");
 
-const flipkartsellerslist = async (url, browser, page) => {
+const flipkartsellerslist = async (url, browser, page, ProductName) => {
   try {
     browser = await puppeteer.launch({
       // headless: "new",
@@ -23,8 +23,11 @@ const flipkartsellerslist = async (url, browser, page) => {
     await browser.close();
 
     const $ = cheerio.load(html);
+    console.log("sellers");
 
-    let count = 0;
+    let count = 0,
+      mn = 1000000,
+      mx = 0;
     let sellersDetails = [];
     $("div._2Y3EWJ").each(async (_idx, el) => {
       const x = $(el);
@@ -33,6 +36,8 @@ const flipkartsellerslist = async (url, browser, page) => {
       Ratings = replce(Ratings);
       let price = x.find("div._25b18c>div._30jeq3").text();
       price = replce(price);
+      mx = Math.max(mx, price);
+      mn = Math.min(mn, price);
       let flipkartassured = x.find("div._3J2v2E>div>img").attr("src");
       if (flipkartassured) {
         flipkartassured = true;
@@ -44,10 +49,18 @@ const flipkartsellerslist = async (url, browser, page) => {
         price,
         Ratings,
         flipkartassured,
+        ProductName,
       });
       count++;
     });
-    return { NumberofSellers: count, sellersDetails };
+
+    return {
+      "St-dev-Price": mx - mn,
+      "Min Price": mn,
+      "Max Price": mx,
+      NumberofSellers: count,
+      sellersDetails,
+    };
   } catch (error) {
     await page.close();
     await browser.close();

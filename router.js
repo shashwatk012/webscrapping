@@ -8,7 +8,7 @@ const {
 } = require("./flipkart/flipkartdetails");
 const { flipkartsellerslist } = require("./flipkart/flipkartsellerslist");
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
-// const { convertJSONtoCSV } = require("./csv");
+const { convertJSONtoCSV } = require("./csv");
 const { typesOfRatings, urlmaking, fields } = require("./text");
 const { amazon } = require("./amazon/amazon");
 const { flipkart } = require("./flipkart/flipkart");
@@ -115,6 +115,27 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
 router.post("/flipkartdetails1", async (req, res) => {
   try {
     const listofproducts = await flipkart(req["body"]);
+    const listofsellers = [],
+      listofreviews = [];
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      }
+      delete listofproducts[i].sellerDetails;
+    }
+
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      }
+      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      }
+      delete listofproducts[i]["POSITIVE_FIRST"];
+      delete listofproducts[i]["NEGATIVE_FIRST"];
+    }
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -125,6 +146,27 @@ router.post("/flipkartdetails1", async (req, res) => {
 router.post("/flipkartdetails2", async (req, res) => {
   try {
     const listofproducts = await flipkart2(req["body"]);
+    const listofsellers = [],
+      listofreviews = [];
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      }
+      delete listofproducts[i].sellerDetails;
+    }
+
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      }
+      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      }
+      delete listofproducts[i]["POSITIVE_FIRST"];
+      delete listofproducts[i]["NEGATIVE_FIRST"];
+    }
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -135,6 +177,27 @@ router.post("/flipkartdetails2", async (req, res) => {
 router.post("/flipkartdetails3", async (req, res) => {
   try {
     const listofproducts = await flipkart3(req["body"]);
+    const listofsellers = [],
+      listofreviews = [];
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      }
+      delete listofproducts[i].sellerDetails;
+    }
+
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      }
+      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      }
+      delete listofproducts[i]["POSITIVE_FIRST"];
+      delete listofproducts[i]["NEGATIVE_FIRST"];
+    }
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -145,6 +208,27 @@ router.post("/flipkartdetails3", async (req, res) => {
 router.post("/flipkartdetails4", async (req, res) => {
   try {
     const listofproducts = await flipkart4(req["body"]);
+    const listofsellers = [],
+      listofreviews = [];
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      }
+      delete listofproducts[i].sellerDetails;
+    }
+
+    for (let i = 0; i < listofproducts.length; i++) {
+      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      }
+      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      }
+      delete listofproducts[i]["POSITIVE_FIRST"];
+      delete listofproducts[i]["NEGATIVE_FIRST"];
+    }
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");

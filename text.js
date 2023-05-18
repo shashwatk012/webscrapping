@@ -12,11 +12,11 @@ const urlmaking = (category) => {
 const fields = [
   "imagelink",
   "productlink",
+  "Position",
   "ProductName",
   "Brand",
   "price",
   "maxretailprice",
-  "Discount%",
   "stars",
   "Ratings",
   "Reviews",
@@ -35,6 +35,16 @@ const fields = [
   "Number of images",
   "POSITIVE_FIRST",
   "NEGATIVE_FIRST",
+  "Net Rating Score (NRS)",
+  "Is Ad? Yes/no",
+  "Discount%",
+  "Search Term",
+  "Min Price",
+  "Max Price",
+  "St-dev-Price",
+  "Title Length",
+  "Description Length",
+  "Date",
 ];
 
 const replce = (str) => {

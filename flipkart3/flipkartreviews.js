@@ -3,7 +3,13 @@ const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const { headers, replce } = require("../text");
 
-const flipkartfetchReviews = async (url, typeofreviews, browser, page) => {
+const flipkartfetchReviews = async (
+  url,
+  typeofreviews,
+  browser,
+  page,
+  ProductName
+) => {
   try {
     let review = [];
     let obj = {};
@@ -28,7 +34,7 @@ const flipkartfetchReviews = async (url, typeofreviews, browser, page) => {
           .scrollIntoView();
       });
 
-      await page.waitForTimeout(1000);
+      // await page.waitForTimeout(1000);
 
       // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
@@ -48,14 +54,7 @@ const flipkartfetchReviews = async (url, typeofreviews, browser, page) => {
 
       const $ = cheerio.load(html);
 
-      // Scraping the Global number of reviews
-      let globalReviews = $("div.col-4-12._17ETNY>div.col")
-        .children("div")
-        .last()
-        .text();
-
-      obj.globalReviews = globalReviews;
-      globalReviews = null;
+      console.log(typeofreviews);
 
       // Scraping the number of all type of ratings such as 5 star, 4 star
       $("div._13sFCC.miQW6D>ul._36LmXx>li._28Xb_u>div._1uJVNT").each(
@@ -72,18 +71,30 @@ const flipkartfetchReviews = async (url, typeofreviews, browser, page) => {
           const x = $(el);
           let title = x.find("p._2-N8zT").text();
           let summary = x.find("div.t-ZTKy>div>div").last().text();
+          let type;
+          if (typeofreviews === "POSITIVE_FIRST") {
+            type = "POSITIVE";
+          } else {
+            type = "NEGATIVE";
+          }
           if (title && summary) {
             review.push({
               title: title,
               summary: summary,
+              type: type,
+              ProductName,
             });
           } else if (title) {
             review.push({
               title: title,
+              type: type,
+              ProductName,
             });
           } else {
             review.push({
               summary: summary,
+              type: type,
+              ProductName,
             });
           }
           title = null;
