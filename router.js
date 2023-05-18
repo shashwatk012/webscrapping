@@ -30,6 +30,7 @@ router.get("/", async (req, res) => {
 // Router to handle post request made by flipkart scraping page
 router.post("/flipkartdetailsbylink", async (req, res) => {
   try {
+    let browser, page;
     let flag = true;
     //Creating the link to be scrapped
     let url = req["body"].link;
@@ -39,7 +40,11 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     };
 
     // scrapping all the required details by going inside every individual products
-    let details = await flipkartfetchIndividualDetails(data.productlink);
+    let details = await flipkartfetchIndividualDetails(
+      data.productlink,
+      browser,
+      page
+    );
     if (details.message === "Can not fetch") {
       flag = false;
     }
@@ -48,7 +53,11 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     }
 
     if (details.sellerslink !== undefined) {
-      let sellers = await flipkartsellerslist(details.sellerslink);
+      let sellers = await flipkartsellerslist(
+        details.sellerslink,
+        browser,
+        page
+      );
       if (sellers.message === "Can not fetch") {
         flag = false;
       }
@@ -69,7 +78,12 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
       // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
       for (let key of typesOfRatings) {
         let urls = url1 + `${key}`;
-        const totalReviewsandratings = await flipkartfetchReviews(urls, key);
+        const totalReviewsandratings = await flipkartfetchReviews(
+          urls,
+          key,
+          browser,
+          page
+        );
         if (totalReviewsandratings.message === "Can not fetch") {
           flag = false;
         }
