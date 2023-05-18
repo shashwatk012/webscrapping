@@ -2,8 +2,8 @@ const axios = require("axios");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const { headers, replce } = require("../text");
-let browser, page;
-const flipkartfetchReviews = async (url, typeofreviews) => {
+
+const flipkartfetchReviews = async (url, typeofreviews, browser, page) => {
   try {
     let review = [];
     let obj = {};
@@ -28,7 +28,7 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
           .scrollIntoView();
       });
 
-      await page.waitForTimeout(3000);
+      await page.waitForTimeout(1000);
 
       // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
@@ -71,11 +71,21 @@ const flipkartfetchReviews = async (url, typeofreviews) => {
         async (_idx, el) => {
           const x = $(el);
           let title = x.find("p._2-N8zT").text();
-          let summary = x.find("div.t-ZTKy>div>div").text();
-          review.push({
-            title: title,
-            summary: summary,
-          });
+          let summary = x.find("div.t-ZTKy>div>div").last().text();
+          if (title && summary) {
+            review.push({
+              title: title,
+              summary: summary,
+            });
+          } else if (title) {
+            review.push({
+              title: title,
+            });
+          } else {
+            review.push({
+              summary: summary,
+            });
+          }
           title = null;
           summary = null;
           flag = false;

@@ -2,8 +2,7 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, replce } = require("../text");
 
-let browser, page;
-const flipkartfetchIndividualDetails = async (url) => {
+const flipkartfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
     // api to get html of the required page
@@ -22,7 +21,7 @@ const flipkartfetchIndividualDetails = async (url) => {
     await page.evaluate(() => {
       document.querySelector("div.col.JOpGWq>a").scrollIntoView();
     });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
     const html = await page.content();
     await page.close();
 
@@ -58,6 +57,9 @@ const flipkartfetchIndividualDetails = async (url) => {
     obj["Discount%"] = Math.floor(discount * 100);
 
     let image = $("div.CXW8mj._3nMexc>img").attr("src");
+    if (image === undefined) {
+      image = $("img._2r_T1I._396QI4").attr("src");
+    }
     console.log(image);
     obj["imagelink"] = image;
 

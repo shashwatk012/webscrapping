@@ -3,8 +3,7 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, apikey, replce } = require("../text");
 
-let browser, page;
-const flipkartsellerslist = async (url) => {
+const flipkartsellerslist = async (url, browser, page) => {
   try {
     browser = await puppeteer.launch({
       // headless: "new",

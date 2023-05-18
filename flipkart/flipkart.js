@@ -52,8 +52,13 @@ const flipkart = async (Categories) => {
 
       // looping to go inside the individual products
       for (let i = 0; i < data.length; i++) {
+        let browser, page;
         // scrapping all the required details by going inside every individual products
-        let details = await flipkartfetchIndividualDetails(data[i].productlink);
+        let details = await flipkartfetchIndividualDetails(
+          data[i].productlink,
+          browser,
+          page
+        );
         if (details.message === "Can not fetch") {
           continue;
         }
@@ -62,7 +67,11 @@ const flipkart = async (Categories) => {
         }
 
         if (details.sellerslink !== undefined) {
-          const sellers = await flipkartsellerslist(details.sellerslink);
+          const sellers = await flipkartsellerslist(
+            details.sellerslink,
+            browser,
+            page
+          );
           if (sellers.message === "Can not fetch") {
             continue;
           }
@@ -86,7 +95,9 @@ const flipkart = async (Categories) => {
             let urls = url1 + `${key}`;
             const totalReviewsandratings = await flipkartfetchReviews(
               urls,
-              key
+              key,
+              browser,
+              page
             );
             if (totalReviewsandratings.message === "Can not fetch") {
               flag = false;
