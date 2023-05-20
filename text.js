@@ -36,7 +36,6 @@ const fields = [
   "POSITIVE_FIRST",
   "NEGATIVE_FIRST",
   "Net Rating Score (NRS)",
-  "Is Ad? Yes/no",
   "Discount%",
   "Search Term",
   "Min Price",

@@ -15,6 +15,7 @@ const { flipkart } = require("./flipkart/flipkart");
 const { flipkart2 } = require("./flipkart2/flipkart");
 const { flipkart3 } = require("./flipkart3/flipkart");
 const { flipkart4 } = require("./flipkart4/flipkart");
+const connection = require("./connection");
 
 // convertJSONtoCSV(arr, "flipkartProductdetails");
 
@@ -37,7 +38,6 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     let flag = true;
     //Creating the link to be scrapped
     let url = req["body"].link;
-
     const data = {
       productlink: url,
     };
@@ -104,6 +104,7 @@ router.post("/flipkartdetailsbylink", async (req, res) => {
     if (!flag) {
       res.send("Something went wrong! Try again");
     } else {
+      console.log(obj);
       res.send(obj);
     }
   } catch (e) {
@@ -118,24 +119,87 @@ router.post("/flipkartdetails1", async (req, res) => {
     const listofsellers = [],
       listofreviews = [];
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
-        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      if (listofproducts[i].sellerDetails) {
+        for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+          listofsellers.push(listofproducts[i].sellerDetails[j]);
+        }
       }
       delete listofproducts[i].sellerDetails;
     }
 
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      if (listofproducts[i]["POSITIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+        }
       }
-      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      if (listofproducts[i]["NEGATIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+        }
       }
       delete listofproducts[i]["POSITIVE_FIRST"];
       delete listofproducts[i]["NEGATIVE_FIRST"];
     }
+    // let Product =
+    //   "INSERT INTO PRODUCT_TABLE (imagelink, productlink, Position, ProductName, Brand, price, maxretailprice, stars, Num_Ratings, Num_Reviews, Mother_Category, Category,num_1_star_ratings,num_2_star_ratings,num_3_star_ratings,num_4_star_ratings,num_5_star_ratings,Platform,Quantity, Num_sellers, Description, Num_Images,Net_Rating_Score_NRS, Discount,Search_Term,Min_Price, Max_Price, St_dev_Price, Title_Length, Description_Length, Date) VALUES ?";
 
-    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
+    // let Seller =
+    //   "INSERT INTO SELLER_TABLE (Seller_Name, price, Ratings,Flipkart_Assured, ProductName ) VALUES ?";
+
+    // let Reviews =
+    //   "INSERT INTO Reviews_TABLE (Title, Summary, Type, ProductName ) VALUES ?";
+
+    // let values = [],
+    //   values1 = [],
+    //   values2 = [];
+    // //Make an array of values:
+    // for (let i = 0; i < listofproducts.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofproducts[i]) {
+    //     keys.push(listofproducts[i][value]);
+    //   }
+    //   values.push(keys);
+    // }
+    // for (let i = 0; i < listofsellers.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofsellers[i]) {
+    //     keys.push(listofsellers[i][value]);
+    //   }
+    //   values1.push(keys);
+    // }
+    // for (let i = 0; i < listofreviews.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofreviews[i]) {
+    //     keys.push(listofreviews[i][value]);
+    //   }
+    //   values2.push(keys);
+    // }
+    // //Execute the SQL statement, with the value array:
+    // connection.query(Product, [values], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Seller, [values1], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Reviews, [values2], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(
+    //   "SELECT * FROM PRODUCT_TABLE",
+    //   function (err, result, fields) {
+    //     if (err) throw err;
+    //     console.log(result);
+    //   }
+    // );
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 1);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -149,24 +213,87 @@ router.post("/flipkartdetails2", async (req, res) => {
     const listofsellers = [],
       listofreviews = [];
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
-        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      if (listofproducts[i].sellerDetails) {
+        for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+          listofsellers.push(listofproducts[i].sellerDetails[j]);
+        }
       }
       delete listofproducts[i].sellerDetails;
     }
 
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      if (listofproducts[i]["POSITIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+        }
       }
-      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      if (listofproducts[i]["NEGATIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+        }
       }
       delete listofproducts[i]["POSITIVE_FIRST"];
       delete listofproducts[i]["NEGATIVE_FIRST"];
     }
+    // let Product =
+    //   "INSERT INTO PRODUCT_TABLE (imagelink, productlink, Position, ProductName, Brand, price, maxretailprice, stars, Num_Ratings, Num_Reviews, Mother_Category, Category,num_1_star_ratings,num_2_star_ratings,num_3_star_ratings,num_4_star_ratings,num_5_star_ratings,Platform,Quantity, Num_sellers, Description, Num_Images,Net_Rating_Score_NRS, Discount,Search_Term,Min_Price, Max_Price, St_dev_Price, Title_Length, Description_Length, Date) VALUES ?";
 
-    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
+    // let Seller =
+    //   "INSERT INTO SELLER_TABLE (Seller_Name, price, Ratings,Flipkart_Assured, ProductName ) VALUES ?";
+
+    // let Reviews =
+    //   "INSERT INTO Reviews_TABLE (Title, Summary, Type, ProductName ) VALUES ?";
+
+    // let values = [],
+    //   values1 = [],
+    //   values2 = [];
+    // //Make an array of values:
+    // for (let i = 0; i < listofproducts.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofproducts[i]) {
+    //     keys.push(listofproducts[i][value]);
+    //   }
+    //   values.push(keys);
+    // }
+    // for (let i = 0; i < listofsellers.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofsellers[i]) {
+    //     keys.push(listofsellers[i][value]);
+    //   }
+    //   values1.push(keys);
+    // }
+    // for (let i = 0; i < listofreviews.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofreviews[i]) {
+    //     keys.push(listofreviews[i][value]);
+    //   }
+    //   values2.push(keys);
+    // }
+    // //Execute the SQL statement, with the value array:
+    // connection.query(Product, [values], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Seller, [values1], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Reviews, [values2], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(
+    //   "SELECT * FROM PRODUCT_TABLE",
+    //   function (err, result, fields) {
+    //     if (err) throw err;
+    //     console.log(result);
+    //   }
+    // );
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 2);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -180,24 +307,87 @@ router.post("/flipkartdetails3", async (req, res) => {
     const listofsellers = [],
       listofreviews = [];
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
-        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      if (listofproducts[i].sellerDetails) {
+        for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+          listofsellers.push(listofproducts[i].sellerDetails[j]);
+        }
       }
       delete listofproducts[i].sellerDetails;
     }
 
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      if (listofproducts[i]["POSITIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+        }
       }
-      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      if (listofproducts[i]["NEGATIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+        }
       }
       delete listofproducts[i]["POSITIVE_FIRST"];
       delete listofproducts[i]["NEGATIVE_FIRST"];
     }
+    // let Product =
+    //   "INSERT INTO PRODUCT_TABLE (imagelink, productlink, Position, ProductName, Brand, price, maxretailprice, stars, Num_Ratings, Num_Reviews, Mother_Category, Category,num_1_star_ratings,num_2_star_ratings,num_3_star_ratings,num_4_star_ratings,num_5_star_ratings,Platform,Quantity, Num_sellers, Description, Num_Images,Net_Rating_Score_NRS, Discount,Search_Term,Min_Price, Max_Price, St_dev_Price, Title_Length, Description_Length, Date) VALUES ?";
 
-    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
+    // let Seller =
+    //   "INSERT INTO SELLER_TABLE (Seller_Name, price, Ratings,Flipkart_Assured, ProductName ) VALUES ?";
+
+    // let Reviews =
+    //   "INSERT INTO Reviews_TABLE (Title, Summary, Type, ProductName ) VALUES ?";
+
+    // let values = [],
+    //   values1 = [],
+    //   values2 = [];
+    // //Make an array of values:
+    // for (let i = 0; i < listofproducts.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofproducts[i]) {
+    //     keys.push(listofproducts[i][value]);
+    //   }
+    //   values.push(keys);
+    // }
+    // for (let i = 0; i < listofsellers.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofsellers[i]) {
+    //     keys.push(listofsellers[i][value]);
+    //   }
+    //   values1.push(keys);
+    // }
+    // for (let i = 0; i < listofreviews.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofreviews[i]) {
+    //     keys.push(listofreviews[i][value]);
+    //   }
+    //   values2.push(keys);
+    // }
+    // //Execute the SQL statement, with the value array:
+    // connection.query(Product, [values], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Seller, [values1], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Reviews, [values2], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(
+    //   "SELECT * FROM PRODUCT_TABLE",
+    //   function (err, result, fields) {
+    //     if (err) throw err;
+    //     console.log(result);
+    //   }
+    // );
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 3);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -211,24 +401,87 @@ router.post("/flipkartdetails4", async (req, res) => {
     const listofsellers = [],
       listofreviews = [];
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
-        listofsellers.push(listofproducts[i].sellerDetails[j]);
+      if (listofproducts[i].sellerDetails) {
+        for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
+          listofsellers.push(listofproducts[i].sellerDetails[j]);
+        }
       }
       delete listofproducts[i].sellerDetails;
     }
 
     for (let i = 0; i < listofproducts.length; i++) {
-      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+      if (listofproducts[i]["POSITIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
+        }
       }
-      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+      if (listofproducts[i]["NEGATIVE_FIRST"]) {
+        for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
+          listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
+        }
       }
       delete listofproducts[i]["POSITIVE_FIRST"];
       delete listofproducts[i]["NEGATIVE_FIRST"];
     }
+    // let Product =
+    //   "INSERT INTO PRODUCT_TABLE (imagelink, productlink, Position, ProductName, Brand, price, maxretailprice, stars, Num_Ratings, Num_Reviews, Mother_Category, Category,num_1_star_ratings,num_2_star_ratings,num_3_star_ratings,num_4_star_ratings,num_5_star_ratings,Platform,Quantity, Num_sellers, Description, Num_Images,Net_Rating_Score_NRS, Discount,Search_Term,Min_Price, Max_Price, St_dev_Price, Title_Length, Description_Length, Date) VALUES ?";
 
-    convertJSONtoCSV(listofproducts, listofsellers, listofreviews);
+    // let Seller =
+    //   "INSERT INTO SELLER_TABLE (Seller_Name, price, Ratings,Flipkart_Assured, ProductName ) VALUES ?";
+
+    // let Reviews =
+    //   "INSERT INTO Reviews_TABLE (Title, Summary, Type, ProductName ) VALUES ?";
+
+    // let values = [],
+    //   values1 = [],
+    //   values2 = [];
+    // //Make an array of values:
+    // for (let i = 0; i < listofproducts.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofproducts[i]) {
+    //     keys.push(listofproducts[i][value]);
+    //   }
+    //   values.push(keys);
+    // }
+    // for (let i = 0; i < listofsellers.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofsellers[i]) {
+    //     keys.push(listofsellers[i][value]);
+    //   }
+    //   values1.push(keys);
+    // }
+    // for (let i = 0; i < listofreviews.length; i++) {
+    //   let keys = [];
+
+    //   for (let value in listofreviews[i]) {
+    //     keys.push(listofreviews[i][value]);
+    //   }
+    //   values2.push(keys);
+    // }
+    // //Execute the SQL statement, with the value array:
+    // connection.query(Product, [values], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Seller, [values1], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(Reviews, [values2], function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of reco rds inserted: " + result.affectedRows);
+    // });
+    // connection.query(
+    //   "SELECT * FROM PRODUCT_TABLE",
+    //   function (err, result, fields) {
+    //     if (err) throw err;
+    //     console.log(result);
+    //   }
+    // );
+
+    convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 4);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");

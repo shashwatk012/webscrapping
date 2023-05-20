@@ -1,7 +1,12 @@
 const ObjectsToCsv = require("objects-to-csv");
 
 // If you use "await", code must be inside an asynchronous function:
-const convertJSONtoCSV = async (product_table, seller_table, reviews_table) => {
+const convertJSONtoCSV = async (
+  product_table,
+  seller_table,
+  reviews_table,
+  res
+) => {
   try {
     const csv = new ObjectsToCsv(product_table);
     const csv1 = new ObjectsToCsv(seller_table);
@@ -16,9 +21,9 @@ const convertJSONtoCSV = async (product_table, seller_table, reviews_table) => {
 
     date = date.toLocaleString("en-IN", options);
     // Save to file:
-    await csv.toDisk(`./csvfiles/product_table_dated(${date}).csv`);
-    await csv1.toDisk(`./csvfiles/seller_table__dated(${date}).csv`);
-    await csv2.toDisk(`./csvfiles/reviews_table__dated(${date}).csv`);
+    await csv.toDisk(`./csvfiles/product_table_dated(${date})${res}.csv`);
+    await csv1.toDisk(`./csvfiles/seller_table__dated(${date})${res}.csv`);
+    await csv2.toDisk(`./csvfiles/reviews_table__dated(${date})${res}.csv`);
     console.log("File has been saved");
   } catch (e) {
     console.log(e);

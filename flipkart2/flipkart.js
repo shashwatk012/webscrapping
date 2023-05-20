@@ -64,9 +64,6 @@ const flipkart2 = async (Categories) => {
           browser,
           page
         );
-        if (details.message === "Can not fetch") {
-          continue;
-        }
         for (let key in details) {
           data[j][key] = details[key];
         }
@@ -98,7 +95,6 @@ const flipkart2 = async (Categories) => {
             "&aid=overall&certifiedBuyer=false&sortOrder="
           );
 
-          let flag = true;
           // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
           for (let key of typesOfRatings) {
             let urls = url1 + `${key}`;
@@ -109,32 +105,24 @@ const flipkart2 = async (Categories) => {
               page,
               data[j]["ProductName"]
             );
-            if (totalReviewsandratings.message === "Can not fetch") {
-              flag = false;
-              break;
-            }
             for (let key in totalReviewsandratings) {
               data[j][key] = totalReviewsandratings[key];
             }
             urls = null;
           }
-          if (!flag) {
-            continue;
-          }
-          flag = null;
           url1 = null;
+
+          let NetRatingRank =
+            (data[j]["5 star ratings"] +
+              data[j]["4 star ratings"] -
+              (data[j]["2 star ratings"] + data[j]["1 star ratings"])) /
+            (data[j]["5 star ratings"] +
+              data[j]["4 star ratings"] +
+              data[j]["3 star ratings"] +
+              (data[j]["2 star ratings"] + data[j]["1 star ratings"]));
+
+          data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
         }
-
-        let NetRatingRank =
-          (data[j]["5 star ratings"] +
-            data[j]["4 star ratings"] -
-            (data[j]["2 star ratings"] + data[j]["1 star ratings"])) /
-          (data[j]["5 star ratings"] +
-            data[j]["4 star ratings"] +
-            data[j]["3 star ratings"] +
-            (data[j]["2 star ratings"] + data[j]["1 star ratings"]));
-
-        data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
 
         data[j]["Title Length"] = data[j]["ProductName"].length;
 
@@ -152,7 +140,7 @@ const flipkart2 = async (Categories) => {
 
         data[j]["Search Term"] = category;
 
-        data[j]["Position"] = i + 1;
+        data[j]["Position"] = j + 1;
 
         // Making a new array of product with required fields
         let obj = {};
