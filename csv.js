@@ -20,13 +20,10 @@ const convertJSONtoCSV = async (
     };
 
     date = date.toLocaleString("en-IN", options);
-    let time = date.toLocaleTimeString();
     // Save to file:
-    await csv.toDisk(`./csvfiles/product_table_dated${date}${time}${res}.csv`);
-    await csv1.toDisk(`./csvfiles/seller_table__dated${date}${time}${res}.csv`);
-    await csv2.toDisk(
-      `./csvfiles/reviews_table__dated${date}${time}${res}.csv`
-    );
+    await csv.toDisk(`./csvfiles/product_table_dated${date}${res}.csv`);
+    await csv1.toDisk(`./csvfiles/seller_table__dated${date}${res}.csv`);
+    await csv2.toDisk(`./csvfiles/reviews_table__dated${date}${res}.csv`);
     console.log("File has been saved");
   } catch (e) {
     console.log(e);
