@@ -19,11 +19,20 @@ const convertJSONtoCSV = async (
       day: "numeric",
     };
 
-    date = date.toLocaleString("en-IN", options);
+    let day = date.getDate();
+    let month = date.getMonth();
+    let year = date.getFullYear();
+    month++;
     // Save to file:
-    await csv.toDisk(`./csvfiles/product_table_dated${date}${res}.csv`);
-    await csv1.toDisk(`./csvfiles/seller_table__dated${date}${res}.csv`);
-    await csv2.toDisk(`./csvfiles/reviews_table__dated${date}${res}.csv`);
+    await csv.toDisk(
+      `./csvfiles/product_table_dated${day}-${month}-${year}_${res}.csv`
+    );
+    await csv1.toDisk(
+      `./csvfiles/seller_table__dated${day}-${month}-${year}_${res}.csv`
+    );
+    await csv2.toDisk(
+      `./csvfiles/reviews_table__dated${day}-${month}-${year}_${res}.csv`
+    );
     console.log("File has been saved");
   } catch (e) {
     console.log(e);
