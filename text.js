@@ -1,17 +1,15 @@
 "use strict";
 
 const headers = {
-  headers: {
-    "User-Agent":
-      "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.2 Chrome/87.0.4280.141 Mobile Safari/537.36",
-    Accept:
-      "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
-    "Accept-Encoding": "gzip, deflate, br",
-    Referer: "https://www.google.com",
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive",
-  },
+  "User-Agent":
+    "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.2 Chrome/87.0.4280.141 Mobile Safari/537.36",
+  Accept:
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
+  "Accept-Encoding": "gzip, deflate, br",
+  Referer: "https://www.google.com/",
+  "Cache-Control": "no-cache",
+  Connection: "keep-alive",
 };
 const allProducts =
   "div._1YokD2._2GoDe3>div._1YokD2._3Mn1Gg>div._1AtVbE.col-12-12>div._13oc-S>div";
