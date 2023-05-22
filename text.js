@@ -3,11 +3,12 @@
 const headers = {
   headers: {
     "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+      "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.2 Chrome/87.0.4280.141 Mobile Safari/537.36",
     Accept:
       "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.5",
-    Referer: "https://www.google.com/",
+    "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    Referer: "https://www.google.com",
     "Cache-Control": "no-cache",
     Connection: "keep-alive",
   },
