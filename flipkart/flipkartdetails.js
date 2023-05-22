@@ -184,10 +184,12 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     description = null;
     return obj;
   } catch (error) {
-    const html = await page.content();
     await page.close();
-
     await browser.close();
+    const response = await axios.get(url);
+
+    const html = response.data;
+    // const html = await page.content();
 
     // cheerio nodejs module to load html
     const $ = cheerio.load(html);
