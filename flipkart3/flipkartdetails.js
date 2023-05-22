@@ -187,7 +187,7 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
   } catch (error) {
     await page.close();
     await browser.close();
-    const response = await axios.get(url);
+    const response = await axios.get(url, headers);
 
     const html = response.data;
     // const html = await page.content();

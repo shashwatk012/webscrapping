@@ -103,7 +103,7 @@ const flipkartfetchReviews = async (
     // const html = await page.content();
     await page.close();
     await browser.close();
-    const response = await axios.get(url);
+    const response = await axios.get(url, headers);
 
     const html = response.data;
     const $ = cheerio.load(html);
