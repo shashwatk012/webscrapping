@@ -49,6 +49,7 @@ const flipkart10 = async (Categories) => {
           break;
         }
       }
+      console.log(arr.length);
 
       //arr contains the whole product but we need only required number of data so pushing the required number of data in data array
       for (let j = 0; j < Math.min(arr.length, numOfData); j++) {

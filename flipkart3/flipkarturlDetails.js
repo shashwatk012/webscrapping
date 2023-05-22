@@ -6,6 +6,7 @@ const { headers, allProducts, imglink, replce } = require("../text");
 
 const flipkartfetchUrlDetails = async (url) => {
   try {
+    console.log(url);
     const response = await axios.get(url, headers);
 
     const html = response.data;
