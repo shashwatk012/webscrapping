@@ -159,6 +159,7 @@ const flipkart3 = async (Categories) => {
     }
     return listofproducts;
   } catch (e) {
+    console.log(e);
     return [{ message: "Unable to fetch. Try again later" }];
   }
 };

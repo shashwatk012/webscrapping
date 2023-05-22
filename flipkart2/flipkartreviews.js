@@ -100,9 +100,12 @@ const flipkartfetchReviews = async (
 
     return obj;
   } catch (error) {
-    const html = await page.content();
+    // const html = await page.content();
     await page.close();
     await browser.close();
+    const response = await axios.get(url);
+
+    const html = response.data;
     const $ = cheerio.load(html);
 
     console.log("ERROR");
