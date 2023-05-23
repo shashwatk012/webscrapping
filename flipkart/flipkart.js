@@ -36,11 +36,8 @@ const flipkart = async (Categories) => {
         urls += `&page=${i + 1}`;
         //function to scrap the data from the main page
         const allProductDetails = await flipkartfetchUrlDetails(urls);
-        wait.for.time(1);
+        wait.for.time(0.5);
 
-        if (allProductDetails.length === 0) {
-          break;
-        }
         if (allProductDetails[0].message === "Can not fetch") {
           continue;
         }
@@ -70,6 +67,7 @@ const flipkart = async (Categories) => {
         for (let key in details) {
           data[j][key] = details[key];
         }
+        wait.for.time(0.5);
 
         if (details.sellerslink !== undefined) {
           const sellers = await flipkartsellerslist(
@@ -100,6 +98,7 @@ const flipkart = async (Categories) => {
 
           // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
           for (let key of typesOfRatings) {
+            wait.for.time(0.5);
             let urls = url1 + `${key}`;
             const totalReviewsandratings = await flipkartfetchReviews(
               urls,
