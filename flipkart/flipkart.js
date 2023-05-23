@@ -37,7 +37,7 @@ const flipkart = async (Categories) => {
         const allProductDetails = await flipkartfetchUrlDetails(urls);
 
         if (allProductDetails.length === 0) {
-          cout << "Haan mere wajah se ho raha hai";
+          console.log("Haan mere wajah se ho raha hai");
           break;
         }
         if (allProductDetails[0].message === "Can not fetch") {
