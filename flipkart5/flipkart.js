@@ -5,7 +5,6 @@ const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
 const { typesOfRatings, fields } = require("../text");
-let wait = require("wait-for-stuff");
 
 const urlmaking = (category) => {
   const url = `https://www.flipkart.com/search?q=${category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
@@ -36,11 +35,11 @@ const flipkart5 = async (Categories) => {
         urls += `&page=${i + 1}`;
         //function to scrap the data from the main page
         const allProductDetails = await flipkartfetchUrlDetails(urls);
-        wait.for.time(0.5);
 
-        if (allProductDetails[0].message === "Can not fetch") {
-          continue;
+        if (allProductDetails.length === 0) {
+          i--;
         }
+
         //storing the coming data in arr
         arr = [...arr, ...allProductDetails];
         allProductDetails.length = 0;
