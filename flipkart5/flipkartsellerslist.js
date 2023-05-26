@@ -47,12 +47,22 @@ const flipkartsellerslist = async (url, browser, page, ProductName) => {
       } else {
         flipkartassured = false;
       }
+      let date = new Date();
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+
+      date = date.toLocaleString("en-IN", options);
       sellersDetails.push({
         sellersName,
         price,
         Ratings,
         flipkartassured,
         ProductName,
+        date,
       });
       count++;
     });

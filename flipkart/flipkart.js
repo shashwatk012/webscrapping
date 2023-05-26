@@ -126,7 +126,7 @@ const flipkart = async (Categories) => {
 
         data[j]["Description Length"] = data[j]["Description"].length;
 
-        const date = new Date();
+        let date = new Date();
         const options = {
           weekday: "long",
           year: "numeric",

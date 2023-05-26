@@ -59,6 +59,15 @@ const flipkartfetchReviews = async (
         obj[`${5 - _idx} star ratings`] = replce(x.text());
       }
     );
+    let date = new Date();
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+
+    date = date.toLocaleString("en-IN", options);
 
     // Scraping the reviewS
     $("div._1AtVbE>div._27M-vq>div.col>div.col._2wzgFH.K0kLPL").each(
@@ -78,18 +87,21 @@ const flipkartfetchReviews = async (
             summary: summary,
             type: type,
             ProductName,
+            date,
           });
         } else if (title) {
           review.push({
             title: title,
             type: type,
             ProductName,
+            date,
           });
         } else {
           review.push({
             summary: summary,
             type: type,
             ProductName,
+            date,
           });
         }
         title = null;
@@ -119,7 +131,15 @@ const flipkartfetchReviews = async (
         obj[`${5 - _idx} star ratings`] = replce(x.text());
       }
     );
+    let date = new Date();
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
 
+    date = date.toLocaleString("en-IN", options);
     // Scraping the reviewS
     $("div._1AtVbE>div._27M-vq>div.col>div.col._2wzgFH.K0kLPL").each(
       async (_idx, el) => {
@@ -138,18 +158,21 @@ const flipkartfetchReviews = async (
             summary: summary,
             type: type,
             ProductName,
+            date,
           });
         } else if (title) {
           review.push({
             title: title,
             type: type,
             ProductName,
+            date,
           });
         } else {
           review.push({
             summary: summary,
             type: type,
             ProductName,
+            date,
           });
         }
         title = null;
