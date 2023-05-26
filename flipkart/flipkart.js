@@ -140,6 +140,18 @@ const flipkart = async (Categories) => {
 
         data[j]["Position"] = j + 1;
 
+        if (data[j].Quantity) {
+          const quantity = data[j].Quantity;
+          const ar = quantity.split(" ");
+          data[j].Quantity = Number(ar[0].trim());
+          data[j]["Quantity unit"] = ar[1].trim();
+          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
+        } else {
+          data[j].Quantity = 1;
+          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
+          data[j]["Quantity unit"] = "NA";
+        }
+
         // Making a new array of product with required fields
         let obj = {};
         for (let k = 0; k < fields.length; k++) {

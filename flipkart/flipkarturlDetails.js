@@ -36,11 +36,20 @@ const flipkartfetchUrlDetails = async (url) => {
       } else {
         maxretailprice = replce(maxretailprice);
       }
+
+      let ads = beardo.find("div._2tfzpE>span").text();
+      if (ads === "Ad") {
+        ads = "Yes";
+      } else {
+        ads = "No";
+      }
+
       let element = {
         imagelink,
         productlink: `https://www.flipkart.com${link}`,
         price,
         maxretailprice,
+        IsAds: ads,
       };
       beards.push(element); //storing the details in an array
     });

@@ -39,7 +39,6 @@ const flipkart2 = async (Categories) => {
         if (allProductDetails.length === 0) {
           i--;
         }
-
         //storing the coming data in arr
         arr = [...arr, ...allProductDetails];
         allProductDetails.length = 0;
@@ -48,6 +47,7 @@ const flipkart2 = async (Categories) => {
         }
       }
       console.log(arr.length);
+
       //arr contains the whole product but we need only required number of data so pushing the required number of data in data array
       for (let j = 0; j < Math.min(arr.length, numOfData); j++) {
         data[j] = arr[j];
@@ -139,6 +139,18 @@ const flipkart2 = async (Categories) => {
         data[j]["Search Term"] = category;
 
         data[j]["Position"] = j + 1;
+
+        if (data[j].Quantity) {
+          const quantity = data[j].Quantity;
+          const ar = quantity.split(" ");
+          data[j].Quantity = Number(ar[0].trim());
+          data[j]["Quantity unit"] = ar[1].trim();
+          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
+        } else {
+          data[j].Quantity = 1;
+          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
+          data[j]["Quantity unit"] = "NA";
+        }
 
         // Making a new array of product with required fields
         let obj = {};

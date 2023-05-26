@@ -1,4 +1,5 @@
 "use strict";
+const math = require("mathjs");
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, apikey, replce } = require("../text");
@@ -28,7 +29,8 @@ const flipkartsellerslist = async (url, browser, page, ProductName) => {
     let count = 0,
       mn = 1000000,
       mx = 0;
-    let sellersDetails = [];
+    let sellersDetails = [],
+      pricearr = [];
     $("div._2Y3EWJ").each(async (_idx, el) => {
       const x = $(el);
       const sellersName = x.find("div._3enH42>span").text();
@@ -36,6 +38,7 @@ const flipkartsellerslist = async (url, browser, page, ProductName) => {
       Ratings = replce(Ratings);
       let price = x.find("div._25b18c>div._30jeq3").text();
       price = replce(price);
+      pricearr.push(price);
       mx = Math.max(mx, price);
       mn = Math.min(mn, price);
       let flipkartassured = x.find("div._3J2v2E>div>img").attr("src");
@@ -53,9 +56,10 @@ const flipkartsellerslist = async (url, browser, page, ProductName) => {
       });
       count++;
     });
+    const stDev = math.std(pricearr);
 
     return {
-      "St-dev-Price": mx - mn,
+      "St-dev-Price": stDev,
       "Min Price": mn,
       "Max Price": mx,
       NumberofSellers: count,

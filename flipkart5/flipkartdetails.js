@@ -127,7 +127,22 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     });
     obj["Mother Category"] = Categories[1];
     obj["Category"] = Categories[2];
-    obj["Brand"] = Categories[Categories.length - 1];
+    obj["Sub-Category"] = Categories[3];
+    obj["Product"] = Categories[Categories.length - 2];
+    const product = obj["Product"].split(" ");
+    const Brand = Categories[Categories.length - 1].split(" ");
+    let pos = Brand[Brand.length - 1];
+    for (let i = 0; i < Brand.length; i++) {
+      if (Brand[i] === product[0]) {
+        pos = i;
+        break;
+      }
+    }
+    let st = "";
+    for (let i = 0; i < pos; i++) {
+      st += Brand[i];
+    }
+    obj["Brand"] = st;
     Categories.length = 0;
 
     //scraping the pagelink for the reviews
@@ -187,7 +202,7 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
   } catch (error) {
     await page.close();
     await browser.close();
-    const response = await axios.get(url,headers);
+    const response = await axios.get(url, headers);
 
     const html = response.data;
     // const html = await page.content();

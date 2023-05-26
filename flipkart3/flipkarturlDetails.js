@@ -6,7 +6,6 @@ const { headers, allProducts, imglink, replce } = require("../text");
 
 const flipkartfetchUrlDetails = async (url) => {
   try {
-    console.log(url);
     const response = await axios.get(url, headers);
 
     const html = response.data;
@@ -37,11 +36,20 @@ const flipkartfetchUrlDetails = async (url) => {
       } else {
         maxretailprice = replce(maxretailprice);
       }
+
+      let ads = beardo.find("div._2tfzpE>span").text();
+      if (ads === "Ad") {
+        ads = "Yes";
+      } else {
+        ads = "No";
+      }
+
       let element = {
         imagelink,
         productlink: `https://www.flipkart.com${link}`,
         price,
         maxretailprice,
+        IsAds: ads,
       };
       beards.push(element); //storing the details in an array
     });
