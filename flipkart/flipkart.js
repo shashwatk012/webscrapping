@@ -27,6 +27,7 @@ const flipkart = async (Categories) => {
 
       let arr = [];
       let data = [];
+      let check = 0;
       for (let i = 0; i < 100; i++) {
         //Scrapping the data from the provided url from all the pages
         let urls = url;
@@ -36,8 +37,11 @@ const flipkart = async (Categories) => {
         //function to scrap the data from the main page
         const allProductDetails = await flipkartfetchUrlDetails(urls);
 
-        if (allProductDetails.length === 0) {
+        if (check < 3 && allProductDetails.length === 0) {
           i--;
+          check++;
+        } else if (allProductDetails.length === 0) {
+          break;
         }
         //storing the coming data in arr
         arr = [...arr, ...allProductDetails];
