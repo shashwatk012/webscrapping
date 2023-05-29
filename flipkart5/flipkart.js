@@ -4,7 +4,7 @@ const { flipkartfetchUrlDetails } = require("./flipkarturlDetails");
 const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
-const { typesOfRatings, fields, urlmaking } = require("../text");
+const { typesOfRatings, fields, urlmaking, sql } = require("../text");
 
 const flipkart5 = async (Categories) => {
   try {
@@ -139,6 +139,7 @@ const flipkart5 = async (Categories) => {
         data[j]["Date"] = date.toLocaleString("en-IN", options);
 
         data[j]["Search Term"] = category;
+        console.log(category);
 
         data[j]["Position"] = j + 1;
 
@@ -164,6 +165,7 @@ const flipkart5 = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
+        await sql(obj);
         listofproducts.push(obj);
         //converting into csv file
         // convertJSONtoCSV(listofproducts, "flipkartProductdetails");

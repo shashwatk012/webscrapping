@@ -148,8 +148,6 @@ router.post("/flipkartdetails1", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 1);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");

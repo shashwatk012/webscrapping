@@ -346,38 +346,29 @@ const scrapdetails = (html) => {
 };
 
 // Saving the data to the database
-let sql = async (listofproducts, num) => {
-  const listofsellers = [],
+let sql = async (listofproducts) => {
+  let listofsellers = [],
     listofreviews = [];
 
   //Separating the sellersdetails from productDetails
-  for (let i = 0; i < listofproducts.length; i++) {
-    if (listofproducts[i].sellerDetails) {
-      for (let j = 0; j < listofproducts[i].sellerDetails.length; j++) {
-        listofsellers.push(listofproducts[i].sellerDetails[j]);
-      }
-    }
-    delete listofproducts[i].sellerDetails;
+  if (listofproducts.sellerDetails) {
+    listofsellers = listofproducts.sellerDetails;
   }
+  delete listofproducts.sellerDetails;
 
   //Separating the Reviews from productDetails
-  for (let i = 0; i < listofproducts.length; i++) {
-    if (listofproducts[i]["POSITIVE_FIRST"]) {
-      for (let j = 0; j < listofproducts[i]["POSITIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["POSITIVE_FIRST"][j]);
-      }
-    }
-    if (listofproducts[i]["NEGATIVE_FIRST"]) {
-      for (let j = 0; j < listofproducts[i]["NEGATIVE_FIRST"].length; j++) {
-        listofreviews.push(listofproducts[i]["NEGATIVE_FIRST"][j]);
-      }
-    }
-    delete listofproducts[i]["POSITIVE_FIRST"];
-    delete listofproducts[i]["NEGATIVE_FIRST"];
+  if (listofproducts["POSITIVE_FIRST"]) {
+    listofreviews = [...listofreviews, ...listofproducts["POSITIVE_FIRST"]];
+  }
+  if (listofproducts["NEGATIVE_FIRST"]) {
+    listofreviews = [...listofreviews, ...listofproducts["NEGATIVE_FIRST"]];
   }
 
-  // Converting the JSON into csv file
-  convertJSONtoCSV(listofproducts, listofsellers, listofreviews, num);
+  delete listofproducts["POSITIVE_FIRST"];
+  delete listofproducts["NEGATIVE_FIRST"];
+
+  // // Converting the JSON into csv file
+  // convertJSONtoCSV(listofproducts, listofsellers, listofreviews, num);
 
   // Inserting the data into database
   let Product =
@@ -393,14 +384,13 @@ let sql = async (listofproducts, num) => {
     values1 = [],
     values2 = [];
   //Make an array of values:
-  for (let i = 0; i < listofproducts.length; i++) {
-    let keys = [];
+  let keys = [];
 
-    for (let value in listofproducts[i]) {
-      keys.push(listofproducts[i][value]);
-    }
-    values.push(keys);
+  for (let value in listofproducts) {
+    keys.push(listofproducts[value]);
   }
+  values.push(keys);
+
   for (let i = 0; i < listofsellers.length; i++) {
     let keys = [];
 
@@ -437,7 +427,6 @@ let sql = async (listofproducts, num) => {
   //     console.log(result);
   //   }
   // );
-  return listofproducts;
 };
 
 // Exporting all the fields so that they can be accessed from other files whenever neccessary
