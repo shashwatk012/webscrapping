@@ -1,4 +1,6 @@
 "use strict";
+// This is main file from where server is listened
+
 require("events").EventEmitter.defaultMaxListeners = Infinity;
 const express = require("express");
 const app = express();

@@ -1,3 +1,4 @@
+// This file is to convert the json into csv file
 const ObjectsToCsv = require("objects-to-csv");
 
 // If you use "await", code must be inside an asynchronous function:
@@ -24,12 +25,18 @@ const convertJSONtoCSV = async (
     let year = date.getFullYear();
     month++;
     // Save to file:
+
+    // Converting product details into csv
     await csv.toDisk(
       `./csvfiles/product_table_dated${day}-${month}-${year}_${res}.csv`
     );
+
+    // Converting sellers details into csv
     await csv1.toDisk(
       `./csvfiles/seller_table__dated${day}-${month}-${year}_${res}.csv`
     );
+
+    // Converting Reviews details into csv
     await csv2.toDisk(
       `./csvfiles/reviews_table__dated${day}-${month}-${year}_${res}.csv`
     );

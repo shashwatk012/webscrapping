@@ -6,7 +6,7 @@ const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
 const { typesOfRatings, fields, urlmaking } = require("../text");
 
-const flipkart4 = async (Categories) => {
+const flipkart9 = async (Categories) => {
   try {
     console.log(Categories);
     // Declaration of an array to store all the product details
@@ -181,4 +181,4 @@ const flipkart4 = async (Categories) => {
   }
 };
 
-module.exports = { flipkart4 };
+module.exports = { flipkart9 };

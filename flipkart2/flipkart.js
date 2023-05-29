@@ -1,15 +1,10 @@
 "use strict";
-
+// Importing all the required modules
 const { flipkartfetchUrlDetails } = require("./flipkarturlDetails");
 const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
-const { typesOfRatings, fields } = require("../text");
-
-const urlmaking = (category) => {
-  const url = `https://www.flipkart.com/search?q=${category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
-  return url;
-};
+const { typesOfRatings, fields, urlmaking } = require("../text");
 
 const flipkart2 = async (Categories) => {
   try {
@@ -22,6 +17,7 @@ const flipkart2 = async (Categories) => {
       // Storing the number of data to be scraped in numData variable
       let numOfData = Categories[i].data;
       let category = Categories[i].category;
+
       //Creating the link to be scrapped
       let url = urlmaking(Categories[i].category);
 
@@ -34,6 +30,7 @@ const flipkart2 = async (Categories) => {
 
         //Changing the page number to scrap data from the next page
         urls += `&page=${i + 1}`;
+
         //function to scrap the data from the main page
         const allProductDetails = await flipkartfetchUrlDetails(urls);
 
@@ -70,6 +67,7 @@ const flipkart2 = async (Categories) => {
           data[j][key] = details[key];
         }
 
+        // Scrapping the sellers details
         if (details.sellerslink !== undefined) {
           const sellers = await flipkartsellerslist(
             details.sellerslink,
@@ -130,7 +128,7 @@ const flipkart2 = async (Categories) => {
 
         data[j]["Description Length"] = data[j]["Description"].length;
 
-        const date = new Date();
+        let date = new Date();
         const options = {
           weekday: "long",
           year: "numeric",
@@ -144,6 +142,7 @@ const flipkart2 = async (Categories) => {
 
         data[j]["Position"] = j + 1;
 
+        // Separating the amount and unit from the quantity (i.e.,100ml->100 and ml)
         if (data[j].Quantity) {
           const quantity = data[j].Quantity;
           const ar = quantity.split(" ");
@@ -156,10 +155,14 @@ const flipkart2 = async (Categories) => {
           data[j]["Quantity unit"] = "NA";
         }
 
-        // Making a new array of product with required fields
+        // Making a new array of product with required fields and in required order
         let obj = {};
         for (let k = 0; k < fields.length; k++) {
-          obj[fields[k]] = data[j][fields[k]];
+          if (data[j][fields[k]]) {
+            obj[fields[k]] = data[j][fields[k]];
+          } else {
+            obj[fields[k]] = null;
+          }
         }
         listofproducts.push(obj);
         //converting into csv file
