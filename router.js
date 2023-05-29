@@ -159,8 +159,6 @@ router.post("/flipkartdetails2", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart2(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 2);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -172,8 +170,6 @@ router.post("/flipkartdetails3", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart3(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 3);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -185,8 +181,6 @@ router.post("/flipkartdetails4", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart4(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 4);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -198,8 +192,6 @@ router.post("/flipkartdetails5", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart5(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 5);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -211,8 +203,6 @@ router.post("/flipkartdetails6", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart6(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 6);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -224,8 +214,6 @@ router.post("/flipkartdetails7", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart7(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 7);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -237,8 +225,6 @@ router.post("/flipkartdetails8", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart8(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 8);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -250,8 +236,6 @@ router.post("/flipkartdetails9", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart9(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 9);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
@@ -263,8 +247,6 @@ router.post("/flipkartdetails10", async (req, res) => {
     // Calling the flipkart function to scrap the all categories details
     let listofproducts = await flipkart10(req["body"]);
 
-    // Calling the sql function to sae the data into database
-    listofproducts = await sql(listofproducts, 10);
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
