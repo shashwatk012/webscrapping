@@ -378,7 +378,7 @@ let sql = async (listofproducts) => {
     "INSERT INTO FLIPKART_SELLERS_TABLE (SellersName , Price,Ratings,Flipkart_Assured , ProductName , Date ) VALUES ?";
 
   let Reviews =
-    "INSERT INTO FLIPKART_REVIEWS_TABLE (Title , Summary ,Type , ProductName , Date ) VALUES ?";
+    "INSERT INTO FLIPKART_REVIEWS_TABLE (Title,Summary,Type,ProductName,Date) VALUES ?";
 
   let values = [],
     values1 = [],
