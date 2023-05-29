@@ -347,20 +347,27 @@ const scrapdetails = (html) => {
 
 // Saving the data to the database
 let sql = async (listofproducts) => {
+  console.log(listofproducts);
   let listofsellers = [],
     listofreviews = [];
 
   //Separating the sellersdetails from productDetails
-  if (listofproducts.sellerDetails) {
+  if (listofproducts.sellerDetails && listofproducts.sellerDetails.length > 0) {
     listofsellers = listofproducts.sellerDetails;
   }
   delete listofproducts.sellerDetails;
 
   //Separating the Reviews from productDetails
-  if (listofproducts["POSITIVE_FIRST"]) {
+  if (
+    listofproducts["POSITIVE_FIRST"] &&
+    listofproducts["POSITIVE_FIRST"].length > 0
+  ) {
     listofreviews = [...listofreviews, ...listofproducts["POSITIVE_FIRST"]];
   }
-  if (listofproducts["NEGATIVE_FIRST"]) {
+  if (
+    listofproducts["NEGATIVE_FIRST"] &&
+    listofproducts["NEGATIVE_FIRST"].length > 0
+  ) {
     listofreviews = [...listofreviews, ...listofproducts["NEGATIVE_FIRST"]];
   }
 
@@ -392,34 +399,41 @@ let sql = async (listofproducts) => {
   values.push(keys);
 
   for (let i = 0; i < listofsellers.length; i++) {
-    let keys = [];
+    let keys1 = [];
 
     for (let value in listofsellers[i]) {
-      keys.push(listofsellers[i][value]);
+      keys1.push(listofsellers[i][value]);
     }
-    values1.push(keys);
+    values1.push(keys1);
   }
   for (let i = 0; i < listofreviews.length; i++) {
-    let keys = [];
+    let keys1 = [];
 
     for (let value in listofreviews[i]) {
-      keys.push(listofreviews[i][value]);
+      keys1.push(listofreviews[i][value]);
     }
-    values2.push(keys);
+    values2.push(keys1);
   }
   //Execute the SQL statement, with the value array:
-  connection.query(Product, [values], function (err, result) {
-    if (err) throw err;
-    console.log("Number of reco rds inserted: " + result.affectedRows);
-  });
-  connection.query(Seller, [values1], function (err, result) {
-    if (err) throw err;
-    console.log("Number of reco rds inserted: " + result.affectedRows);
-  });
-  connection.query(Reviews, [values2], function (err, result) {
-    if (err) throw err;
-    console.log("Number of reco rds inserted: " + result.affectedRows);
-  });
+  if (values.length > 0) {
+    connection.query(Product, [values], function (err, result) {
+      if (err) throw err;
+      console.log("Number of reco rds inserted: " + result.affectedRows);
+    });
+  }
+  if (values1.length > 0) {
+    connection.query(Seller, [values1], function (err, result) {
+      if (err) throw err;
+      console.log("Number of reco rds inserted: " + result.affectedRows);
+    });
+  }
+  if (values2.length > 0) {
+    connection.query(Reviews, [values2], function (err, result) {
+      if (err) throw err;
+      console.log("Number of reco rds inserted: " + result.affectedRows);
+    });
+  }
+
   // connection.query(
   //   "SELECT * FROM PRODUCT_TABLE",
   //   function (err, result, fields) {
