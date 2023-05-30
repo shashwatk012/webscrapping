@@ -18,7 +18,7 @@ const nykaafetchUrlDetails = async (url, browser, page) => {
     page = await browser.newPage();
     await page.goto(url);
 
-    await page.waitForSelector("button.load-more-button");
+    // await page.waitForSelector("button.load-more-button");
 
     let html = await page.content();
 
@@ -36,7 +36,7 @@ const nykaafetchUrlDetails = async (url, browser, page) => {
       console.log(load);
       console.log(i);
       i++;
-      if (i == 7) {
+      if (i == 10) {
         break;
       }
     }

@@ -8,7 +8,7 @@ const { typesOfRatings, fields, urlmaking, sql } = require("../text");
 // Module to convert JSON into CSV
 const { convertJSONtoCSV } = require("../csv");
 
-const flipkart = async (Categories) => {
+const flipkart18 = async (Categories) => {
   try {
     console.log(Categories);
     // Declaration of an array to store all the product details
@@ -163,7 +163,7 @@ const flipkart = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        await sql(obj);
+        // await sql(obj);
         if (obj.sellerDetails) {
           listofsellers = [...listofsellers, ...obj.sellerDetails];
         }
@@ -180,7 +180,7 @@ const flipkart = async (Categories) => {
 
         listofproducts.push(obj);
         //converting into csv file
-        convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 1);
+        convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 18);
         console.log(j);
       }
       numOfData = null;
@@ -195,4 +195,4 @@ const flipkart = async (Categories) => {
   }
 };
 
-module.exports = { flipkart };
+module.exports = { flipkart18 };

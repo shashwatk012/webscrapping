@@ -3,7 +3,68 @@
 const axios = require("axios");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
-const { headers, replce, scrapreviews } = require("../text");
+const { headers, replce } = require("../text");
+
+const scrapreviews = (html, typeofreviews, ProductName) => {
+  const $ = cheerio.load(html);
+
+  let review = [];
+  let obj = {};
+
+  // Scraping the number of all type of ratings such as 5 star, 4 star
+  $("div._13sFCC.miQW6D>ul._36LmXx>li._28Xb_u>div._1uJVNT").each(
+    async (_idx, el) => {
+      const x = $(el);
+      obj[`${5 - _idx} star ratings`] = replce(x.text());
+    }
+  );
+  let date = new Date();
+
+  date = date.toLocaleDateString();
+
+  // Scraping the reviewS
+  $("div._1AtVbE>div._27M-vq>div.col>div.col._2wzgFH.K0kLPL").each(
+    async (_idx, el) => {
+      const x = $(el);
+      let title = x.find("p._2-N8zT").text();
+      let summary = x.find("div.t-ZTKy>div>div").last().text();
+      let type;
+      if (typeofreviews === "POSITIVE_FIRST") {
+        type = "POSITIVE";
+      } else {
+        type = "NEGATIVE";
+      }
+      if (title && summary) {
+        review.push({
+          title: title,
+          summary: summary,
+          type: type,
+          ProductName,
+          date,
+        });
+      } else if (title) {
+        review.push({
+          title: title,
+          type: type,
+          ProductName,
+          date,
+        });
+      } else {
+        review.push({
+          summary: summary,
+          type: type,
+          ProductName,
+          date,
+        });
+      }
+      title = null;
+      summary = null;
+    }
+  );
+  obj[typeofreviews] = review;
+
+  return obj;
+};
 
 const flipkartfetchReviews = async (
   url,

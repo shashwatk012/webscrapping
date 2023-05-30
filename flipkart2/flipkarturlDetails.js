@@ -1,6 +1,5 @@
 "use strict";
 const axios = require("axios");
-const scrapingbee = require("scrapingbee");
 const cheerio = require("cheerio");
 const { headers, allProducts, imglink, replce } = require("../text");
 
