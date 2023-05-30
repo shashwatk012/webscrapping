@@ -102,7 +102,6 @@ const replce = (str) => {
 const scrapreviews = (html, typeofreviews, ProductName) => {
   const $ = cheerio.load(html);
 
-  console.log(typeofreviews);
   let review = [];
   let obj = {};
 
@@ -263,7 +262,6 @@ const scrapdetails = (html) => {
   obj["Category"] = Categories[2];
   obj["Sub-Category"] = Categories[3];
   obj["Product"] = Categories[Categories.length - 2];
-  console.log(Categories);
   if (Categories.length) {
     const product = obj["Product"].split(" ");
     const Brand = Categories[Categories.length - 1].split(" ");
@@ -342,7 +340,6 @@ const scrapdetails = (html) => {
 
 const sellers = (html, ProductName) => {
   const $ = cheerio.load(html);
-  console.log("sellers");
 
   let count = 0,
     mn = 1000000,
@@ -395,6 +392,7 @@ const sellers = (html, ProductName) => {
 
 // Saving the data to the database
 let sql = async (listofproducts) => {
+  console.log(listofproducts["Search Term"]);
   let listofsellers = [],
     listofreviews = [];
 
