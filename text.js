@@ -1,6 +1,7 @@
 "use strict";
 // In this file all the reusable code are put together so that they can be called as per need.
 
+const math = require("mathjs");
 // Importing the cheerio module to load the html
 const cheerio = require("cheerio");
 
@@ -113,14 +114,8 @@ const scrapreviews = (html, typeofreviews, ProductName) => {
     }
   );
   let date = new Date();
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
 
-  date = date.toLocaleString("en-IN", options);
+  date = date.toLocaleDateString();
 
   // Scraping the reviewS
   $("div._1AtVbE>div._27M-vq>div.col>div.col._2wzgFH.K0kLPL").each(
@@ -345,9 +340,61 @@ const scrapdetails = (html) => {
   return obj;
 };
 
+const sellers = (html, ProductName) => {
+  const $ = cheerio.load(html);
+  console.log("sellers");
+
+  let count = 0,
+    mn = 1000000,
+    mx = 0;
+  let sellersDetails = [],
+    pricearr = [];
+  $("div._2Y3EWJ").each(async (_idx, el) => {
+    const x = $(el);
+
+    const sellersName = x.find("div._3enH42>span").text();
+
+    let Ratings = x.find("div._3LWZlK._2GCNvL").text();
+    Ratings = replce(Ratings);
+
+    let price = x.find("div._25b18c>div._30jeq3").text();
+    price = replce(price);
+    pricearr.push(price);
+    mx = Math.max(mx, price);
+    mn = Math.min(mn, price);
+
+    let flipkartassured = x.find("div._3J2v2E>div>img").attr("src");
+    if (flipkartassured) {
+      flipkartassured = 1;
+    } else {
+      flipkartassured = 0;
+    }
+    let date = new Date();
+
+    date = date.toLocaleDateString();
+    sellersDetails.push({
+      sellersName,
+      price,
+      Ratings,
+      flipkartassured,
+      ProductName,
+      date,
+    });
+    count++;
+  });
+  const stDev = math.std(pricearr);
+
+  return {
+    "St-dev-Price": stDev,
+    "Min Price": mn,
+    "Max Price": mx,
+    NumberofSellers: count,
+    sellersDetails,
+  };
+};
+
 // Saving the data to the database
 let sql = async (listofproducts) => {
-  console.log(listofproducts);
   let listofsellers = [],
     listofreviews = [];
 
@@ -455,4 +502,5 @@ module.exports = {
   sql,
   scrapdetails,
   scrapreviews,
+  sellers,
 };

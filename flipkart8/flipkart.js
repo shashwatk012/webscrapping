@@ -129,14 +129,8 @@ const flipkart8 = async (Categories) => {
         data[j]["Description Length"] = data[j]["Description"].length;
 
         let date = new Date();
-        const options = {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        };
 
-        data[j]["Date"] = date.toLocaleString("en-IN", options);
+        data[j]["Date"] = date.toLocaleDateString();
 
         data[j]["Search Term"] = category;
         console.log(category);
