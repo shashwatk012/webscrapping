@@ -8,7 +8,6 @@ const { headers, replce, scrap, scrapdetails } = require("../text");
 const flipkartfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
-    console.log("details");
     // api to get html of the required page
     browser = await puppeteer.launch({
       headless: `true`,

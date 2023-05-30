@@ -5,9 +5,6 @@ const math = require("mathjs");
 // Importing the cheerio module to load the html
 const cheerio = require("cheerio");
 
-// Module to convert JSON into CSV
-const { convertJSONtoCSV } = require("./csv");
-
 // Establishing the connection to database
 const connection = require("./connection");
 
@@ -392,7 +389,6 @@ const sellers = (html, ProductName) => {
 
 // Saving the data to the database
 let sql = async (listofproducts) => {
-  console.log(listofproducts["Search Term"]);
   let listofsellers = [],
     listofreviews = [];
 

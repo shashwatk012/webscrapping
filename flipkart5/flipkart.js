@@ -5,12 +5,16 @@ const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
 const { typesOfRatings, fields, urlmaking, sql } = require("../text");
+// Module to convert JSON into CSV
+const { convertJSONtoCSV } = require("../csv");
 
 const flipkart5 = async (Categories) => {
   try {
     console.log(Categories);
     // Declaration of an array to store all the product details
-    let listofproducts = [];
+    let listofproducts = [],
+      listofsellers = [],
+      listofreviews = [];
 
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
@@ -159,10 +163,24 @@ const flipkart5 = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        await sql(obj);
+        // await sql(obj);
+        if (obj.sellerDetails) {
+          listofsellers = [...listofsellers, ...obj.sellerDetails];
+        }
+        if (obj["POSITIVE_FIRST"]) {
+          listofreviews = [...listofreviews, ...obj["POSITIVE_FIRST"]];
+        }
+        if (obj["NEGATIVE_FIRST"]) {
+          listofreviews = [...listofreviews, ...obj["NEGATIVE_FIRST"]];
+        }
+
+        delete obj.sellerDetails;
+        delete obj["POSITIVE_FIRST"];
+        delete obj["NEGATIVE_FIRST"];
+
         listofproducts.push(obj);
         //converting into csv file
-        // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
+        convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 5);
         console.log(j);
       }
       numOfData = null;
