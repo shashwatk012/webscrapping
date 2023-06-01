@@ -208,6 +208,7 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     // function in text.js to scrap the required details from the page
     return scrapdetails(html);
   } catch (error) {
+    console.log(error);
     await page.close();
 
     await browser.close();
