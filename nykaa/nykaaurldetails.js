@@ -18,16 +18,40 @@ const nykaafetchUrlDetails = async (url, browser, page) => {
     page = await browser.newPage();
     await page.goto(url);
 
+    let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+    while (true) {
+      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      await page.waitForTimeout(1000); // sleep a bit
+      let newHeight = await page.evaluate("document.body.scrollHeight");
+      if (newHeight === lastHeight) {
+        break;
+      }
+      lastHeight = newHeight;
+    }
+
     // await page.waitForSelector("button.load-more-button");
 
     let html = await page.content();
 
     let $ = cheerio.load(html);
     let load = $("button.load-more-button").text();
-    console.log(load);
     let i = 0;
     while (load) {
       await page.click("button.load-more-button");
+      // await page.waitForTimeout(1000);
+      let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+      while (true) {
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+        await page.waitForTimeout(1000); // sleep a bit
+        let newHeight = await page.evaluate("document.body.scrollHeight");
+        if (newHeight === lastHeight) {
+          break;
+        }
+        lastHeight = newHeight;
+      }
+
       // await page.waitForSelector("button.load-more-button");
       html = await page.content();
 
@@ -36,10 +60,12 @@ const nykaafetchUrlDetails = async (url, browser, page) => {
       console.log(load);
       console.log(i);
       i++;
-      if (i == 10) {
+      if (i == 5) {
         break;
       }
     }
+    await page.close();
+    await browser.close();
 
     const nykaa = [];
 
@@ -61,10 +87,10 @@ const nykaafetchUrlDetails = async (url, browser, page) => {
         nykaa.push(element); //storing the details in an array
       }
     );
-    await page.close();
-    await browser.close();
     return nykaa;
   } catch (error) {
+    await page.close();
+    await browser.close();
     console.log(error);
     return [{ message: "Can not fetch" }];
   }

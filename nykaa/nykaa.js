@@ -1,7 +1,37 @@
 "use strict";
-const { fields } = require("../text");
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
 const { nykaafetchUrlDetails } = require("./nykaaurldetails");
+const { nykaafetchReviews } = require("./nykaareviews");
+const { check } = require("./checkformat");
+
+const fields = [
+  "imagelink",
+  "productlink",
+  "Position",
+  "Product",
+  "ProductName",
+  "Brand",
+  "price",
+  "Price per unit",
+  "maxretailprice",
+  "stars",
+  "Ratings",
+  "Reviews",
+  "Mother Category",
+  "Category",
+  "Sub-Category",
+  "Platform",
+  "Quantity",
+  "Quantity unit",
+  "Number of images",
+  "MOST_USEFUL",
+  "POSITIVE_FIRST",
+  "NEGATIVE_FIRST",
+  "Discount%",
+  "Search Term",
+  "Title Length",
+  "Date",
+];
 
 const urlmaking = (category) => {
   const url = `https://www.nykaa.com/search/result/?q=${category}&root=search&searchType=history&suggestionType=query&ssp=2&searchItem=${category}&sourcepage=home&`;
@@ -25,14 +55,33 @@ const nykaa = async (Categories) => {
 
       let arr = [];
       let data = [];
-      let check = 0;
+
+      const flag = await check(url, browser, page);
 
       //function to scrap the data from the main page
-      const allProductDetails = await nykaafetchUrlDetails(url, browser, page);
+      if (flag) {
+        const allProductDetails = await nykaafetchUrlDetails(
+          url,
+          browser,
+          page
+        );
+        //storing the coming data in arr
+        arr = [...arr, ...allProductDetails];
+        allProductDetails.length = 0;
+      } else {
+        for (let i = 1; i < 11; i++) {
+          let urls = `https://www.nykaa.com/${category}/c/8400?page_no=${i}&sort=popularity&eq=desktop`;
+          const allProductDetails = await nykaafetchUrlDetails(
+            urls,
+            browser,
+            page
+          );
+          //storing the coming data in arr
+          arr = [...arr, ...allProductDetails];
+          allProductDetails.length = 0;
+        }
+      }
 
-      //storing the coming data in arr
-      arr = [...arr, ...allProductDetails];
-      allProductDetails.length = 0;
       console.log(arr.length);
 
       //arr contains the whole product but we need only required number of data so pushing the required number of data in data array
@@ -52,6 +101,18 @@ const nykaa = async (Categories) => {
           data[j][key] = details[key];
         }
 
+        if (details.reviewsLink != undefined) {
+          const totalReviewsandratings = await nykaafetchReviews(
+            data[j].reviewsLink,
+            browser,
+            page,
+            data[j]["ProductName"]
+          );
+          for (let key in totalReviewsandratings) {
+            data[j][key] = totalReviewsandratings[key];
+          }
+        }
+
         data[j]["Platform"] = "nykaa";
 
         data[j]["Title Length"] = data[j]["ProductName"].length;
@@ -59,14 +120,8 @@ const nykaa = async (Categories) => {
         // data[j]["Description Length"] = data[j]["Description"].length;
 
         let date = new Date();
-        const options = {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        };
 
-        data[j]["Date"] = date.toLocaleString("en-IN", options);
+        data[j]["Date"] = date.toLocaleDateString();
 
         data[j]["Search Term"] = category;
 
@@ -75,7 +130,11 @@ const nykaa = async (Categories) => {
         // Making a new array of product with required fields
         let obj = {};
         for (let k = 0; k < fields.length; k++) {
-          obj[fields[k]] = data[j][fields[k]];
+          if (data[j][fields[k]]) {
+            obj[fields[k]] = data[j][fields[k]];
+          } else {
+            obj[fields[k]] = null;
+          }
         }
         listofproducts.push(obj);
         //converting into csv file
@@ -89,7 +148,7 @@ const nykaa = async (Categories) => {
     }
     return listofproducts;
   } catch (e) {
-    // console.log(e);
+    console.log(e);
     return [{ message: "Unable to fetch. Try again later" }];
   }
 };

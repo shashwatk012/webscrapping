@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { headers, replce } = require("../text");
+const { headers, replce, brands } = require("../text");
 
 const nykaafetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
@@ -32,25 +32,21 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
 
     const html = await page.content();
 
-    const hii = await page.$("span.css-16jimk8");
-    await hii.click("span.css-16jimk8");
-    await page.waitForSelector("div.css-3auqkn>span.css-kvhcn5");
+    // const hii = await page.$("span.css-16jimk8");
+    // await hii.click("span.css-16jimk8");
+    // await page.waitForSelector("div.css-3auqkn>span.css-kvhcn5");
 
-    // const html1 = await page.content();
+    // // const html1 = await page.content();
 
-    await page.click("span.css-kvhcn5");
-    await page.waitForSelector("label.css-qi8mdx");
-
-    // const html2 = await page.content();
-
-    const pullovers = await page.$$("label.css-qi8mdx>span");
-    // console.log(pullovers);
-    await pullovers[4].click();
-    await page.waitForSelector("div.css-3auqkn>span.css-kvhcn5");
+    // const pullovers = await page.$$("label.css-qi8mdx>span");
+    // // console.log(pullovers);
+    // await pullovers[4].click();
+    // await page.waitForSelector("div.css-3auqkn>span.css-kvhcn5");
 
     // await page.hover("a.css-1mavm7h");
 
-    const html1 = await page.content();
+    await page.close();
+    await browser.close();
 
     // cheerio nodejs module to load html
     let $ = cheerio.load(html);
@@ -81,6 +77,9 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
       obj["Quantity"] = 1;
       obj["Quantity Unit"] = "NA";
     }
+
+    let imagelink = $("div.css-5n0nl4>div>img").attr("src");
+    obj["imagelink"] = imagelink;
 
     const price = $("div.css-1d0jf8e>span.css-1jczs19").text();
     let arr = [];
@@ -137,6 +136,7 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
     obj["Mother Category"] = categories[1];
     obj["Category"] = categories[2];
     obj["Sub-Category"] = categories[3];
+    obj["Product"] = categories[categories.length - 1];
 
     //scraping the pagelink for the reviews
     const reviewsLink = $("div.css-1ux41ja>a.css-1xv8iu0").attr("href");
@@ -150,26 +150,16 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
     });
     obj["Number of images"] = count;
 
+    if (ProductName) {
+      let arr = ProductName.split(" ");
+      const index = brands.findIndex((element) => element.includes(arr[0]));
+      obj.Brand = brands[index];
+    }
     console.log(obj);
-    $ = cheerio.load(html1);
-    // const ab = $("label.css-qi8mdx").text();
-    const abc = $("span.css-kvhcn5").text();
-    console.log(abc);
-    // let brands = [];
-    // $("div.css-150nd8c>a").each(async (_idx, el) => {
-    //   const x = $(el);
-    //   brands.push(x.text());
-    // });
-
-    // if (ProductName) {
-    //   let arr = ProductName.split(" ");
-    //   const index = brands.findIndex((element) => element.includes(arr[0]));
-    //   obj.Brand = brands[index];
-    // }
-    await page.close();
-    await browser.close();
     return obj;
   } catch (error) {
+    await page.close();
+    await browser.close();
     console.log(error);
     res.send("something wrong with details");
   }
