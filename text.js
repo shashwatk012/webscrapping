@@ -5,7 +5,7 @@
 const cheerio = require("cheerio");
 
 // Establishing the connection to database
-const connection = require("../connection");
+const connection = require("./connection");
 
 // headers to send with api request to sites to avoid blockage
 const headers = {
