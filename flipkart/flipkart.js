@@ -10,7 +10,10 @@ const { convertJSONtoCSV } = require("../csv");
 
 const flipkart = async (Categories) => {
   try {
-    console.log(Categories);
+    console.log(Categories.length);
+    if (!Categories.length) {
+      Categories = [Categories];
+    }
     // Declaration of an array to store all the product details
     let listofproducts = [],
       listofsellers = [],
