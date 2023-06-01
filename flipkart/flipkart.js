@@ -10,7 +10,7 @@ const { convertJSONtoCSV } = require("../csv");
 
 const flipkart = async (Categories) => {
   try {
-    console.log(Categories.length);
+    console.log(Categories);
     if (!Categories.length) {
       Categories = [Categories];
     }
