@@ -163,7 +163,7 @@ const flipkart5 = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        // await sql(obj);
+        await sql(obj);
         if (obj.sellerDetails) {
           listofsellers = [...listofsellers, ...obj.sellerDetails];
         }
