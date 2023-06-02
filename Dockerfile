@@ -1,8 +1,8 @@
 FROM node:10
 
 RUN apt-get update \
-    && apt-get install -yyq ca-certificates \
-    && apt-get install -yyq \
+    apt-get install -yyq ca-certificates \
+    apt-get install -yyq \
     libappindicator1 \
     libasound2 \
     libatk1.0-0 \
