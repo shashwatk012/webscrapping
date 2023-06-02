@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install gnupg wget -y && \
   rm -rf /var/lib/apt/lists/*
 
 
-WORKDIR /app
+WORKDIR /webscrapping
 
 COPY package*.json ./
 
