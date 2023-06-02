@@ -1,6 +1,6 @@
-FROM node:10
+FROM node:14
 
-RUN apt-get update \
+RUN apt-get update && \
     apt-get install -yyq ca-certificates \
     apt-get install -yyq \
     libappindicator1 \
