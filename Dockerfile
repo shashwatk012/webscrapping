@@ -52,7 +52,7 @@ COPY package*.json ./
 # Install npm dependencies
 RUN npm install 
 
-RUN apt-get install nodejs npm
+# RUN apt-get install nodejs npm
 
 RUN npm install -g puppeteer
 
