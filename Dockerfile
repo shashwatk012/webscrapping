@@ -1,8 +1,8 @@
 FROM node:14
 
 RUN apt-get update && \
-    apt-get install -yyq ca-certificates \
-    apt-get install -yyq \
+    apt-get install -y ca-certificates \
+    apt-get install -y \
     libappindicator1 \
     libasound2 \
     libatk1.0-0 \
@@ -33,8 +33,8 @@ RUN apt-get update && \
     libxrender1 \
     libxss1 \
     libxtst6 \
-    && apt-get install -yyq gconf-service lsb-release wget xdg-utils \
-    && apt-get install -yyq fonts-liberation
+    && apt-get install -y gconf-service lsb-release wget xdg-utils \
+    && apt-get install -y fonts-liberation
 
 WORKDIR /app
 
