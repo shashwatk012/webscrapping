@@ -23,7 +23,7 @@ const scrapdetails = (html) => {
   }
 
   ProductName = null;
-
+  
   let price = $("div._30jeq3._16Jk6d").text();
   price = replce(price);
   obj["price"] = price;
