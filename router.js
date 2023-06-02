@@ -5,28 +5,10 @@
 const express = require("express");
 const router = new express.Router();
 
-// Importing the file to scrap the given category products link from flipkart
-const { flipkartfetchUrlDetails } = require("./flipkart/flipkarturlDetails");
-
-// Importing the file to scrap the given products positive and negative reviews from flipkart
-const { flipkartfetchReviews } = require("./flipkart/flipkartreviews");
-
-// Importing the file to scrap the given complete products details from flipkart
-const {
-  flipkartfetchIndividualDetails,
-} = require("./flipkart/flipkartdetails");
-
-// Importing the file to scrap the given products sellers details from flipkart
-const { flipkartsellerslist } = require("./flipkart/flipkartsellerslist");
-
 // Importing the file to scrap the complete products details from nykaa
 const { nykaafetchIndividualDetails } = require("./nykaa/nykaadetails");
 
-// Importing module to convert json to csv
-const { convertJSONtoCSV } = require("./csv");
-
-// Importing text.js file to use the reusable codes
-const { typesOfRatings, urlmaking, fields, sql } = require("./text");
+const { flipkartbylink } = require("./flipkartbylink/flipkartbylink");
 
 const { amazon } = require("./amazon/amazon");
 const { flipkart } = require("./flipkart/flipkart");
@@ -67,86 +49,7 @@ router.get("/", async (req, res) => {
 // Router to handle post request made by client to scrap the particular product details from a link
 router.post("/flipkartdetailsbylink", async (req, res) => {
   try {
-    let browser, page;
-    let flag = true;
-
-    //Creating the link to be scrapped
-    let url = req["body"].link;
-
-    // Creating an object which is going to be the response of the coming request
-    const data = {
-      productlink: url,
-    };
-
-    // scrapping all the required details by going inside every individual products
-    let details = await flipkartfetchIndividualDetails(
-      data.productlink,
-      browser,
-      page
-    );
-    if (details.message === "Can not fetch") {
-      flag = false;
-    }
-
-    // Inserting all the data into data object
-    for (let key in details) {
-      data[key] = details[key];
-    }
-
-    // Checking whether sellers details are present on the page or not
-    if (details.sellerslink !== undefined) {
-      // Scrapping the sellers details
-      let sellers = await flipkartsellerslist(
-        details.sellerslink,
-        browser,
-        page
-      );
-      if (sellers.message === "Can not fetch") {
-        flag = false;
-      }
-      data["NumberofSellers"] = sellers.NumberofSellers;
-      data["sellerDetails"] = sellers.sellersDetails;
-    }
-
-    data["Platform"] = "Flipkart";
-
-    // Checking whether reviews page is available on the site or not
-    if (details.reviewsLink !== undefined) {
-      let url1 = details.reviewsLink;
-      url1 = url1.replace(
-        "&marketplace=FLIPKART",
-        "&aid=overall&certifiedBuyer=false&sortOrder="
-      );
-
-      // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
-      for (let key of typesOfRatings) {
-        let urls = url1 + `${key}`;
-        const totalReviewsandratings = await flipkartfetchReviews(
-          urls,
-          key,
-          browser,
-          page
-        );
-        if (totalReviewsandratings.message === "Can not fetch") {
-          flag = false;
-        }
-        for (let key in totalReviewsandratings) {
-          data[key] = totalReviewsandratings[key];
-        }
-      }
-    }
-
-    // Making a new array of product details with required fields and in required order
-    let obj = {};
-    for (let k = 0; k < fields.length; k++) {
-      obj[fields[k]] = data[fields[k]];
-    }
-    if (!flag) {
-      res.send("Something went wrong! Try again");
-    } else {
-      console.log(obj);
-      res.send(obj);
-    }
+    res.send(await flipkartbylink(req["body"].link));
   } catch (e) {
     res.send("Check the input format");
   }
