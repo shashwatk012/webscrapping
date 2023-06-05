@@ -70,7 +70,7 @@ const flipkart = async (Categories) => {
           browser,
           page
         );
-        if (details.message) {
+        if (!details.message) {
           for (let key in details) {
             data[j][key] = details[key];
           }
@@ -114,7 +114,7 @@ const flipkart = async (Categories) => {
               page,
               data[j]["ProductName"]
             );
-            if (totalReviewsandratings.message) {
+            if (!totalReviewsandratings.message) {
               for (let key in totalReviewsandratings) {
                 data[j][key] = totalReviewsandratings[key];
               }
@@ -135,9 +135,13 @@ const flipkart = async (Categories) => {
           data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
         }
 
-        data[j]["Title Length"] = data[j]["ProductName"].length;
-
-        data[j]["Description Length"] = data[j]["Description"].length;
+        if (data[j].ProductName) {
+          data[j]["Title Length"] = data[j]["ProductName"].length;
+        }
+        if (data[j]["Description"]) {
+          data[j]["Title Length"] = data[j]["ProductName"].length;
+          data[j]["Description Length"] = data[j]["Description"].length;
+        }
 
         let date = new Date();
 
