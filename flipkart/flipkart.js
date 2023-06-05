@@ -70,8 +70,10 @@ const flipkart = async (Categories) => {
           browser,
           page
         );
-        for (let key in details) {
-          data[j][key] = details[key];
+        if (details.message) {
+          for (let key in details) {
+            data[j][key] = details[key];
+          }
         }
 
         // Scrapping the sellers details
@@ -112,8 +114,10 @@ const flipkart = async (Categories) => {
               page,
               data[j]["ProductName"]
             );
-            for (let key in totalReviewsandratings) {
-              data[j][key] = totalReviewsandratings[key];
+            if (totalReviewsandratings.message) {
+              for (let key in totalReviewsandratings) {
+                data[j][key] = totalReviewsandratings[key];
+              }
             }
             urls = null;
           }
