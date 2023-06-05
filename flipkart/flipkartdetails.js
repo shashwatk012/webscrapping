@@ -215,9 +215,20 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
       await browser.close();
     }
 
-    const response = await axios.get(url, headers);
+    // api to get html of the required page
+    browser = await puppeteer.launch({
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
 
-    const html = response.data;
+    page = await browser.newPage();
+    await page.goto(url);
+
+    // await page.waitForTimeout(1000);
+    const html = await page.content();
+    await page.close();
+
+    await browser.close();
 
     // function in text.js to scrap the required details from the page
     return scrapdetails(html);
