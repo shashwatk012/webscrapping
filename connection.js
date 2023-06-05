@@ -5,9 +5,9 @@ const mysql = require("mysql2");
 
 // Connecting to the database through host,user,password,port
 const connection = mysql.createConnection({
-  host: "database-2.crvs0kcwplwy.ap-south-1.rds.amazonaws.com",
+  host: "publiqdatabase.crvs0kcwplwy.ap-south-1.rds.amazonaws.com",
   user: "admin",
-  password: "Ramlala.12",
+  password: "Publiq2023",
   port: 3306,
   database: "Publiq",
 });

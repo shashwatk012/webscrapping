@@ -76,8 +76,12 @@ const flipkartsellerslist = async (url, browser, page, ProductName) => {
 
     return sellers(html, ProductName);
   } catch (error) {
-    await page.close();
-    await browser.close();
+    if (page) {
+      await page.close();
+    }
+    if (browser) {
+      await browser.close();
+    }
     return { message: "Can not fetch" };
   }
 };

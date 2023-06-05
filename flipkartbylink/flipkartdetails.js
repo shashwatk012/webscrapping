@@ -23,7 +23,7 @@ const scrapdetails = (html) => {
   }
 
   ProductName = null;
-  
+
   let price = $("div._30jeq3._16Jk6d").text();
   price = replce(price);
   obj["price"] = price;
@@ -208,9 +208,12 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     // function in text.js to scrap the required details from the page
     return scrapdetails(html);
   } catch (error) {
-    await page.close();
-
-    await browser.close();
+    if (page) {
+      await page.close();
+    }
+    if (browser) {
+      await browser.close();
+    }
 
     // api to get html of the required page
     browser = await puppeteer.launch({

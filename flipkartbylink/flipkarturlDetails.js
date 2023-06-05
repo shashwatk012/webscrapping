@@ -11,24 +11,24 @@ const flipkartfetchUrlDetails = async (url) => {
 
     const $ = cheerio.load(html);
 
-    const beards = [];
+    const products = [];
 
     $(allProducts).each(async (_idx, el) => {
       // selecting the elements to be scrapped
-      const beardo = $(el);
-      let imagelink = beardo.find(imglink).attr("src"); // scraping the image
+      const listofproducts = $(el);
+      let imagelink = listofproducts.find(imglink).attr("src"); // scraping the image
       if (!imagelink) {
-        imagelink = beardo.find("img._2r_T1I").attr("src"); // scraping the image
+        imagelink = listofproducts.find("img._2r_T1I").attr("src"); // scraping the image
       }
 
-      const link = beardo // scraping the link of the product
+      const link = listofproducts // scraping the link of the product
         .find("a")
         .attr("href");
 
-      let price = beardo.find("div._30jeq3").text();
+      let price = listofproducts.find("div._30jeq3").text();
       price = replce(price);
 
-      let maxretailprice = beardo.find("div._3I9_wc").text();
+      let maxretailprice = listofproducts.find("div._3I9_wc").text();
 
       if (maxretailprice === "") {
         maxretailprice = price;
@@ -36,7 +36,7 @@ const flipkartfetchUrlDetails = async (url) => {
         maxretailprice = replce(maxretailprice);
       }
 
-      let ads = beardo.find("div._2tfzpE>span").text();
+      let ads = listofproducts.find("div._2tfzpE>span").text();
       if (ads === "Ad") {
         ads = "Yes";
       } else {
@@ -50,9 +50,9 @@ const flipkartfetchUrlDetails = async (url) => {
         maxretailprice,
         IsAds: ads,
       };
-      beards.push(element); //storing the details in an array
+      products.push(element); //storing the details in an array
     });
-    return beards;
+    return products;
   } catch (error) {
     return [{ message: "Can not fetch" }];
   }

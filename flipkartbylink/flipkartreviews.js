@@ -95,8 +95,12 @@ const flipkartfetchReviews = async (
     // function in text.js to scrap the required details from the page
     return scrapreviews(html, typeofreviews, ProductName);
   } catch (error) {
-    await page.close();
-    await browser.close();
+    if (page) {
+      await page.close();
+    }
+    if (browser) {
+      await browser.close();
+    }
     const response = await axios.get(url, headers);
 
     const html = response.data;

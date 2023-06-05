@@ -166,24 +166,24 @@ const flipkart = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        // await sql(obj);
-        if (obj.sellerDetails) {
-          listofsellers = [...listofsellers, ...obj.sellerDetails];
-        }
-        if (obj["POSITIVE_FIRST"]) {
-          listofreviews = [...listofreviews, ...obj["POSITIVE_FIRST"]];
-        }
-        if (obj["NEGATIVE_FIRST"]) {
-          listofreviews = [...listofreviews, ...obj["NEGATIVE_FIRST"]];
-        }
+        await sql(obj);
+        // if (obj.sellerDetails) {
+        //   listofsellers = [...listofsellers, ...obj.sellerDetails];
+        // }
+        // if (obj["POSITIVE_FIRST"]) {
+        //   listofreviews = [...listofreviews, ...obj["POSITIVE_FIRST"]];
+        // }
+        // if (obj["NEGATIVE_FIRST"]) {
+        //   listofreviews = [...listofreviews, ...obj["NEGATIVE_FIRST"]];
+        // }
 
         delete obj.sellerDetails;
         delete obj["POSITIVE_FIRST"];
         delete obj["NEGATIVE_FIRST"];
 
         listofproducts.push(obj);
-        //converting into csv file
-        convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 1);
+        // //converting into csv file
+        // convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 1);
         console.log(j);
       }
       numOfData = null;
