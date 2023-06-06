@@ -92,14 +92,19 @@ const scrapdetails = (html) => {
   stars = null;
 
   // Declaration of an array to store the Category and Sub-Categories
-  let Categories = [];
+  let Categories = [],
+    link = [];
 
   //selecting the category element and the looping to get the category and sub-category
   $("div._1MR4o5>div._3GIHBu").each(async (_idx, el) => {
     const x = $(el);
     let category = x.find("a._2whKao").text();
+    let links = x.find("a._2whKao").attr("href");
     if (category) {
       Categories.push(category);
+    }
+    if (links) {
+      link.push(links);
     }
     category = null;
   });
@@ -107,6 +112,7 @@ const scrapdetails = (html) => {
   obj["Category"] = Categories[2];
   obj["Sub-Category"] = Categories[3];
   obj["Product"] = Categories[Categories.length - 2];
+  obj["mainPagelink"] = `https://www.flipkart.com${link[link.length - 2]}`;
   if (Categories.length) {
     const product = obj["Product"].split(" ");
     const Brand = Categories[Categories.length - 1].split(" ");
@@ -179,7 +185,6 @@ const scrapdetails = (html) => {
   obj["Description"] = description;
   count = null;
   description = null;
-
   return obj;
 };
 

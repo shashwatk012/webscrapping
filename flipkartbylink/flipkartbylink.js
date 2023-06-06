@@ -10,6 +10,8 @@ const { flipkartsellerslist } = require("./flipkartsellerslist");
 // Importing text.js file to use the reusable codes
 const { typesOfRatings, fields } = require("../text");
 
+const { flipkartPosition } = require("./flipkartposition");
+
 const flipkartbylink = async (url) => {
   try {
     let browser, page;
@@ -29,6 +31,33 @@ const flipkartbylink = async (url) => {
     // Inserting all the data into data object
     for (let key in details) {
       data[key] = details[key];
+    }
+
+    if (details.mainPagelink) {
+      let res = 0;
+      for (let i = 0; i < 5; i++) {
+        //Scrapping the data from the provided url from all the pages
+        let urls = details.mainPagelink;
+
+        //Changing the page number to scrap data from the next page
+        urls += `&page=${i + 1}`;
+
+        //function to scrap the data from the main page
+        const pos = await flipkartPosition(
+          urls,
+          browser,
+          page,
+          details.ProductName
+        );
+        if (pos.Position) {
+          data.Position = res + pos.Position;
+          break;
+        }
+        res += pos.totalproducts;
+      }
+      if (!data.Position) {
+        data.Position = "100+";
+      }
     }
 
     // Checking whether sellers details are present on the page or not
@@ -111,7 +140,6 @@ const flipkartbylink = async (url) => {
     if (!flag) {
       return "Something went wrong! Try again";
     } else {
-      console.log(obj);
       return obj;
     }
   } catch (e) {
