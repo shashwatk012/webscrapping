@@ -18,18 +18,6 @@ const check = async (url, browser, page) => {
     page = await browser.newPage();
     await page.goto(url);
 
-    let lastHeight = await page.evaluate("document.body.scrollHeight");
-
-    while (true) {
-      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-      await page.waitForTimeout(1000); // sleep a bit
-      let newHeight = await page.evaluate("document.body.scrollHeight");
-      if (newHeight === lastHeight) {
-        break;
-      }
-      lastHeight = newHeight;
-    }
-
     // await page.waitForSelector("button.load-more-button");
 
     let html = await page.content();
@@ -44,10 +32,30 @@ const check = async (url, browser, page) => {
     }
     return false;
   } catch (error) {
-    await page.close();
-    await browser.close();
-    console.log(error);
-    return [{ message: "Can not fetch" }];
+    try {
+      if (page) {
+        await page.close();
+      }
+      if (browser) {
+        await browser.close();
+      }
+      // api to get html of the required page
+      const response = await axios.get(url, headers);
+
+      const html = response.data;
+
+      let $ = cheerio.load(html);
+
+      let load = $("button.load-more-button").text();
+      console.log(load);
+      if (load) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.log(error);
+      return "NOT POSSIBLE";
+    }
   }
 };
 

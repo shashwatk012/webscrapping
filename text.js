@@ -3,6 +3,7 @@
 
 // Importing the cheerio module to load the html
 const cheerio = require("cheerio");
+const { convertJSONtoCSV } = require("./csv");
 
 // Establishing the connection to database
 const connection = require("./connection");
@@ -97,72 +98,45 @@ const replce = (str) => {
 
 // Saving the data to the database
 let sql = async (listofproducts) => {
-  let listofsellers = [],
-    listofreviews = [];
-
-  //Separating the sellersdetails from productDetails
-  if (listofproducts.sellerDetails && listofproducts.sellerDetails.length > 0) {
-    listofsellers = listofproducts.sellerDetails;
-  }
-  delete listofproducts.sellerDetails;
-
-  //Separating the Reviews from productDetails
-  if (
-    listofproducts["POSITIVE_FIRST"] &&
-    listofproducts["POSITIVE_FIRST"].length > 0
-  ) {
-    listofreviews = [...listofreviews, ...listofproducts["POSITIVE_FIRST"]];
-  }
-  if (
-    listofproducts["NEGATIVE_FIRST"] &&
-    listofproducts["NEGATIVE_FIRST"].length > 0
-  ) {
-    listofreviews = [...listofreviews, ...listofproducts["NEGATIVE_FIRST"]];
-  }
-
-  delete listofproducts["POSITIVE_FIRST"];
-  delete listofproducts["NEGATIVE_FIRST"];
-
-  // // Converting the JSON into csv file
-  // convertJSONtoCSV(listofproducts, listofsellers, listofreviews, num);
-
   // Inserting the data into database
   let Product =
     "INSERT INTO FLIPKART_PRODUCT_TABLE (imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_per_unit, maxretailprice , stars, Num_Ratings , Num_Reviews , Mother_Category , Category ,Sub_Category,num_1_star_ratings ,num_2_star_ratings ,num_3_star_ratings ,num_4_star_ratings ,num_5_star_ratings ,Platform,Quantity ,Quantity_unit, Num_sellers , Description, Num_Images ,Is_Ads,Net_Rating_Score_NRS, Discount ,Search_Term ,Min_Price , Max_Price , St_dev_Price, Title_Length , Description_Length , Date) VALUES ?";
 
-  let Seller =
-    "INSERT INTO FLIPKART_SELLERS_TABLE (SellersName , Price,Ratings,Flipkart_Assured , ProductName , Date ) VALUES ?";
+  // let Seller =
+  //   "INSERT INTO FLIPKART_SELLERS_TABLE (SellersName , Price,Ratings,Flipkart_Assured , ProductName , Date ) VALUES ?";
 
-  let Reviews =
-    "INSERT INTO FLIPKART_REVIEWS_TABLE (Title,Summary,Type,ProductName,Date) VALUES ?";
+  // let Reviews =
+  //   "INSERT INTO FLIPKART_REVIEWS_TABLE (Title,Summary,Type,ProductName,Date) VALUES ?";
 
   let values = [],
     values1 = [],
     values2 = [];
   //Make an array of values:
-  let keys = [];
+  for (let i = 0; i < listofproducts.length; i++) {
+    let keys = [];
 
-  for (let value in listofproducts) {
-    keys.push(listofproducts[value]);
-  }
-  values.push(keys);
-
-  for (let i = 0; i < listofsellers.length; i++) {
-    let keys1 = [];
-
-    for (let value in listofsellers[i]) {
-      keys1.push(listofsellers[i][value]);
+    for (let value in listofproducts[i]) {
+      keys.push(listofproducts[i][value]);
     }
-    values1.push(keys1);
+    values.push(keys);
   }
-  for (let i = 0; i < listofreviews.length; i++) {
-    let keys1 = [];
 
-    for (let value in listofreviews[i]) {
-      keys1.push(listofreviews[i][value]);
-    }
-    values2.push(keys1);
-  }
+  // for (let i = 0; i < listofsellers.length; i++) {
+  //   let keys1 = [];
+
+  //   for (let value in listofsellers[i]) {
+  //     keys1.push(listofsellers[i][value]);
+  //   }
+  //   values1.push(keys1);
+  // }
+  // for (let i = 0; i < listofreviews.length; i++) {
+  //   let keys1 = [];
+
+  //   for (let value in listofreviews[i]) {
+  //     keys1.push(listofreviews[i][value]);
+  //   }
+  //   values2.push(keys1);
+  // }
   //Execute the SQL statement, with the value array:
   if (values.length > 0) {
     connection.query(Product, [values], function (err, result) {
@@ -170,24 +144,24 @@ let sql = async (listofproducts) => {
       console.log("Number of reco rds inserted: " + result.affectedRows);
     });
   }
-  if (values1.length > 0) {
-    connection.query(Seller, [values1], function (err, result) {
-      if (err) throw err;
-      console.log("Number of reco rds inserted: " + result.affectedRows);
-    });
-  }
-  if (values2.length > 0) {
-    connection.query(Reviews, [values2], function (err, result) {
-      if (err) throw err;
-      console.log("Number of reco rds inserted: " + result.affectedRows);
-    });
-  }
+  // if (values1.length > 0) {
+  //   connection.query(Seller, [values1], function (err, result) {
+  //     if (err) throw err;
+  //     console.log("Number of reco rds inserted: " + result.affectedRows);
+  //   });
+  // }
+  // if (values2.length > 0) {
+  //   connection.query(Reviews, [values2], function (err, result) {
+  //     if (err) throw err;
+  //     console.log("Number of reco rds inserted: " + result.affectedRows);
+  //   });
+  // }
 
   // connection.query(
-  //   "SELECT * FROM PRODUCT_TABLE",
+  //   "SELECT * FROM FLIPKART_PRODUCT_TABLE",
   //   function (err, result, fields) {
   //     if (err) throw err;
-  //     console.log(result);
+  //     convertJSONtoCSV(result, listofsellers, listofreviews, 1);
   //   }
   // );
 };

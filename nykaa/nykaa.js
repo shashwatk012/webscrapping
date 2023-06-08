@@ -1,7 +1,9 @@
 "use strict";
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
 const { nykaafetchUrlDetails } = require("./nykaaurldetails");
+const { nykaafetchUrlDetails1 } = require("./nykaaurldetails1");
 const { nykaafetchReviews } = require("./nykaareviews");
+const { fetchlink } = require("./fetchlink");
 const { check } = require("./checkformat");
 
 const fields = [
@@ -25,8 +27,6 @@ const fields = [
   "Quantity unit",
   "Number of images",
   "MOST_USEFUL",
-  "POSITIVE_FIRST",
-  "NEGATIVE_FIRST",
   "Discount%",
   "Search Term",
   "Title Length",
@@ -42,7 +42,8 @@ const nykaa = async (Categories) => {
   try {
     console.log(Categories);
     // Declaration of an array to store all the product details
-    let listofproducts = [];
+    let listofproducts = [],
+      listofreviews = [];
 
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
@@ -57,6 +58,9 @@ const nykaa = async (Categories) => {
       let data = [];
 
       const flag = await check(url, browser, page);
+      if (flag === "NOT POSSIBLE") {
+        continue;
+      }
 
       //function to scrap the data from the main page
       if (flag) {
@@ -69,17 +73,14 @@ const nykaa = async (Categories) => {
         arr = [...arr, ...allProductDetails];
         allProductDetails.length = 0;
       } else {
-        for (let i = 1; i < 11; i++) {
-          let urls = `https://www.nykaa.com/${category}/c/8400?page_no=${i}&sort=popularity&eq=desktop`;
-          const allProductDetails = await nykaafetchUrlDetails(
-            urls,
-            browser,
-            page
-          );
-          //storing the coming data in arr
-          arr = [...arr, ...allProductDetails];
-          allProductDetails.length = 0;
-        }
+        const allProductDetails = await nykaafetchUrlDetails1(
+          url,
+          browser,
+          page
+        );
+        //storing the coming data in arr
+        arr = [...arr, ...allProductDetails];
+        allProductDetails.length = 0;
       }
 
       console.log(arr.length);
@@ -97,25 +98,31 @@ const nykaa = async (Categories) => {
           browser,
           page
         );
-        for (let key in details) {
-          data[j][key] = details[key];
+        if (details.message !== "NOT POSSIBLE") {
+          for (let key in details) {
+            data[j][key] = details[key];
+          }
         }
 
-        if (details.reviewsLink != undefined) {
+        if (details.reviewsLink !== undefined) {
           const totalReviewsandratings = await nykaafetchReviews(
             data[j].reviewsLink,
             browser,
             page,
             data[j]["ProductName"]
           );
-          for (let key in totalReviewsandratings) {
-            data[j][key] = totalReviewsandratings[key];
+          if (totalReviewsandratings.message !== "NOT POSSIBLE") {
+            for (let key in totalReviewsandratings) {
+              data[j][key] = totalReviewsandratings[key];
+            }
           }
         }
 
         data[j]["Platform"] = "nykaa";
 
-        data[j]["Title Length"] = data[j]["ProductName"].length;
+        if (data[j]["ProductName"].length) {
+          data[j]["Title Length"] = data[j]["ProductName"].length;
+        }
 
         // data[j]["Description Length"] = data[j]["Description"].length;
 
@@ -136,6 +143,10 @@ const nykaa = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
+        if (obj["MOST_USEFUL"]) {
+          listofreviews = [...listofreviews, ...obj["MOST_USEFUL"]];
+        }
+        delete obj["MOST_USEFUL"];
         listofproducts.push(obj);
         //converting into csv file
         // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
