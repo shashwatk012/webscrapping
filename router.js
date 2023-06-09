@@ -6,30 +6,34 @@ const express = require("express");
 const router = new express.Router();
 
 // Importing the file to scrap the complete products details from nykaa
-const { nykaafetchIndividualDetails } = require("./nykaa/nykaadetails");
-const { flipkartbylink } = require("./flipkartbylink/flipkartbylink");
-const { amazon } = require("./amazon/amazon");
-const { flipkart } = require("./flipkart/flipkart");
-const { flipkart2 } = require("./flipkart2/flipkart");
-const { flipkart3 } = require("./flipkart3/flipkart");
-const { flipkart4 } = require("./flipkart4/flipkart");
-const { flipkart5 } = require("./flipkart5/flipkart");
-const { flipkart6 } = require("./flipkart6/flipkart");
-const { flipkart7 } = require("./flipkart7/flipkart");
-const { flipkart8 } = require("./flipkart8/flipkart");
-const { flipkart9 } = require("./flipkart9/flipkart");
-const { flipkart10 } = require("./flipkart10/flipkart");
-const { flipkart11 } = require("./flipkart11/flipkart");
-const { flipkart12 } = require("./flipkart12/flipkart");
-const { flipkart13 } = require("./flipkart13/flipkart");
-const { flipkart14 } = require("./flipkart14/flipkart");
-const { flipkart15 } = require("./flipkart15/flipkart");
-const { flipkart16 } = require("./flipkart16/flipkart");
-const { flipkart17 } = require("./flipkart17/flipkart");
-const { flipkart18 } = require("./flipkart18/flipkart");
-const { flipkart19 } = require("./flipkart19/flipkart");
-const { flipkart20 } = require("./flipkart20/flipkart");
-const { nykaa } = require("./nykaa/nykaa");
+const {
+  flipkartbylink,
+} = require("./Allflipkartfiles/flipkartbylink/flipkartbylink");
+const { amazon } = require("./Allamazonfiles/amazon/amazon");
+const { flipkart } = require("./Allflipkartfiles/flipkart/flipkart");
+const { flipkart2 } = require("./Allflipkartfiles/flipkart2/flipkart");
+const { flipkart3 } = require("./Allflipkartfiles/flipkart3/flipkart");
+const { flipkart4 } = require("./Allflipkartfiles/flipkart4/flipkart");
+const { flipkart5 } = require("./Allflipkartfiles/flipkart5/flipkart");
+const { flipkart6 } = require("./Allflipkartfiles/flipkart6/flipkart");
+const { flipkart7 } = require("./Allflipkartfiles/flipkart7/flipkart");
+const { flipkart8 } = require("./Allflipkartfiles/flipkart8/flipkart");
+const { flipkart9 } = require("./Allflipkartfiles/flipkart9/flipkart");
+const { flipkart10 } = require("./Allflipkartfiles/flipkart10/flipkart");
+const { flipkart11 } = require("./Allflipkartfiles/flipkart11/flipkart");
+const { flipkart12 } = require("./Allflipkartfiles/flipkart12/flipkart");
+const { flipkart13 } = require("./Allflipkartfiles/flipkart13/flipkart");
+const { flipkart14 } = require("./Allflipkartfiles/flipkart14/flipkart");
+const { flipkart15 } = require("./Allflipkartfiles/flipkart15/flipkart");
+const { flipkart16 } = require("./Allflipkartfiles/flipkart16/flipkart");
+const { flipkart17 } = require("./Allflipkartfiles/flipkart17/flipkart");
+const { flipkart18 } = require("./Allflipkartfiles/flipkart18/flipkart");
+const { flipkart19 } = require("./Allflipkartfiles/flipkart19/flipkart");
+const { flipkart20 } = require("./Allflipkartfiles/flipkart20/flipkart");
+const { nykaa } = require("./Allnykaafiles/nykaa/nykaa");
+const {
+  nykaabylink,
+} = require("./Allnykaafiles/nykaadetailsbylink/nykaabylink");
 
 //Calling middleware to identify the incoming JSON from the front end
 router.use(express.json());
@@ -286,31 +290,7 @@ router.post("/amazondetails", async (req, res) => {
 // Route to scrap the the data of an individual product through link
 router.post("/nykaadetailsbylink", async (req, res) => {
   try {
-    let browser, page;
-    //Creating the link to be scrapped
-    let url = req["body"].link;
-
-    const data = {
-      productlink: url,
-    };
-
-    // scrapping all the required details by going inside every individual products
-    let details = await nykaafetchIndividualDetails(
-      data.productlink,
-      browser,
-      page
-    );
-    for (let key in details) {
-      data[key] = details[key];
-    }
-
-    data["Platform"] = "nykaa";
-
-    // Making a new array of product with required fields and in required order
-    let obj = {};
-    for (let k = 0; k < fields.length; k++) {
-      obj[fields[k]] = data[fields[k]];
-    }
+    const obj = await nykaabylink(req.body);
     res.send(obj);
   } catch (e) {
     console.log("jh");

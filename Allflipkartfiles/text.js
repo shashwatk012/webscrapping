@@ -3,10 +3,10 @@
 
 // Importing the cheerio module to load the html
 const cheerio = require("cheerio");
-const { convertJSONtoCSV } = require("./csv");
+const { convertJSONtoCSV } = require("../csv");
 
 // Establishing the connection to database
-const connection = require("./connection");
+const connection = require("../connection");
 
 // headers to send with api request to sites to avoid blockage
 const headers = {
