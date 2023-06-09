@@ -45,12 +45,14 @@ const scrapreviews = (html, typeofreviews, ProductName) => {
       } else if (title) {
         review.push({
           title: title,
+          summary: "NA",
           type: type,
           ProductName,
           date,
         });
       } else {
         review.push({
+          title: "NA",
           summary: summary,
           type: type,
           ProductName,

@@ -134,7 +134,11 @@ const flipkartbylink = async (url) => {
     // Making a new array of product details with required fields and in required order
     let obj = {};
     for (let k = 0; k < fields.length; k++) {
-      obj[fields[k]] = data[fields[k]];
+      if (data[fields[k]]) {
+        obj[fields[k]] = data[fields[k]];
+      } else {
+        obj[fields[k]] = "NA";
+      }
     }
 
     if (!flag) {
