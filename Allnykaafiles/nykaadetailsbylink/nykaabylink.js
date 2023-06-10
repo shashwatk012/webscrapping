@@ -1,6 +1,7 @@
 "use strict";
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
 const { nykaafetchReviews } = require("./nykaareviews");
+const { fetchPosition } = require("./nykaafetchposition");
 
 const fields = [
   "imagelink",
@@ -18,6 +19,11 @@ const fields = [
   "Mother Category",
   "Category",
   "Sub-Category",
+  "5 star ratings",
+  "4 star ratings",
+  "3 star ratings",
+  "2 star ratings",
+  "1 star ratings",
   "Platform",
   "Quantity",
   "Quantity unit",
@@ -25,6 +31,7 @@ const fields = [
   "Discount%",
   "Search Term",
   "Title Length",
+  "Net Rating Score (NRS)",
   "MOST_USEFUL",
   "Date",
 ];
@@ -49,6 +56,16 @@ const nykaabylink = async (body) => {
       for (let key in details) {
         data[key] = details[key];
       }
+      let NetRatingRank =
+        (data["5 star ratings"] +
+          data["4 star ratings"] -
+          (data["2 star ratings"] + data["1 star ratings"])) /
+        (data["5 star ratings"] +
+          data["4 star ratings"] +
+          data["3 star ratings"] +
+          (data["2 star ratings"] + data["1 star ratings"]));
+
+      data["Net Rating Score (NRS)"] = NetRatingRank * 100;
     }
 
     if (details.reviewsLink !== undefined) {
@@ -63,6 +80,11 @@ const nykaabylink = async (body) => {
           data[key] = totalReviewsandratings[key];
         }
       }
+    }
+
+    if (details.posLink !== undefined) {
+      const pos = await fetchPosition(details.posLink, browser, page, url);
+      data["Position"] = pos;
     }
 
     data["Platform"] = "nykaa";

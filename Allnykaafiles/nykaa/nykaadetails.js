@@ -84,6 +84,13 @@ const individualdetails = (html) => {
   obj["Ratings"] = ratings;
   obj["Reviews"] = reviews;
 
+  // console.log($("div.css-kxc9rx>span").text());
+  $("div.css-kxc9rx>span").each(async (_idx, el) => {
+    const x = $(el);
+    const diffratings = x.text();
+    obj[`${5 - _idx} star ratings`] = Number(diffratings);
+  });
+
   let categories = [];
   $("div.css-16kpx0l>ul.css-1uxnb1o>li").each(async (_idx, el) => {
     const x = $(el);
@@ -100,6 +107,13 @@ const individualdetails = (html) => {
   if (reviewsLink !== undefined) {
     obj["reviewsLink"] = `https://www.nykaa.com${reviewsLink}`;
   }
+
+  const posLink = $(
+    "div.css-16kpx0l>ul.css-1uxnb1o>li.last-list.css-hnjjmz>a.name"
+  )
+    .last()
+    .attr("href");
+  obj["posLink"] = `https://www.nykaa.com${posLink}`;
 
   let count = 1;
   $("div.css-qb9x9j").each(async (_idx, el) => {
@@ -142,6 +156,8 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
       }
       lastHeight = newHeight;
     }
+
+    await page.hover("div.css-1m0y15j");
 
     const html = await page.content();
 

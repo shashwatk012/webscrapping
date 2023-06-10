@@ -156,21 +156,13 @@ let sql = async (listofproducts) => {
   //     console.log("Number of reco rds inserted: " + result.affectedRows);
   //   });
   // }
-
-  // connection.query(
-  //   "SELECT * FROM FLIPKART_PRODUCT_TABLE",
-  //   function (err, result, fields) {
-  //     if (err) throw err;
-  //     convertJSONtoCSV(result, listofsellers, listofreviews, 1);
-  //   }
-  // );
 };
 
 // Saving the data to the flipkartdatabase
 let nykaasql = async (listofproducts) => {
   // Inserting the data into database
   let Product =
-    "INSERT INTO NYKAA_PRODUCT_TABLE (imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_per_unit, maxretailprice , stars, Num_Ratings , Num_Reviews , Mother_Category , Category ,Sub_Category,Platform,Quantity ,Quantity_unit, Num_Images , Discount ,Search_Term  , Title_Length ,  Date) VALUES ?";
+    "INSERT INTO NYKAA_PRODUCT_TABLE (imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_per_unit, maxretailprice , stars, Num_Ratings , Num_Reviews , Mother_Category , Category ,Sub_Category,num_1_star_ratings ,num_2_star_ratings ,num_3_star_ratings ,num_4_star_ratings ,num_5_star_ratings,Platform,Quantity ,Quantity_unit, Num_Images , Discount ,Search_Term  , Title_Length ,Net_Rating_Score_NRS,  Date) VALUES ?";
 
   let values = [];
   //Make an array of values:

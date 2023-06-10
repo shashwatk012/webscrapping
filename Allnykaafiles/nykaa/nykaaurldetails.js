@@ -60,7 +60,7 @@ const nykaafetchUrlDetails = async (url, browser, page) => {
       console.log(load);
       console.log(i);
       i++;
-      if (i == 3) {
+      if (i == 1) {
         break;
       }
     }

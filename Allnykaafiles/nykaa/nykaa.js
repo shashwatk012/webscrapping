@@ -22,6 +22,11 @@ const fields = [
   "Mother Category",
   "Category",
   "Sub-Category",
+  "5 star ratings",
+  "4 star ratings",
+  "3 star ratings",
+  "2 star ratings",
+  "1 star ratings",
   "Platform",
   "Quantity",
   "Quantity unit",
@@ -29,6 +34,7 @@ const fields = [
   "Discount%",
   "Search Term",
   "Title Length",
+  "Net Rating Score (NRS)",
   "Date",
 ];
 
@@ -106,6 +112,16 @@ const nykaa = async (Categories) => {
           for (let key in details) {
             data[j][key] = details[key];
           }
+          let NetRatingRank =
+            (data[j]["5 star ratings"] +
+              data[j]["4 star ratings"] -
+              (data[j]["2 star ratings"] + data[j]["1 star ratings"])) /
+            (data[j]["5 star ratings"] +
+              data[j]["4 star ratings"] +
+              data[j]["3 star ratings"] +
+              (data[j]["2 star ratings"] + data[j]["1 star ratings"]));
+
+          data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
         }
 
         // if (details.reviewsLink !== undefined) {

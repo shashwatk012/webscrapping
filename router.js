@@ -5,7 +5,7 @@
 const express = require("express");
 const router = new express.Router();
 
-// Importing the file to scrap the complete products details from nykaa
+// Importing the file to scrap the complete products details from nykaa and flipkart
 const {
   flipkartbylink,
 } = require("./Allflipkartfiles/flipkartbylink/flipkartbylink");
@@ -31,6 +31,25 @@ const { flipkart18 } = require("./Allflipkartfiles/flipkart18/flipkart");
 const { flipkart19 } = require("./Allflipkartfiles/flipkart19/flipkart");
 const { flipkart20 } = require("./Allflipkartfiles/flipkart20/flipkart");
 const { nykaa } = require("./Allnykaafiles/nykaa/nykaa");
+const { nykaa2 } = require("./Allnykaafiles/nykaa2/nykaa");
+const { nykaa3 } = require("./Allnykaafiles/nykaa3/nykaa");
+const { nykaa4 } = require("./Allnykaafiles/nykaa4/nykaa");
+const { nykaa5 } = require("./Allnykaafiles/nykaa5/nykaa");
+const { nykaa6 } = require("./Allnykaafiles/nykaa6/nykaa");
+const { nykaa7 } = require("./Allnykaafiles/nykaa7/nykaa");
+const { nykaa8 } = require("./Allnykaafiles/nykaa8/nykaa");
+const { nykaa9 } = require("./Allnykaafiles/nykaa9/nykaa");
+const { nykaa10 } = require("./Allnykaafiles/nykaa10/nykaa");
+const { nykaa11 } = require("./Allnykaafiles/nykaa11/nykaa");
+const { nykaa12 } = require("./Allnykaafiles/nykaa12/nykaa");
+const { nykaa13 } = require("./Allnykaafiles/nykaa13/nykaa");
+const { nykaa14 } = require("./Allnykaafiles/nykaa14/nykaa");
+const { nykaa15 } = require("./Allnykaafiles/nykaa15/nykaa");
+const { nykaa16 } = require("./Allnykaafiles/nykaa16/nykaa");
+const { nykaa17 } = require("./Allnykaafiles/nykaa17/nykaa");
+const { nykaa18 } = require("./Allnykaafiles/nykaa18/nykaa");
+const { nykaa19 } = require("./Allnykaafiles/nykaa19/nykaa");
+const { nykaa20 } = require("./Allnykaafiles/nykaa20/nykaa");
 const {
   nykaabylink,
 } = require("./Allnykaafiles/nykaadetailsbylink/nykaabylink");
@@ -302,6 +321,215 @@ router.post("/nykaadetailsbylink", async (req, res) => {
 router.post("/nykaadetails", async (req, res) => {
   try {
     let listofproducts = await nykaa(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails2", async (req, res) => {
+  try {
+    let listofproducts = await nykaa2(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails3", async (req, res) => {
+  try {
+    let listofproducts = await nykaa3(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails4", async (req, res) => {
+  try {
+    let listofproducts = await nykaa4(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails5", async (req, res) => {
+  try {
+    let listofproducts = await nykaa5(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails6", async (req, res) => {
+  try {
+    let listofproducts = await nykaa6(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails7", async (req, res) => {
+  try {
+    let listofproducts = await nykaa7(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails8", async (req, res) => {
+  try {
+    let listofproducts = await nykaa8(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails9", async (req, res) => {
+  try {
+    let listofproducts = await nykaa9(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails10", async (req, res) => {
+  try {
+    let listofproducts = await nykaa10(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails11", async (req, res) => {
+  try {
+    let listofproducts = await nykaa11(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails12", async (req, res) => {
+  try {
+    let listofproducts = await nykaa12(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails13", async (req, res) => {
+  try {
+    let listofproducts = await nykaa13(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails14", async (req, res) => {
+  try {
+    let listofproducts = await nykaa14(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails15", async (req, res) => {
+  try {
+    let listofproducts = await nykaa15(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails16", async (req, res) => {
+  try {
+    let listofproducts = await nykaa16(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails17", async (req, res) => {
+  try {
+    let listofproducts = await nykaa17(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails18", async (req, res) => {
+  try {
+    let listofproducts = await nykaa18(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails19", async (req, res) => {
+  try {
+    let listofproducts = await nykaa19(req["body"]);
+    // listofproducts = await sql(listofproducts, 5);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("jh");
+    res.send("Something went wrong on router");
+  }
+});
+
+router.post("/nykaadetails20", async (req, res) => {
+  try {
+    let listofproducts = await nykaa20(req["body"]);
     // listofproducts = await sql(listofproducts, 5);
     res.send(listofproducts);
   } catch (e) {
