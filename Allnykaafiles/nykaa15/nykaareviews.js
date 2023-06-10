@@ -1,62 +1,10 @@
+"use strict";
 const axios = require("axios");
-const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
+const cheerio = require("cheerio");
 const { headers, replce } = require("../../text");
 
-const reviews = (html, ProductName) => {
-  // cheerio nodejs module to load html
-  let $ = cheerio.load(html);
-  let date = new Date();
-
-  date = date.toLocaleDateString();
-
-  let obj = {},
-    review = [];
-  // Scraping the reviewS
-  $("div.css-z7l7ua").each(async (_idx, el) => {
-    const x = $(el);
-    let name = x.find("span.css-amd8cf").text();
-    let title = x.find("h4.css-tm4hnq").text();
-    let summary = x.find("p.css-1n0nrdk").text();
-    let type = "Most Useful";
-
-    if (title && summary) {
-      review.push({
-        name,
-        title: title,
-        summary: summary,
-        type: type,
-        ProductName,
-        date,
-      });
-    } else if (title) {
-      review.push({
-        name,
-        title: title,
-        summary: null,
-        type: type,
-        ProductName,
-        date,
-      });
-    } else {
-      review.push({
-        name,
-        title: null,
-        summary: summary,
-        type: type,
-        ProductName,
-        date,
-      });
-    }
-    title = null;
-    summary = null;
-  });
-  obj["MOST_USEFUL"] = review;
-  return obj;
-};
-
-const nykaafetchReviews = async (url, browser, page, ProductName) => {
-  // function to scrap complete data about one product
+const nykaafetchUrlDetails = async (url, browser, page) => {
   try {
     // api to get html of the required page
     browser = await puppeteer.launch({
@@ -70,12 +18,48 @@ const nykaafetchReviews = async (url, browser, page, ProductName) => {
     page = await browser.newPage();
     await page.goto(url);
 
-    const html = await page.content();
+    let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+    while (true) {
+      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      await page.waitForTimeout(1000); // sleep a bit
+      let newHeight = await page.evaluate("document.body.scrollHeight");
+      if (newHeight === lastHeight) {
+        break;
+      }
+      lastHeight = newHeight;
+    }
+
+    // await page.waitForSelector("button.load-more-button");
+
+    let html = await page.content();
+
+    let $ = cheerio.load(html);
 
     await page.close();
     await browser.close();
 
-    return reviews(html, ProductName);
+    const nykaa = [];
+
+    $("div#product-list-wrap>div.productWrapper.css-xin9gt").each(
+      async (_idx, el) => {
+        // selecting the elements to be scrapped
+        const links = $(el);
+
+        // let imagelink = links.find(imglink).attr("src"); // scraping the image
+
+        const link = links // scraping the link of the product
+          .find("a")
+          .attr("href");
+
+        let element = {
+          // imagelink,
+          productlink: `https://www.nykaa.com${link}`,
+        };
+        nykaa.push(element); //storing the details in an array
+      }
+    );
+    return nykaa;
   } catch (error) {
     try {
       if (page) {
@@ -89,11 +73,33 @@ const nykaafetchReviews = async (url, browser, page, ProductName) => {
 
       const html = response.data;
 
-      return reviews(html, ProductName);
+      $ = cheerio.load(html);
+
+      const nykaa = [];
+
+      $("div#product-list-wrap>div.productWrapper.css-xin9gt").each(
+        async (_idx, el) => {
+          // selecting the elements to be scrapped
+          const links = $(el);
+
+          // let imagelink = links.find(imglink).attr("src"); // scraping the image
+
+          const link = links // scraping the link of the product
+            .find("a")
+            .attr("href");
+
+          let element = {
+            // imagelink,
+            productlink: `https://www.nykaa.com${link}`,
+          };
+          nykaa.push(element); //storing the details in an array
+        }
+      );
+      return nykaa;
     } catch (e) {
-      return { message: "NOT POSSIBLE" };
+      return [{ message: "Can not fetch" }];
     }
   }
 };
 
-module.exports = { nykaafetchReviews };
+module.exports = { nykaafetchUrlDetails };

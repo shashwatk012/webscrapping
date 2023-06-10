@@ -140,7 +140,7 @@ const nykaa = async (Categories) => {
 
         data[j]["Platform"] = "nykaa";
 
-        if (data[j]["ProductName"].length) {
+        if (data[j]["ProductName"]) {
           data[j]["Title Length"] = data[j]["ProductName"].length;
         }
 

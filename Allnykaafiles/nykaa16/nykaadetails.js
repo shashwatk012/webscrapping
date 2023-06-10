@@ -19,20 +19,35 @@ const individualdetails = (html) => {
   }
 
   const pos = ProductName.indexOf("(");
-
+  let pos1 = ProductName.indexOf(")");
   if (pos !== -1) {
-    let Quantity = ProductName.substring(pos + 1, ProductName.length - 1);
+    let Quantity = ProductName.substring(pos + 1, pos1);
     console.log(Quantity);
-
-    const QuantityUnit = Quantity.match(/[a-z]+/gi).join("");
+    const splitArray = Quantity.match(/([\d\.]+)(.*)/);
+    console.log(splitArray);
+    let QuantityUnit;
+    if (splitArray && splitArray[2]) {
+      QuantityUnit = splitArray[2].trim();
+    }
     // matching all numbers
-    Quantity = Quantity.match(/\d+/g).join("");
+    if (splitArray && splitArray[1]) {
+      Quantity = Number(splitArray[1]);
+    }
 
-    obj["Quantity"] = Number(Quantity);
-    obj["Quantity unit"] = QuantityUnit;
+    if (
+      QuantityUnit === "gm" ||
+      QuantityUnit === "ml" ||
+      QuantityUnit === "g"
+    ) {
+      obj["Quantity"] = Number(Quantity);
+      obj["Quantity unit"] = QuantityUnit;
+    } else {
+      obj["Quantity"] = 1;
+      obj["Quantity unit"] = "NA";
+    }
   } else {
     obj["Quantity"] = 1;
-    obj["Quantity Unit"] = "NA";
+    obj["Quantity unit"] = "NA";
   }
 
   let imagelink = $("div.css-5n0nl4>div>img").attr("src");
@@ -173,13 +188,52 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
       if (browser) {
         await browser.close();
       }
+      console.log("error");
       // api to get html of the required page
       const response = await axios.get(url, headers);
 
       const html = response.data;
 
-      return individualdetails(html);
+      let obj = individualdetails(html);
+      let ProductName = obj.ProductName;
+
+      let pos = ProductName.indexOf(")");
+
+      ProductName = ProductName.substring(0, pos + 1);
+      obj.ProductName = ProductName;
+
+      pos = ProductName.indexOf("(");
+      let pos1 = ProductName.indexOf(")");
+      if (pos !== -1 && pos1 !== -1) {
+        let Quantity = ProductName.substring(pos + 1, pos1 - 1);
+        const splitArray = Quantity.match(/([\d\.]+)(.*)/);
+
+        let QuantityUnit = "NA";
+        if (splitArray && splitArray[2]) {
+          QuantityUnit = splitArray[2].trim();
+        }
+        // matching all numbers
+        if (splitArray && splitArray[1]) {
+          Quantity = Number(splitArray[1]);
+        }
+        if (
+          QuantityUnit === "gm" ||
+          QuantityUnit === "ml" ||
+          QuantityUnit === "g"
+        ) {
+          obj["Quantity"] = Number(Quantity);
+          obj["Quantity unit"] = QuantityUnit;
+        } else {
+          obj["Quantity"] = 1;
+          obj["Quantity unit"] = "NA";
+        }
+      } else {
+        obj["Quantity"] = 1;
+        obj["Quantity unit"] = "NA";
+      }
+      return obj;
     } catch (e) {
+      console.log(e);
       return { message: "NOT POSSIBLE" };
     }
   }
