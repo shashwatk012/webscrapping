@@ -46,6 +46,9 @@ const urlmaking = (category) => {
 const nykaa18 = async (Categories) => {
   try {
     console.log(Categories);
+    if (!Categories.length) {
+      Categories = [Categories];
+    }
     // Declaration of an array to store all the product details
     let listofproducts = [];
 
