@@ -4,7 +4,7 @@ const { flipkartfetchUrlDetails } = require("./flipkarturlDetails");
 const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
-const { typesOfRatings, fields, urlmaking, sql } = require("../text");
+const { typesOfRatings, fields, urlmaking, sql, save } = require("../text");
 
 const flipkart = async (Categories) => {
   try {
@@ -189,6 +189,8 @@ const flipkart = async (Categories) => {
         delete obj.sellerDetails;
         delete obj["POSITIVE_FIRST"];
         delete obj["NEGATIVE_FIRST"];
+
+        console.log(await save(obj));
 
         listofproducts.push(obj);
 

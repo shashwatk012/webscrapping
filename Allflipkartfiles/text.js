@@ -8,6 +8,19 @@ const { convertJSONtoCSV } = require("../csv");
 // Establishing the connection to database
 const connection = require("../connection");
 
+const axios = require("axios");
+
+const save = async (obj) => {
+  const response = await axios({
+    method: "post",
+    url: "https://www.publiqverse.io/version-62l7/api/1.1/obj/ProductCatalogue",
+    data: obj,
+  });
+
+  let html = response.data;
+  return html;
+};
+
 // headers to send with api request to sites to avoid blockage
 const headers = {
   Accept:
@@ -2589,4 +2602,5 @@ module.exports = {
   brands,
   sql,
   nykaasql,
+  save,
 };
