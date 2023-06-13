@@ -5,7 +5,6 @@ const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
 const { typesOfRatings, fields, urlmaking, sql, save } = require("../text");
-const { convertJSONtoCSV } = require("../../csv");
 
 const flipkart = async (Categories) => {
   try {
@@ -195,8 +194,8 @@ const flipkart = async (Categories) => {
 
         listofproducts.push(obj);
 
-        //converting into csv file
-        convertJSONtoCSV(listofproducts);
+        // //converting into csv file
+        // convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 1);
         console.log(j);
       }
       await sql(listofproducts);
