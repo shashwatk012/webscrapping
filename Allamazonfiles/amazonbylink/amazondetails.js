@@ -2,6 +2,7 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { replce } = require("../text");
 const math = require("mathjs");
+const readline = require("readline");
 
 const amazonfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
@@ -32,9 +33,24 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       lastHeight = newHeight;
     }
     await page.screenshot({ path: "screenshot.png" });
+    let Name;
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    rl.question("Enter your name: ", (name) => {
+      console.log(`Hello, ${name}!`);
+      Name = name;
+      rl.close();
+    });
+    while (!Name) {
+      await page.waitForTimeout(1000);
+    }
+    console.log(Name);
 
     const html = await page.content();
-    // console.log(html);
+    console.log(html);
 
     await page.close();
     await browser.close();
