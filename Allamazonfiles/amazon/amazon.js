@@ -1,4 +1,3 @@
-const puppeteer = require("puppeteer");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
@@ -13,11 +12,7 @@ const amazon = async (Categories) => {
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
       listofproducts = [];
-      let page;
-      let browser = await puppeteer.launch({
-        headless: `true`,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      });
+      let page, browser;
       //Creating the link to be scrapped
       let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
 
@@ -36,7 +31,7 @@ const amazon = async (Categories) => {
         //function to scrap the data from the main page
         const allProductDetails = await amazonfetchUrlDetails(
           url,
-          { browser },
+          browser,
           page
         );
 
@@ -61,7 +56,7 @@ const amazon = async (Categories) => {
         // scrapping all the required details by going inside every individual products
         let details = await amazonfetchIndividualDetails(
           data[j].productlink,
-          { browser },
+          browser,
           page
         );
         for (const key in details) {
@@ -72,7 +67,7 @@ const amazon = async (Categories) => {
         if (details.reviewsLink !== "https://amazon.inundefined") {
           const totalReviewsandratings = await amazonfetchReviews(
             details.reviewsLink,
-            { browser },
+            browser,
             page
           );
           for (const key in totalReviewsandratings) {
@@ -171,7 +166,6 @@ const amazon = async (Categories) => {
         listofproducts.push(obj);
         console.log(j);
       }
-      await browser.close();
     }
     return listofproducts;
   } catch (e) {
