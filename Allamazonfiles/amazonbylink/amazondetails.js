@@ -31,9 +31,10 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       }
       lastHeight = newHeight;
     }
+    await page.screenshot({ path: "screenshot.png" });
 
     const html = await page.content();
-    console.log(html);
+    // console.log(html);
 
     await page.close();
     await browser.close();
