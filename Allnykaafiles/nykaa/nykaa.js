@@ -4,39 +4,7 @@ const { nykaafetchUrlDetails } = require("./nykaaurldetails");
 const { nykaafetchUrlDetails1 } = require("./nykaaurldetails1");
 const { nykaafetchReviews } = require("./nykaareviews");
 const { check } = require("./checkformat");
-const { nykaasql } = require("../../text");
-
-const fields = [
-  "imagelink",
-  "productlink",
-  "Position",
-  "Product",
-  "ProductName",
-  "Brand",
-  "price",
-  "Price per unit",
-  "maxretailprice",
-  "stars",
-  "Ratings",
-  "Reviews",
-  "Mother Category",
-  "Category",
-  "Sub-Category",
-  "5 star ratings",
-  "4 star ratings",
-  "3 star ratings",
-  "2 star ratings",
-  "1 star ratings",
-  "Platform",
-  "Quantity",
-  "Quantity unit",
-  "Number of images",
-  "Discount%",
-  "Search Term",
-  "Title Length",
-  "Net Rating Score (NRS)",
-  "Date",
-];
+const { nykaasql, fields, save } = require("../../text");
 
 const urlmaking = (category) => {
   const url = `https://www.nykaa.com/search/result/?q=${category}&root=search&searchType=history&suggestionType=query&ssp=2&searchItem=${category}&sourcepage=home&`;
@@ -166,16 +134,15 @@ const nykaa = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        // if (obj["MOST_USEFUL"]) {
-        //   listofreviews = [...listofreviews, ...obj["MOST_USEFUL"]];
-        // }
         // delete obj["MOST_USEFUL"];
+        delete obj["POSITIVE_FIRST"];
+        delete obj["NEGATIVE_FIRST"];
+        delete obj["sellerDetails"];
         listofproducts.push(obj);
-        //converting into csv file
-        // convertJSONtoCSV(listofproducts, "flipkartProductdetails");
+        console.log(await save(obj));
         console.log(j);
       }
-      await nykaasql(listofproducts);
+      // await nykaasql(listofproducts);
       numOfData = null;
       url = null;
       arr.length = 0;

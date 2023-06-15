@@ -1,11 +1,17 @@
 const cheerio = require("cheerio");
-const { headers, apikey } = require("../../text");
-const scrapingbee = require("scrapingbee");
 const puppeteer = require("puppeteer");
 
 const amazonfetchReviews = async (url, browser, page) => {
   try {
-    page = await browser.browser.newPage();
+    browser = await puppeteer.launch({
+      // headless: "new",
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // `headless: 'new'` enables new Headless;
+      // `headless: false` enables “headful” mode.
+    });
+
+    page = await browser.newPage();
     await page.goto(url);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
@@ -23,7 +29,7 @@ const amazonfetchReviews = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    // await browser.close();
+    await browser.close();
 
     const $ = cheerio.load(html);
 
@@ -59,33 +65,29 @@ const amazonfetchReviews = async (url, browser, page) => {
     });
 
     // Scraping the reviews
-    // const reviews1 = [];
-    // $("div.a-section.review.aok-relative").each(async (_idx, el) => {
-    //   const reviews = $(el);
-    //   const name = reviews.find("span.a-profile-name").text();
-    //   const review = reviews
-    //     .find("span.a-size-base.review-text.review-text-content>span")
-    //     .text();
-    //   reviews1.push({
-    //     name: name,
-    //     review: review,
-    //   });
-    // });
+    const reviews1 = [];
+    $("div.a-section.review.aok-relative").each(async (_idx, el) => {
+      const reviews = $(el);
+      const name = reviews.find("span.a-profile-name").text();
+      const review = reviews
+        .find("span.a-size-base.review-text.review-text-content>span")
+        .text();
+      reviews1.push({
+        name: name,
+        review: review,
+      });
+    });
     obj["Reviews"] = Number(numberReviews);
-    // obj["top10reviews"] = reviews1;
+    obj["top10reviews"] = reviews1;
     return obj;
   } catch (error) {
-    try {
-      if (page) {
-        await page.close();
-      }
-      // if (browser) {
-      //   await browser.close();
-      // }
-      return {};
-    } catch (e) {
-      return {};
+    if (page) {
+      await page.close();
     }
+    if (browser) {
+      await browser.close();
+    }
+    return {};
   }
 };
 

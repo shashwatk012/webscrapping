@@ -1,16 +1,23 @@
+const puppeteer = require("puppeteer");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
-const { typesOfRatings, urlmaking, fields } = require("../../text");
+const { typesOfRatings, fields, save } = require("../../text");
 
 const amazon = async (Categories) => {
   try {
+    let browser, page;
+    browser = await puppeteer.launch({
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     console.log(Categories);
     // Declaration of an array to store all the product details
     let listofproducts = [];
 
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
+      listofproducts = [];
       //Creating the link to be scrapped
       let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
 
@@ -21,16 +28,24 @@ const amazon = async (Categories) => {
         data = [];
 
       //Scrapping the data from the provided url from all the pages
-      for (let j = 0; j < 100; j++) {
+      for (let j = 0; j < 10; j++) {
         //Changing the page number to scrap data from the next page
         url = url.replace(`page=${j}&crid`, `page=${j + 1}&crid`);
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
 
         //function to scrap the data from the main page
-        const allProductDetails = await amazonfetchUrlDetails(url);
+        const allProductDetails = await amazonfetchUrlDetails(
+          url,
+          { browser },
+          page
+        );
 
         //storing the coming data in arr
-        arr = [...arr, ...allProductDetails];
+        if (allProductDetails && allProductDetails.length) {
+          arr = [...arr, ...allProductDetails];
+        }
+        console.log(arr.length);
+
         if (arr.length >= numOfData) {
           break;
         }
@@ -46,7 +61,8 @@ const amazon = async (Categories) => {
         // scrapping all the required details by going inside every individual products
         let details = await amazonfetchIndividualDetails(
           data[j].productlink,
-          data[j].price
+          { browser },
+          page
         );
         for (const key in details) {
           data[j][key] = details[key];
@@ -55,7 +71,9 @@ const amazon = async (Categories) => {
         // Checking whether reviews page is available on the site or not
         if (details.reviewsLink !== "https://amazon.inundefined") {
           const totalReviewsandratings = await amazonfetchReviews(
-            details.reviewsLink
+            details.reviewsLink,
+            { browser },
+            page
           );
           for (const key in totalReviewsandratings) {
             data[j][key] = totalReviewsandratings[key];
@@ -78,13 +96,14 @@ const amazon = async (Categories) => {
 
         // Number of reviews is in percentage so converting in the numbers
         for (let k = 1; k <= 5; k++) {
-          data[j][`${k} star ratings`] = Math.floor(
-            (Number(data[j][`${k} star ratings`]) *
-              Number(data[j]["Ratings"])) /
-              100
-          );
-          if (data[j][`${k} star ratings`] === NaN) {
-            data[j][`${k} star ratings`] = "0";
+          if (data[j][`${k} star ratings`]) {
+            data[j][`${k} star ratings`] = Math.floor(
+              (Number(data[j][`${k} star ratings`]) *
+                Number(data[j]["Ratings"])) /
+                100
+            );
+          } else {
+            data[j][`${k} star ratings`] = 0;
           }
         }
 
@@ -135,6 +154,7 @@ const amazon = async (Categories) => {
           data[j]["Quantity unit"] = "NA";
         }
 
+        fields.push("BSR in Mother Category", "BSR in Category");
         // Making a new array of product with required fields
         let obj = {};
         for (let k = 0; k < fields.length; k++) {
@@ -147,10 +167,13 @@ const amazon = async (Categories) => {
         delete obj["sellerDetails"];
         delete obj["POSITIVE_FIRST"];
         delete obj["NEGATIVE_FIRST"];
+
+        console.log(await save(obj));
         listofproducts.push(obj);
         console.log(j);
       }
     }
+    await browser.close();
     return listofproducts;
   } catch (e) {
     console.log(e);

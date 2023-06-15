@@ -10,6 +10,7 @@ const {
   flipkartbylink,
 } = require("./Allflipkartfiles/flipkartbylink/flipkartbylink");
 const { amazon } = require("./Allamazonfiles/amazon/amazon");
+const { amazonbylink } = require("./Allamazonfiles/amazonbylink/amazonbylink");
 const { flipkart } = require("./Allflipkartfiles/flipkart/flipkart");
 const { flipkart2 } = require("./Allflipkartfiles/flipkart2/flipkart");
 const { flipkart3 } = require("./Allflipkartfiles/flipkart3/flipkart");
@@ -294,6 +295,15 @@ router.post("/flipkartdetails20", async (req, res) => {
     res.send(listofproducts);
   } catch (e) {
     res.send("Check the input format");
+  }
+});
+
+router.post("/amazondetailsbylink", async (req, res) => {
+  try {
+    const listofproducts = await amazonbylink(req["body"].link);
+    res.send(listofproducts);
+  } catch (e) {
+    console.log("Something went wrong on router");
   }
 });
 

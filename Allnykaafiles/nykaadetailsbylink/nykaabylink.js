@@ -2,39 +2,7 @@
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
 const { nykaafetchReviews } = require("./nykaareviews");
 const { fetchPosition } = require("./nykaafetchposition");
-
-const fields = [
-  "imagelink",
-  "productlink",
-  "Position",
-  "Product",
-  "ProductName",
-  "Brand",
-  "price",
-  "Price per unit",
-  "maxretailprice",
-  "stars",
-  "Ratings",
-  "Reviews",
-  "Mother Category",
-  "Category",
-  "Sub-Category",
-  "5 star ratings",
-  "4 star ratings",
-  "3 star ratings",
-  "2 star ratings",
-  "1 star ratings",
-  "Platform",
-  "Quantity",
-  "Quantity unit",
-  "Number of images",
-  "Discount%",
-  "Search Term",
-  "Title Length",
-  "Net Rating Score (NRS)",
-  "MOST_USEFUL",
-  "Date",
-];
+const { fields } = require("../../text");
 
 const nykaabylink = async (body) => {
   try {
@@ -89,10 +57,23 @@ const nykaabylink = async (body) => {
 
     data["Platform"] = "nykaa";
 
+    if (data.ProductName) {
+      data["Title Length"] = data.ProductName.length;
+    }
+
+    let date = new Date();
+
+    data["Date"] = date.toLocaleDateString();
+
+    fields.push("MOST_USEFUL");
     // Making a new array of product with required fields and in required order
     let obj = {};
     for (let k = 0; k < fields.length; k++) {
-      obj[fields[k]] = data[fields[k]];
+      if (data[fields[k]]) {
+        obj[fields[k]] = data[fields[k]];
+      } else {
+        obj[fields[k]] = null;
+      }
     }
     return obj;
   } catch (e) {

@@ -6,7 +6,16 @@ const math = require("mathjs");
 const amazonfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
-    page = await browser.browser.newPage();
+    // fetching the html page through scraping bee
+    browser = await puppeteer.launch({
+      // headless: "new",
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // `headless: 'new'` enables new Headless;
+      // `headless: false` enables “headful” mode.
+    });
+
+    page = await browser.newPage();
     await page.goto(url);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
@@ -24,7 +33,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    // await browser.close();
+    await browser.close();
 
     // cheerio nodejs module to load html
     const $ = cheerio.load(html);
@@ -50,7 +59,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
         "src"
       );
     }
-    console.log($("div#imgTagWrapperId").html(), imagelink);
+
     // price
     let price = $(
       "span.a-price.aok-align-center.reinventPricePriceToPayMargin.priceToPay>span.a-offscreen"
@@ -133,7 +142,6 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
           num = ranks.split("  ");
         }
 
-        // console.log(num);
         let st = [],
           rank = [];
         for (let i = 0; i < num.length; i++) {
@@ -165,12 +173,12 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
         console.log(st);
 
         // saving the scraped data in an object
-        if (st.length > 1) {
+        if (st.length) {
           obj["Mother Category"] = st[0];
           obj["Category"] = st[1];
           obj["BSR in Mother Category"] = rank[0];
           obj["BSR in Category"] = rank[1];
-          if (st.length > 2) {
+          if (st[2]) {
             obj["Sub-Category"] = st[2];
             obj["Product"] = st[2];
           } else {
@@ -313,7 +321,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
         }
       });
 
-    //selecting the product details element and the looping to get the complete product details in case of electronics
+    //selecting the product details element and the looping to get the complete product details
     $("table#productDetails_detailBullets_sections1>tbody>tr").each(
       async (_idx, el) => {
         const x = $(el);
@@ -379,12 +387,12 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       console.log(st);
 
       // saving the scraped data in an object
-      if (st.length > 1) {
+      if (st.length) {
         obj["Mother Category"] = st[0];
         obj["Category"] = st[1];
         obj["BSR in Mother Category"] = rank[0];
         obj["BSR in Category"] = rank[1];
-        if (st.length > 2) {
+        if (st[2]) {
           obj["Sub-Category"] = st[2];
           obj["Product"] = st[2];
         } else {
@@ -397,21 +405,15 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
 
     return obj;
   } catch (error) {
-    try {
-      console.log(error);
-      if (page) {
-        await page.close();
-      }
-      // if (browser) {
-      //   await browser.close();
-      // }
-      console.log("Some thing Went Wrong on details.js");
-      return {};
-    } catch (e) {
-      console.log(e);
-      console.log("Some thing Went Wrong on details1.js");
-      return {};
+    if (page) {
+      await page.close();
     }
+    if (browser) {
+      await browser.close();
+    }
+    console.log(error);
+    console.log("Some thing Went Wrong on details.js");
+    return {};
   }
 };
 
