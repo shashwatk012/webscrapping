@@ -44,9 +44,8 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       Name = name;
       rl.close();
     });
-    while (!Name) {
-      await page.waitForTimeout(10000);
-    }
+    await page.waitForTimeout(30000);
+
     console.log(Name);
 
     const html = await page.content();
