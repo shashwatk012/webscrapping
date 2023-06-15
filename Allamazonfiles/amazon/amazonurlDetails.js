@@ -6,17 +6,17 @@ const amazonfetchUrlDetails = async (url, browser, page) => {
     page = await browser.browser.newPage();
     await page.goto(url);
 
-    let lastHeight = await page.evaluate("document.body.scrollHeight");
+    // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
-    while (true) {
-      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-      await page.waitForTimeout(1000); // sleep a bit
-      let newHeight = await page.evaluate("document.body.scrollHeight");
-      if (newHeight === lastHeight) {
-        break;
-      }
-      lastHeight = newHeight;
-    }
+    // while (true) {
+    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+    //   await page.waitForTimeout(1000); // sleep a bit
+    //   let newHeight = await page.evaluate("document.body.scrollHeight");
+    //   if (newHeight === lastHeight) {
+    //     break;
+    //   }
+    //   lastHeight = newHeight;
+    // }
 
     const html = await page.content();
 

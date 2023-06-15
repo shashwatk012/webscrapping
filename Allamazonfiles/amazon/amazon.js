@@ -6,8 +6,8 @@ const { typesOfRatings, fields, save } = require("../../text");
 
 const amazon = async (Categories) => {
   try {
-    let browser, page;
-    browser = await puppeteer.launch({
+    let page;
+    let browser = await puppeteer.launch({
       headless: `true`,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });

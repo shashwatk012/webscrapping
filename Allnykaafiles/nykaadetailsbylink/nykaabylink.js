@@ -2,7 +2,7 @@
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
 const { nykaafetchReviews } = require("./nykaareviews");
 const { fetchPosition } = require("./nykaafetchposition");
-const { fields } = require("../../text");
+const { fields } = require("../text");
 
 const nykaabylink = async (body) => {
   try {
@@ -65,7 +65,6 @@ const nykaabylink = async (body) => {
 
     data["Date"] = date.toLocaleDateString();
 
-    fields.push("MOST_USEFUL");
     // Making a new array of product with required fields and in required order
     let obj = {};
     for (let k = 0; k < fields.length; k++) {

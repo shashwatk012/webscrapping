@@ -4,7 +4,7 @@ const { nykaafetchUrlDetails } = require("./nykaaurldetails");
 const { nykaafetchUrlDetails1 } = require("./nykaaurldetails1");
 const { nykaafetchReviews } = require("./nykaareviews");
 const { check } = require("./checkformat");
-const { nykaasql, fields, save } = require("../../text");
+const { nykaasql, fields, save } = require("../text");
 
 const urlmaking = (category) => {
   const url = `https://www.nykaa.com/search/result/?q=${category}&root=search&searchType=history&suggestionType=query&ssp=2&searchItem=${category}&sourcepage=home&`;
@@ -134,7 +134,7 @@ const nykaa = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        // delete obj["MOST_USEFUL"];
+        delete obj["MOST_USEFUL"];
         delete obj["POSITIVE_FIRST"];
         delete obj["NEGATIVE_FIRST"];
         delete obj["sellerDetails"];

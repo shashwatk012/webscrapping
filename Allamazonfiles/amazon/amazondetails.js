@@ -50,7 +50,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
         "src"
       );
     }
-    console.log($("div#imgTagWrapperId").html(), imagelink);
+
     // price
     let price = $(
       "span.a-price.aok-align-center.reinventPricePriceToPayMargin.priceToPay>span.a-offscreen"
