@@ -1,9 +1,9 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 
-const amazonfetchUrlDetails = async (url) => {
+const amazonfetchUrlDetails = async (url, browser, page) => {
   try {
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       // headless: "new",
       headless: `true`,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
