@@ -6,11 +6,6 @@ const { typesOfRatings, fields, save } = require("../text");
 
 const amazon = async (Categories) => {
   try {
-    let page;
-    let browser = await puppeteer.launch({
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
     console.log(Categories);
     // Declaration of an array to store all the product details
     let listofproducts = [];
@@ -18,6 +13,11 @@ const amazon = async (Categories) => {
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
       listofproducts = [];
+      let page;
+      let browser = await puppeteer.launch({
+        headless: `true`,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
       //Creating the link to be scrapped
       let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
 
@@ -171,8 +171,8 @@ const amazon = async (Categories) => {
         listofproducts.push(obj);
         console.log(j);
       }
+      await browser.close();
     }
-    await browser.close();
     return listofproducts;
   } catch (e) {
     console.log(e);

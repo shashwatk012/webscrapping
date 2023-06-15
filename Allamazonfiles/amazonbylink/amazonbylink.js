@@ -13,7 +13,6 @@ const amazonbylink = async (url) => {
     // scrapping all the required details by going inside the given url
     let details = await amazonfetchIndividualDetails(
       data.productlink,
-      data.price,
       browser,
       page
     );
@@ -36,7 +35,7 @@ const amazonbylink = async (url) => {
       for (const element of typesOfRatings) {
         const str =
           details.reviewsLink + `&pageNumber=1&filterByStar=${element}`;
-        const data1 = await amazonfetchReviews(str);
+        const data1 = await amazonfetchReviews(str, browser, page);
         console.log(element);
         if (data1.Reviews) {
           data[`${element} reviews and ratings`] = data1.Reviews;
