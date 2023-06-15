@@ -1,6 +1,6 @@
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
-const { typesOfRatings, fields } = require("../../text");
+const { typesOfRatings, fields } = require("../text");
 
 const amazonbylink = async (url) => {
   try {
