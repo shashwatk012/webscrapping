@@ -1,16 +1,10 @@
 const cheerio = require("cheerio");
+const scrapingbee = require("scrapingbee");
 const puppeteer = require("puppeteer");
 
 const amazonfetchReviews = async (url, browser, page) => {
   try {
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
-    });
-    page = await browser.newPage();
+    page = await browser.browser.newPage();
     await page.goto(url);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
@@ -28,7 +22,7 @@ const amazonfetchReviews = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    await browser.close();
+    // await browser.close();
 
     const $ = cheerio.load(html);
 
@@ -84,9 +78,9 @@ const amazonfetchReviews = async (url, browser, page) => {
       if (page) {
         await page.close();
       }
-      if (browser) {
-        await browser.close();
-      }
+      // if (browser) {
+      //   await browser.close();
+      // }
       return {};
     } catch (e) {
       return {};

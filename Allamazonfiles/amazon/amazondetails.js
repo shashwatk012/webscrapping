@@ -6,14 +6,7 @@ const math = require("mathjs");
 const amazonfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
-    });
-    page = await browser.newPage();
+    page = await browser.browser.newPage();
     await page.goto(url);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
@@ -31,7 +24,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    await browser.close();
+    // await browser.close();
 
     // cheerio nodejs module to load html
     const $ = cheerio.load(html);
@@ -407,9 +400,9 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       if (page) {
         await page.close();
       }
-      if (browser) {
-        await browser.close();
-      }
+      // if (browser) {
+      //   await browser.close();
+      // }
       console.log("Some thing Went Wrong on details.js");
       return {};
     } catch (e) {

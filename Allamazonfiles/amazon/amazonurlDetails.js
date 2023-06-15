@@ -3,14 +3,7 @@ const puppeteer = require("puppeteer");
 
 const amazonfetchUrlDetails = async (url, browser, page) => {
   try {
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
-    });
-    page = await browser.newPage();
+    page = await browser.browser.newPage();
     await page.goto(url);
 
     // let lastHeight = await page.evaluate("document.body.scrollHeight");
@@ -55,9 +48,9 @@ const amazonfetchUrlDetails = async (url, browser, page) => {
     if (page) {
       await page.close();
     }
-    if (browser) {
-      await browser.close();
-    }
+    // if (browser) {
+    //   await browser.close();
+    // }
     return [];
   }
 };
