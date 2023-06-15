@@ -28,7 +28,7 @@ const amazon = async (Categories) => {
         data = [];
 
       //Scrapping the data from the provided url from all the pages
-      for (let j = 0; j < 10; j++) {
+      for (let j = 0; j < 1000; j++) {
         //Changing the page number to scrap data from the next page
         url = url.replace(`page=${j}&crid`, `page=${j + 1}&crid`);
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
