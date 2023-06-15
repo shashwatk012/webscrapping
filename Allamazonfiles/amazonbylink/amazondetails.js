@@ -9,7 +9,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     // fetching the html page through scraping bee
     browser = await puppeteer.launch({
       // headless: "new",
-      headless: `true`,
+      headless: `false`,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       // `headless: 'new'` enables new Headless;
       // `headless: false` enables “headful” mode.
