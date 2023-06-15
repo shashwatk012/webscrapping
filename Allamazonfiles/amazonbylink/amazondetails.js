@@ -53,11 +53,9 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     let numratings = $("span#acrCustomerReviewText").text();
 
     // Link for the images
-    let imagelink = $("div#imgTagWrapperId>img").attr("src");
+    let imagelink = $("div.imgTagWrapper>img").attr("src");
     if (!imagelink) {
-      imagelink = $("div#imgTagWrapperId>div#unrolledImgNo0>div>img").attr(
-        "src"
-      );
+      imagelink = $("div.imgTagWrapper>div#unrolledImgNo0>div>img").attr("src");
     }
 
     // price
