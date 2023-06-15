@@ -1,10 +1,15 @@
+const puppeteer = require("puppeteer");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { typesOfRatings, fields } = require("../text");
 
 const amazonbylink = async (url) => {
   try {
-    let browser, page;
+    let page;
+    let browser = await puppeteer.launch({
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     console.log(url);
     let data = {
       productlink: url,
@@ -13,7 +18,7 @@ const amazonbylink = async (url) => {
     // scrapping all the required details by going inside the given url
     let details = await amazonfetchIndividualDetails(
       data.productlink,
-      browser,
+      { browser },
       page
     );
     for (const key in details) {
@@ -24,7 +29,7 @@ const amazonbylink = async (url) => {
     if (details.reviewsLink !== "https://amazon.inundefined") {
       const totalReviewsandratings = await amazonfetchReviews(
         details.reviewsLink,
-        browser,
+        { browser },
         page
       );
       for (const key in totalReviewsandratings) {
@@ -35,7 +40,7 @@ const amazonbylink = async (url) => {
       for (const element of typesOfRatings) {
         const str =
           details.reviewsLink + `&pageNumber=1&filterByStar=${element}`;
-        const data1 = await amazonfetchReviews(str, browser, page);
+        const data1 = await amazonfetchReviews(str, { browser }, page);
         console.log(element);
         if (data1.Reviews) {
           data[`${element} reviews and ratings`] = data1.Reviews;
@@ -107,6 +112,7 @@ const amazonbylink = async (url) => {
         obj[fields[k]] = "NA";
       }
     }
+    await browser.close();
 
     return obj;
   } catch (e) {

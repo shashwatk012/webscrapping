@@ -24,7 +24,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    // await browser.close();
+    // await browser.browser.close();
 
     // cheerio nodejs module to load html
     const $ = cheerio.load(html);
