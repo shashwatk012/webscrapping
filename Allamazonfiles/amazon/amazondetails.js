@@ -1,6 +1,6 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { replce } = require("../../text");
+const { replce } = require("../text");
 const math = require("mathjs");
 
 const amazonfetchIndividualDetails = async (url, browser, page) => {

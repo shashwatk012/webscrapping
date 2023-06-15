@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { headers, replce, brands } = require("../../text");
+const { headers, replce, brands } = require("../text");
 
 const individualdetails = (html) => {
   // cheerio nodejs module to load html

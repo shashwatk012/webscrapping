@@ -2,7 +2,7 @@
 const axios = require("axios");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
-const { headers, replce } = require("../../text");
+const { headers, replce } = require("../text");
 
 const nykaafetchUrlDetails = async (url, browser, page) => {
   try {

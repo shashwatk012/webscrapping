@@ -99,7 +99,6 @@ const amazonbylink = async (url) => {
       data["Quantity unit"] = "NA";
     }
 
-    fields.push("BSR in Mother Category", "BSR in Category");
     // Making a new array of product with required fields
     let obj = {};
     for (let k = 0; k < fields.length; k++) {

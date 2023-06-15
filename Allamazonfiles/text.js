@@ -92,6 +92,8 @@ const fields = [
   "Title Length",
   "Description Length",
   "Date",
+  "BSR in Mother Category",
+  "BSR in Category",
 ];
 
 // function to convert the string into Number by removing the unwanted symbols.

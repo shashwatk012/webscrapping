@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
-const { typesOfRatings, fields, save } = require("../../text");
+const { typesOfRatings, fields, save } = require("../text");
 
 const amazon = async (Categories) => {
   try {
@@ -154,7 +154,6 @@ const amazon = async (Categories) => {
           data[j]["Quantity unit"] = "NA";
         }
 
-        fields.push("BSR in Mother Category", "BSR in Category");
         // Making a new array of product with required fields
         let obj = {};
         for (let k = 0; k < fields.length; k++) {
