@@ -29,11 +29,7 @@ const amazon = async (Categories) => {
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
 
         //function to scrap the data from the main page
-        const allProductDetails = await amazonfetchUrlDetails(
-          url,
-          browser,
-          page
-        );
+        const allProductDetails = await amazonfetchUrlDetails(url);
 
         //storing the coming data in arr
         if (allProductDetails && allProductDetails.length) {
