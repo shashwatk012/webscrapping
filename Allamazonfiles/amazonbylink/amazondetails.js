@@ -14,9 +14,10 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     //   // `headless: 'new'` enables new Headless;
     //   // `headless: false` enables “headful” mode.
     // });
+    console.log(browser);
 
     page = await browser.browser.newPage();
-    await page.goto(url);
+    await page.goto(url, { waitUntil: "load" });
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
 
