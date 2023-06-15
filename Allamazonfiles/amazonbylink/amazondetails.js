@@ -31,6 +31,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     }
 
     const html = await page.content();
+    console.log(html);
 
     await page.close();
     await browser.close();
