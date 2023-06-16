@@ -1,2 +1,3 @@
-2023/06/16-21:34:25.339 135c Creating DB C:\Users\shash\Desktop\web dev\web scrapping\flip+amazon scrapping - Copy - Copy - Copy\tmp\Default\shared_proto_db\metadata since it was missing.
-2023/06/16-21:34:25.439 135c Reusing MANIFEST C:\Users\shash\Desktop\web dev\web scrapping\flip+amazon scrapping - Copy - Copy - Copy\tmp\Default\shared_proto_db\metadata/MANIFEST-000001
+2023/06/16-21:39:27.838 4190 Reusing MANIFEST C:\Users\shash\Desktop\web dev\web scrapping\flip+amazon scrapping - Copy - Copy - Copy\tmp\Default\shared_proto_db\metadata/MANIFEST-000001
+2023/06/16-21:39:27.838 4190 Recovering log #3
+2023/06/16-21:39:27.839 4190 Reusing old log C:\Users\shash\Desktop\web dev\web scrapping\flip+amazon scrapping - Copy - Copy - Copy\tmp\Default\shared_proto_db\metadata/000003.log 
