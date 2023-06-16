@@ -1,32 +1,27 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const axios = require("axios");
-const { headers } = require("../text");
 
 const amazonfetchUrlDetails = async (url, browser, page) => {
   try {
-    const response = await axios.get(url, headers);
+    page = await browser.browser.newPage();
+    await page.goto(url);
 
-    const html = response.data;
-    // page = await browser.browser.newPage();
-    // await page.goto(url);
+    // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
-    // // let lastHeight = await page.evaluate("document.body.scrollHeight");
+    // while (true) {
+    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+    //   await page.waitForTimeout(1000); // sleep a bit
+    //   let newHeight = await page.evaluate("document.body.scrollHeight");
+    //   if (newHeight === lastHeight) {
+    //     break;
+    //   }
+    //   lastHeight = newHeight;
+    // }
 
-    // // while (true) {
-    // //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-    // //   await page.waitForTimeout(1000); // sleep a bit
-    // //   let newHeight = await page.evaluate("document.body.scrollHeight");
-    // //   if (newHeight === lastHeight) {
-    // //     break;
-    // //   }
-    // //   lastHeight = newHeight;
-    // // }
+    const html = await page.content();
 
-    // const html = await page.content();
-
-    // await page.close();
-    // // await browser.close();
+    await page.close();
+    // await browser.close();
     const $ = cheerio.load(html);
 
     const products = [];

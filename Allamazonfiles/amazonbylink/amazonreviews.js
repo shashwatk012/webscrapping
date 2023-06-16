@@ -3,32 +3,7 @@ const puppeteer = require("puppeteer");
 
 const amazonfetchReviews = async (url, browser, page) => {
   try {
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
-      Host: "httpbin.org",
-      "Sec-Ch-Ua":
-        '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-      "Sec-Ch-Ua-Mobile": "?0",
-      "Sec-Ch-Ua-Platform": '"Windows"',
-      "Sec-Fetch-Dest": "document",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Site": "cross-site",
-      "Sec-Fetch-User": "?1",
-      "Upgrade-Insecure-Requests": "1",
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-      "X-Amzn-Trace-Id": "Root=1-648c640d-4b4b06d0031cf89a458ca171",
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
-    });
-
-    page = await browser.newPage();
+    page = await browser.browser.newPage();
     await page.goto(url);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
@@ -46,7 +21,7 @@ const amazonfetchReviews = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    await browser.close();
+    // await browser.close();
 
     const $ = cheerio.load(html);
 
@@ -101,9 +76,9 @@ const amazonfetchReviews = async (url, browser, page) => {
     if (page) {
       await page.close();
     }
-    if (browser) {
-      await browser.close();
-    }
+    // if (browser) {
+    //   await browser.close();
+    // }
     return {};
   }
 };

@@ -15,8 +15,11 @@ const amazon = async (Categories) => {
       listofproducts = [];
       let page;
       let browser = await puppeteer.launch({
-        headless: `true`,
+        headless: false, // indicates that we want the browser visible
+        defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+        userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        // devtools: true,
       });
       //Creating the link to be scrapped
       let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
@@ -28,7 +31,7 @@ const amazon = async (Categories) => {
         data = [];
 
       //Scrapping the data from the provided url from all the pages
-      for (let j = 0; j < 1000; j++) {
+      for (let j = 0; j < 10; j++) {
         //Changing the page number to scrap data from the next page
         url = url.replace(`page=${j}&crid`, `page=${j + 1}&crid`);
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);

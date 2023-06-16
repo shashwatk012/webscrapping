@@ -1,43 +1,33 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { replce, headers } = require("../text");
+const { replce } = require("../text");
 const math = require("mathjs");
-const axios = require("axios");
 
 const amazonfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
-    // // fetching the html page through scraping bee
-    // browser = await puppeteer.launch({
-    //   // headless: "new",
-    //   headless: `true`,
-    //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    //   // `headless: 'new'` enables new Headless;
-    //   // `headless: false` enables “headful” mode.
-    // });
-    const response = await axios.get(url, headers);
+    page = await browser.browser.newPage();
+    await page.goto(url);
 
-    const html = response.data;
+    await page.waitForTimeout(10000);
 
-    // page = await browser.newPage();
-    // await page.goto(url);
+    let lastHeight = await page.evaluate("document.body.scrollHeight");
 
-    // let lastHeight = await page.evaluate("document.body.scrollHeight");
+    while (true) {
+      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      await page.waitForTimeout(1000); // sleep a bit
+      let newHeight = await page.evaluate("document.body.scrollHeight");
+      if (newHeight === lastHeight) {
+        break;
+      }
+      lastHeight = newHeight;
+    }
+    await page.screenshot({ path: "screenshot.png" });
 
-    // while (true) {
-    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-    //   await page.waitForTimeout(1000); // sleep a bit
-    //   let newHeight = await page.evaluate("document.body.scrollHeight");
-    //   if (newHeight === lastHeight) {
-    //     break;
-    //   }
-    //   lastHeight = newHeight;
-    // }
+    const html = await page.content();
+    // console.log(html);
 
-    // const html = await page.content();
-    // // console.log(html);
-
-    // await page.close();
+    await page.close();
     // await browser.close();
 
     // cheerio nodejs module to load html
@@ -411,9 +401,9 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     if (page) {
       await page.close();
     }
-    if (browser) {
-      await browser.close();
-    }
+    // if (browser) {
+    //   await browser.close();
+    // }
     console.log(error);
     console.log("Some thing Went Wrong on details.js");
     return {};
