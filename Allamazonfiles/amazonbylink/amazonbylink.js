@@ -7,7 +7,7 @@ const amazonbylink = async (url) => {
   try {
     let browser, page;
     browser = await puppeteer.launch({
-      headless: false, // indicates that we want the browser visible
+      headless: `true`, // indicates that we want the browser visible
       defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
       userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
