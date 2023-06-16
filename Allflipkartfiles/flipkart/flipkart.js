@@ -13,15 +13,11 @@ const flipkart = async (Categories) => {
       Categories = [Categories];
     }
     // Declaration of an array to store all the product details
-    let listofproducts = [],
-      listofsellers = [],
-      listofreviews = [];
-
+    let listofproducts = [];
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
       listofproducts = [];
-      listofreviews = [];
-      listofsellers = [];
+
       // Storing the number of data to be scraped in numData variable
       let numOfData = Categories[i].data;
       let category = Categories[i].category;
@@ -176,15 +172,6 @@ const flipkart = async (Categories) => {
           }
         }
         // await sql(obj);
-        if (obj.sellerDetails) {
-          listofsellers = [...listofsellers, ...obj.sellerDetails];
-        }
-        if (obj["POSITIVE_FIRST"]) {
-          listofreviews = [...listofreviews, ...obj["POSITIVE_FIRST"]];
-        }
-        if (obj["NEGATIVE_FIRST"]) {
-          listofreviews = [...listofreviews, ...obj["NEGATIVE_FIRST"]];
-        }
 
         delete obj.sellerDetails;
         delete obj["POSITIVE_FIRST"];
@@ -194,15 +181,9 @@ const flipkart = async (Categories) => {
 
         listofproducts.push(obj);
 
-        // //converting into csv file
-        // convertJSONtoCSV(listofproducts, listofsellers, listofreviews, 1);
         console.log(j);
       }
       await sql(listofproducts);
-      numOfData = null;
-      url = null;
-      arr.length = 0;
-      data.length = 0;
     }
     return listofproducts;
   } catch (e) {

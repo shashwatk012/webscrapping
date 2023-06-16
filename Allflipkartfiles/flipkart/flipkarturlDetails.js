@@ -1,7 +1,7 @@
 "use strict";
 const axios = require("axios");
 const cheerio = require("cheerio");
-const { headers, allProducts, imglink, replce } = require("../text");
+const { headers, allProducts } = require("../text");
 
 const flipkartfetchUrlDetails = async (url) => {
   try {
@@ -11,32 +11,17 @@ const flipkartfetchUrlDetails = async (url) => {
 
     const $ = cheerio.load(html);
 
-    const beards = [];
+    const allLink = [];
 
     $(allProducts).each(async (_idx, el) => {
       // selecting the elements to be scrapped
-      const beardo = $(el);
-      let imagelink = beardo.find(imglink).attr("src"); // scraping the image
-      if (!imagelink) {
-        imagelink = beardo.find("img._2r_T1I").attr("src"); // scraping the image
-      }
+      const links = $(el);
 
-      const link = beardo // scraping the link of the product
+      const link = links // scraping the link of the product
         .find("a")
         .attr("href");
 
-      let price = beardo.find("div._30jeq3").text();
-      price = replce(price);
-
-      let maxretailprice = beardo.find("div._3I9_wc").text();
-
-      if (maxretailprice === "") {
-        maxretailprice = price;
-      } else {
-        maxretailprice = replce(maxretailprice);
-      }
-
-      let ads = beardo.find("div._2tfzpE>span").text();
+      let ads = links.find("div._2tfzpE>span").text();
       if (ads === "Ad") {
         ads = "Yes";
       } else {
@@ -44,15 +29,12 @@ const flipkartfetchUrlDetails = async (url) => {
       }
 
       let element = {
-        imagelink,
         productlink: `https://www.flipkart.com${link}`,
-        price,
-        maxretailprice,
         IsAds: ads,
       };
-      beards.push(element); //storing the details in an array
+      allLink.push(element); //storing the details in an array
     });
-    return beards;
+    return allLink;
   } catch (error) {
     return [{ message: "Can not fetch" }];
   }

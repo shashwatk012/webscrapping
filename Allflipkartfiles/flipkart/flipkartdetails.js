@@ -1,9 +1,11 @@
+"use strict";
+
 // This page scrapps the complete product details
 
-const axios = require("axios");
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { headers, replce } = require("../text");
+const flipkarttext = require("./flipkarttext");
 
 const scrapdetails = (html) => {
   // cheerio nodejs module to load html
@@ -13,43 +15,37 @@ const scrapdetails = (html) => {
   let obj = {};
 
   // Scraping the ProductName
-  let ProductName = $(
-    "div._1AtVbE.col-12-12>div.aMaAEs>div>h1.yhB1nd>span.B_NuCI"
-  )
-    .text()
-    .trim();
+  let ProductName = $(flipkarttext.F_PRODUCTNAME_CN).text().trim();
   if (ProductName !== undefined) {
-    obj["ProductName"] = ProductName;
+    obj[flipkarttext.F_PRODUCTNAME_FD] = ProductName;
   }
 
-  ProductName = null;
-
-  let price = $("div._30jeq3._16Jk6d").text();
+  let price = $(flipkarttext.F_PRICE_CN).text();
   price = replce(price);
-  obj["price"] = price;
+  obj[flipkarttext.F_PRICE_FD] = price;
 
-  let maxprice = $("div._3I9_wc._2p6lqe").text();
+  let maxprice = $(flipkarttext.F_MAXRETAILPRICE_CN).text();
   if (maxprice === "") {
     maxprice = price;
   } else {
     maxprice = replce(maxprice);
   }
-  obj["maxretailprice"] = maxprice;
+  obj[flipkarttext.F_MAXRETAILPRICE_FD] = maxprice;
 
   let discount = (maxprice - price) / maxprice;
-  obj["Discount%"] = Math.floor(discount * 100);
+  obj[flipkarttext.F_DISCOUNT_FD] = Math.floor(discount * 100);
 
-  let image = $("div.CXW8mj._3nMexc>img").attr("src");
+  let image = $(flipkarttext.F_IMAGELINK_CN).attr("src");
   if (image === undefined) {
-    image = $("img._2r_T1I._396QI4").attr("src");
+    image = $(flipkarttext.F_IMAGELINK_ALTERNATIVE_CN).attr("src");
   }
-  obj["imagelink"] = image;
+  obj[flipkarttext.F_IMAGELINK_FD] = image;
 
   // scraping the number of global ratings
-  let ratings = $("span._2_R_DZ._2IRzS8").text();
+  let ratings = $(flipkarttext.F_RATINGS_CN).text();
 
   // scraping the global rating(i.e 4.1)
-  let stars = $("div._3LWZlK._138NNC").text();
+  let stars = $(flipkarttext.F_STARS_CN).text();
 
   if (stars && ratings) {
     stars = replce(stars);
@@ -65,14 +61,14 @@ const scrapdetails = (html) => {
 
     rating = replce(rating);
     review = replce(review);
-    obj["Ratings"] = rating;
-    obj["Reviews"] = review;
+    obj[flipkarttext.F_RATINGS_FD] = rating;
+    obj[flipkarttext.F_REVIEWS_FD] = review;
   } else {
     // scraping the number of global ratings
-    let ratings = $("div.row._2afbiS>div.col-12-12>span").text();
+    let ratings = $(flipkarttext.F_RATINGS_ALTERNATIVE_CN).text();
 
     // scraping the global ratings(i.e 4.1)
-    let stars = $("div._2d4LTz").text();
+    let stars = $(flipkarttext.F_STARS_ALTERNATIVE_CN).text();
     stars = replce(stars);
     obj.stars = stars;
     let p = ratings.indexOf("and");
@@ -85,30 +81,28 @@ const scrapdetails = (html) => {
     review = review.replace(/\D/g, "");
     rating = replce(rating);
     review = replce(review);
-    obj["Ratings"] = rating;
-    obj["Reviews"] = review;
+    obj[flipkarttext.F_RATINGS_FD] = rating;
+    obj[flipkarttext.F_REVIEWS_FD] = review;
   }
-  ratings = null;
-  stars = null;
 
   // Declaration of an array to store the Category and Sub-Categories
   let Categories = [];
 
   //selecting the category element and the looping to get the category and sub-category
-  $("div._1MR4o5>div._3GIHBu").each(async (_idx, el) => {
+  $(flipkarttext.F_LISTOFCATEGORIES_CN).each(async (_idx, el) => {
     const x = $(el);
-    let category = x.find("a._2whKao").text();
+    let category = x.find(flipkarttext.F_CATEGORY_CN).text();
     if (category) {
       Categories.push(category);
     }
     category = null;
   });
-  obj["Mother Category"] = Categories[1];
-  obj["Category"] = Categories[2];
-  obj["Sub-Category"] = Categories[3];
-  obj["Product"] = Categories[Categories.length - 2];
+  obj[flipkarttext.F_MOTHER_CATEGORY_FD] = Categories[1];
+  obj[flipkarttext.F_CATEGORY_FD] = Categories[2];
+  obj[flipkarttext.F_SUB_CATEGORY_FD] = Categories[3];
+  obj[flipkarttext.F_PRODUCT_FD] = Categories[Categories.length - 2];
   if (Categories.length) {
-    const product = obj["Product"].split(" ");
+    const product = obj[flipkarttext.F_PRODUCT_FD].split(" ");
     const Brand = Categories[Categories.length - 1].split(" ");
     let pos = Brand[Brand.length - 1];
     for (let i = 0; i < Brand.length; i++) {
@@ -121,15 +115,17 @@ const scrapdetails = (html) => {
     for (let i = 0; i < pos; i++) {
       st += Brand[i];
     }
-    obj["Brand"] = st;
+    obj[flipkarttext.F_BRAND_FD] = st;
   }
 
   Categories.length = 0;
 
   //scraping the pagelink for the reviews
-  let reviewsLink = $("div.col.JOpGWq>a").attr("href");
+  let reviewsLink = $(flipkarttext.F_REVIEWSLINK_CN).attr("href");
   if (reviewsLink !== undefined) {
-    obj["reviewsLink"] = `https://www.flipkart.com${reviewsLink}`;
+    obj[
+      flipkarttext.F_REVIEWSLINK_FD
+    ] = `${flipkarttext.FLIPKART_PAGE_LINK}${reviewsLink}`;
   }
   reviewsLink = null;
 
@@ -137,54 +133,51 @@ const scrapdetails = (html) => {
   let highLits = [];
 
   //selecting the product details element and the looping to get the highlights of product
-  $("div._2418kt>ul>li._21Ahn-").each(async (_idx, el) => {
+  $(flipkarttext.F_PRODUCTDETAILS1_CN).each(async (_idx, el) => {
     const x = $(el);
     const p = x.text();
     highLits.push(p);
 
     if (highLits.length !== 0) {
-      obj["HighLights"] = highLits;
+      obj[flipkarttext.F_HIGHLIGHTS_FD] = highLits;
     }
   });
-  highLits.length = 0;
 
   //selecting the product details element and the looping to get the complete product details
-  $("table._14cfVK>tbody>tr._1s_Smc.row").each(async (_idx, el) => {
+  $(flipkarttext.F_PRODUCTDETAILS2_CN).each(async (_idx, el) => {
     const x = $(el);
-    let key = x.find("td._1hKmbr.col.col-3-12").text();
-    let value = x.find("li._21lJbe").text();
+    let key = x.find(flipkarttext.F_PRODUCTDETAILS_KEY_CN).text();
+    let value = x.find(flipkarttext.F_PRODUCTDETAILS_VALUE_CN).text();
     if (key !== "" && value !== "") {
       obj[key] = value;
     }
-    key = null;
-    value = null;
   });
 
   // Scraping the sellers page link
-  let sellerslink = $("li._38I6QT>a").attr("href");
+  let sellerslink = $(flipkarttext.F_SELLERLINK_CN).attr("href");
   if (sellerslink) {
-    obj["sellerslink"] = `https://www.flipkart.com${sellerslink}`;
+    obj[
+      flipkarttext.F_SELLERLINK_FD
+    ] = `${flipkarttext.FLIPKART_PAGE_LINK}${sellerslink}`;
   }
-  sellerslink = null;
-  let description = $("div._1mXcCf").text();
+
+  let description = $(flipkarttext.F_DESCRIPTION_CN).text();
 
   let count = 1;
-  $("li._20Gt85._1Y_A6W").each(async (_idx, el) => {
+  $(flipkarttext.F_NUMBEROFIMAGES_CN).each(async (_idx, el) => {
     count++;
   });
-  obj["Number of images"] = count;
+  obj[flipkarttext.F_NUMBEROFIMAGES_FD] = count;
   if (description === "") {
     description = "NA";
   }
-  obj["Description"] = description;
-  count = null;
-  description = null;
+  obj[flipkarttext.F_DESCRIPTION_FD] = description;
 
   return obj;
 };
 
+// function to scrap complete data about one product
 const flipkartfetchIndividualDetails = async (url, browser, page) => {
-  // function to scrap complete data about one product
   try {
     // api to get html of the required page
     browser = await puppeteer.launch({
@@ -193,16 +186,18 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     });
 
     page = await browser.newPage();
+
     await page.goto(url);
-    // await page.waitForSelector("div.col.JOpGWq>a");
+
+    await page.waitForTimeout(1000);
 
     await page.evaluate(() => {
       document.querySelector("div.col.JOpGWq>a").scrollIntoView();
     });
-    // await page.waitForTimeout(1000);
-    const html = await page.content();
-    await page.close();
 
+    const html = await page.content();
+
+    await page.close();
     await browser.close();
 
     // function in text.js to scrap the required details from the page
