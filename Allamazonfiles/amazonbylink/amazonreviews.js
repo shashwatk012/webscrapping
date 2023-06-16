@@ -5,10 +5,25 @@ const amazonfetchReviews = async (url, browser, page) => {
   try {
     browser = await puppeteer.launch({
       // headless: "new",
-      headless: `true`,
+      headless: `false`,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
+      Host: "httpbin.org",
+      "Sec-Ch-Ua":
+        '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Sec-Fetch-Dest": "document",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-Site": "cross-site",
+      "Sec-Fetch-User": "?1",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+      "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
     });
 
     page = await browser.newPage();
