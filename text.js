@@ -20,7 +20,6 @@ const save = async (obj) => {
   let html = response.data;
   return html;
 };
-
 // headers to send with api request to sites to avoid blockage
 const headers = {
   Accept:
@@ -29,7 +28,7 @@ const headers = {
   "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
   Host: "httpbin.org",
   "Sec-Ch-Ua":
-    '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+    '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
   "Sec-Ch-Ua-Mobile": "?0",
   "Sec-Ch-Ua-Platform": '"Windows"',
   "Sec-Fetch-Dest": "document",
@@ -38,8 +37,8 @@ const headers = {
   "Sec-Fetch-User": "?1",
   "Upgrade-Insecure-Requests": "1",
   "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
-  "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+  "X-Amzn-Trace-Id": "Root=1-648c640d-4b4b06d0031cf89a458ca171",
 };
 
 const allProducts =

@@ -1,71 +1,44 @@
 const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
-const { replce } = require("../text");
+const { replce, headers } = require("../text");
 const math = require("mathjs");
-const readline = require("readline");
+const axios = require("axios");
 
 const amazonfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
-    // fetching the html page through scraping bee
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `false`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
-      Host: "httpbin.org",
-      "Sec-Ch-Ua":
-        '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
-      "Sec-Ch-Ua-Mobile": "?0",
-      "Sec-Ch-Ua-Platform": '"Windows"',
-      "Sec-Fetch-Dest": "document",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Site": "cross-site",
-      "Sec-Fetch-User": "?1",
-      "Upgrade-Insecure-Requests": "1",
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
-      "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
-    });
+    // // fetching the html page through scraping bee
+    // browser = await puppeteer.launch({
+    //   // headless: "new",
+    //   headless: `true`,
+    //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    //   // `headless: 'new'` enables new Headless;
+    //   // `headless: false` enables “headful” mode.
+    // });
+    const response = await axios.get(url, headers);
 
-    page = await browser.newPage();
-    await page.goto(url);
+    const html = response.data;
 
-    let lastHeight = await page.evaluate("document.body.scrollHeight");
+    // page = await browser.newPage();
+    // await page.goto(url);
 
-    while (true) {
-      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-      await page.waitForTimeout(1000); // sleep a bit
-      let newHeight = await page.evaluate("document.body.scrollHeight");
-      if (newHeight === lastHeight) {
-        break;
-      }
-      lastHeight = newHeight;
-    }
-    await page.screenshot({ path: "screenshot.png" });
-    let Name;
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
+    // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
-    rl.question("Enter your name: ", (name) => {
-      console.log(`Hello, ${name}!`);
-      Name = name;
-      rl.close();
-    });
-    await page.waitForTimeout(30000);
+    // while (true) {
+    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+    //   await page.waitForTimeout(1000); // sleep a bit
+    //   let newHeight = await page.evaluate("document.body.scrollHeight");
+    //   if (newHeight === lastHeight) {
+    //     break;
+    //   }
+    //   lastHeight = newHeight;
+    // }
 
-    console.log(Name);
+    // const html = await page.content();
+    // // console.log(html);
 
-    const html = await page.content();
-    console.log(html);
-
-    await page.close();
-    await browser.close();
+    // await page.close();
+    // await browser.close();
 
     // cheerio nodejs module to load html
     const $ = cheerio.load(html);
