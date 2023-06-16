@@ -9,10 +9,41 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     page = await browser.browser.newPage();
     await page.goto(url);
 
-    await page.waitForTimeout(10000);
+    let html = await page.content();
+
+    // cheerio nodejs module to load html
+    let $ = cheerio.load(html);
+
+    let captchalink = $("div.a-row.a-text-center>img").attr("src");
+
+    console.log(captchalink);
+
+    let captcha = undefined;
+    const readline = require("readline").createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    readline.question("Who are you?", (name) => {
+      console.log(`Captcha is ${name}!`);
+      captcha = name;
+      readline.close();
+    });
+
+    await page.waitForTimeout(20000);
+
+    console.log(captcha);
+
+    await page.type("input#captchacharacters", captcha);
+
+    await page.click(
+      "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
+    );
+
+    await page.waitForTimeout(5000);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
-
+    //
     while (true) {
       await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
       await page.waitForTimeout(1000); // sleep a bit
@@ -22,16 +53,15 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       }
       lastHeight = newHeight;
     }
-    await page.screenshot({ path: "screenshot.png" });
+    // await page.screenshot({ path: "screenshot.png" });
 
-    const html = await page.content();
-    console.log(html);
+    html = await page.content();
 
     await page.close();
     // await browser.close();
 
     // cheerio nodejs module to load html
-    const $ = cheerio.load(html);
+    $ = cheerio.load(html);
 
     // Declaration of object to store the product details
     let obj = {};
