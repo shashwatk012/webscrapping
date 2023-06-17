@@ -3,7 +3,6 @@
 // This page scrapps the complete product details
 
 const cheerio = require("cheerio");
-const puppeteer = require("puppeteer");
 const { headers, replce } = require("../text");
 const flipkarttext = require("./flipkarttext");
 
@@ -118,8 +117,6 @@ const scrapdetails = (html) => {
     obj[flipkarttext.F_BRAND_FD] = st;
   }
 
-  Categories.length = 0;
-
   //scraping the pagelink for the reviews
   let reviewsLink = $(flipkarttext.F_REVIEWSLINK_CN).attr("href");
   if (reviewsLink !== undefined) {
@@ -127,7 +124,6 @@ const scrapdetails = (html) => {
       flipkarttext.F_REVIEWSLINK_FD
     ] = `${flipkarttext.FLIPKART_PAGE_LINK}${reviewsLink}`;
   }
-  reviewsLink = null;
 
   // Declaration of an array to store the highlights of products
   let highLits = [];
@@ -180,12 +176,8 @@ const scrapdetails = (html) => {
 const flipkartfetchIndividualDetails = async (url, browser, page) => {
   try {
     // api to get html of the required page
-    browser = await puppeteer.launch({
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
 
-    page = await browser.newPage();
+    page = await browser.browser.newPage();
 
     await page.goto(url);
 
@@ -198,7 +190,6 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    await browser.close();
 
     // function in text.js to scrap the required details from the page
     return scrapdetails(html);
@@ -207,9 +198,7 @@ const flipkartfetchIndividualDetails = async (url, browser, page) => {
       if (page) {
         await page.close();
       }
-      if (browser) {
-        await browser.close();
-      }
+
       // api to get html of the required page
       const response = await axios.get(url, headers);
 

@@ -2,9 +2,9 @@
 // This page scrapps the sellers details
 
 const cheerio = require("cheerio");
-const puppeteer = require("puppeteer");
-const { headers, apikey, replce } = require("../text");
+const { replce } = require("../text");
 const math = require("mathjs");
+const flipkarttext = require("./flipkarttext");
 
 const sellers = (html, ProductName) => {
   const $ = cheerio.load(html);
@@ -14,21 +14,23 @@ const sellers = (html, ProductName) => {
     mx = 0;
   let sellersDetails = [],
     pricearr = [];
-  $("div._2Y3EWJ").each(async (_idx, el) => {
+  $(flipkarttext.F_SELLERS_CN).each(async (_idx, el) => {
     const x = $(el);
 
-    const sellersName = x.find("div._3enH42>span").text();
+    const sellersName = x.find(flipkarttext.F_SELLERSNAME_CN).text();
 
-    let Ratings = x.find("div._3LWZlK._2GCNvL").text();
+    let Ratings = x.find(flipkarttext.F_SELLERSRATINGS_CN).text();
     Ratings = replce(Ratings);
 
-    let price = x.find("div._25b18c>div._30jeq3").text();
+    let price = x.find(flipkarttext.F_SELLERSPRICE_CN).text();
     price = replce(price);
     pricearr.push(price);
     mx = Math.max(mx, price);
     mn = Math.min(mn, price);
 
-    let flipkartassured = x.find("div._3J2v2E>div>img").attr("src");
+    let flipkartassured = x
+      .find(flipkarttext.F_SELLERSFLIPKARTASSURED_CN)
+      .attr("src");
     if (flipkartassured) {
       flipkartassured = 1;
     } else {
@@ -60,27 +62,19 @@ const sellers = (html, ProductName) => {
 
 const flipkartsellerslist = async (url, browser, page, ProductName) => {
   try {
-    browser = await puppeteer.launch({
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    page = await browser.newPage();
+    page = await browser.browser.newPage();
     await page.goto(url, { timeout: 60000 });
 
     await page.waitForSelector("div._2Y3EWJ");
 
     const html = await page.content();
+
     await page.close();
-    await browser.close();
 
     return sellers(html, ProductName);
   } catch (error) {
     if (page) {
       await page.close();
-    }
-    if (browser) {
-      await browser.close();
     }
     return { message: "Can not fetch" };
   }

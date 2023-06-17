@@ -2,6 +2,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const { headers, allProducts } = require("../text");
+const flipkarttext = require("./flipkarttext");
 
 const flipkartfetchUrlDetails = async (url) => {
   try {
@@ -21,7 +22,7 @@ const flipkartfetchUrlDetails = async (url) => {
         .find("a")
         .attr("href");
 
-      let ads = links.find("div._2tfzpE>span").text();
+      let ads = links.find(flipkarttext.F_ADS_CN).text();
       if (ads === "Ad") {
         ads = "Yes";
       } else {
@@ -29,7 +30,7 @@ const flipkartfetchUrlDetails = async (url) => {
       }
 
       let element = {
-        productlink: `https://www.flipkart.com${link}`,
+        productlink: `${flipkarttext.FLIPKART_PAGE_LINK}${link}`,
         IsAds: ads,
       };
       allLink.push(element); //storing the details in an array

@@ -5,6 +5,8 @@ const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
 const { typesOfRatings, fields, urlmaking, sql, save } = require("../text");
+const puppeteer = require("puppeteer");
+const flipkarttext = require("./flipkarttext");
 
 const flipkart = async (Categories) => {
   try {
@@ -16,6 +18,13 @@ const flipkart = async (Categories) => {
     let listofproducts = [];
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
+      let page;
+      let browser = await puppeteer.launch({
+        headless: `true`,
+        defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+
       listofproducts = [];
 
       // Storing the number of data to be scraped in numData variable
@@ -28,7 +37,7 @@ const flipkart = async (Categories) => {
       let arr = [];
       let data = [];
       let check = 0;
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 10; i++) {
         //Scrapping the data from the provided url from all the pages
         let urls = url;
 
@@ -60,11 +69,10 @@ const flipkart = async (Categories) => {
 
       // looping to go inside the individual products
       for (let j = 0; j < data.length; j++) {
-        let browser, page;
         // scrapping all the required details by going inside every individual products
         let details = await flipkartfetchIndividualDetails(
           data[j].productlink,
-          browser,
+          { browser },
           page
         );
         if (!details.message) {
@@ -77,21 +85,24 @@ const flipkart = async (Categories) => {
         if (details.sellerslink !== undefined) {
           const sellers = await flipkartsellerslist(
             details.sellerslink,
-            browser,
+            { browser },
             page,
-            data[j]["ProductName"]
+            data[j][flipkarttext.F_PRODUCTNAME_FD]
           );
           if (sellers.message === "Can not fetch") {
             continue;
           }
-          data[j]["NumberofSellers"] = sellers.NumberofSellers;
-          data[j]["sellerDetails"] = sellers.sellersDetails;
-          data[j]["Max Price"] = sellers["Max Price"];
-          data[j]["Min Price"] = sellers["Min Price"];
-          data[j]["St-dev-Price"] = sellers["St-dev-Price"];
+          data[j][flipkarttext.F_NUMBEROFSELLERS_FD] = sellers.NumberofSellers;
+          data[j][flipkarttext.F_SELLERDETAILS_FD] = sellers.sellersDetails;
+          data[j][flipkarttext.F_MAX_PRICE_FD] =
+            sellers[flipkarttext.F_MAX_PRICE_FD];
+          data[j][flipkarttext.F_MIN_PRICE_FD] =
+            sellers[flipkarttext.F_MIN_PRICE_FD];
+          data[j][flipkarttext.F_ST_DEV_PRICE_FD] =
+            sellers[flipkarttext.F_ST_DEV_PRICE_FD];
         }
 
-        data[j]["Platform"] = "Flipkart";
+        data[j][flipkarttext.F_PLATFORM_FD] = "Flipkart";
 
         // Checking whether reviews page is available on the site or not
         if (details.reviewsLink !== undefined) {
@@ -107,59 +118,69 @@ const flipkart = async (Categories) => {
             const totalReviewsandratings = await flipkartfetchReviews(
               urls,
               key,
-              browser,
+              { browser },
               page,
-              data[j]["ProductName"]
+              data[j][flipkarttext.F_PRODUCTNAME_FD]
             );
             if (!totalReviewsandratings.message) {
               for (let key in totalReviewsandratings) {
                 data[j][key] = totalReviewsandratings[key];
               }
             }
-            urls = null;
+            break;
           }
-          url1 = null;
+
+          for (let k = 1; k <= 5; k++) {
+            if (!data[j][`${k} ${flipkarttext.F_STARRATINGS_FD}`]) {
+              data[j][`${k} ${flipkarttext.F_STARRATINGS_FD}`] = 0;
+            }
+          }
 
           let NetRatingRank =
-            (data[j]["5 star ratings"] +
-              data[j]["4 star ratings"] -
-              (data[j]["2 star ratings"] + data[j]["1 star ratings"])) /
-            (data[j]["5 star ratings"] +
-              data[j]["4 star ratings"] +
-              data[j]["3 star ratings"] +
-              (data[j]["2 star ratings"] + data[j]["1 star ratings"]));
+            (data[j][`5 ${flipkarttext.F_STARRATINGS_FD}`] +
+              data[j][`4 ${flipkarttext.F_STARRATINGS_FD}`] -
+              (data[j][`2 ${flipkarttext.F_STARRATINGS_FD}`] +
+                data[j][`1 ${flipkarttext.F_STARRATINGS_FD}`])) /
+            (data[j][`5 ${flipkarttext.F_STARRATINGS_FD}`] +
+              data[j][`4 ${flipkarttext.F_STARRATINGS_FD}`] +
+              data[j][`3 ${flipkarttext.F_STARRATINGS_FD}`] +
+              (data[j][`2 ${flipkarttext.F_STARRATINGS_FD}`] +
+                data[j][`1 ${flipkarttext.F_STARRATINGS_FD}`]));
 
           data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
         }
 
-        if (data[j].ProductName) {
-          data[j]["Title Length"] = data[j]["ProductName"].length;
+        if (data[j][flipkarttext.F_PRODUCTNAME_FD]) {
+          data[j][flipkarttext.F_TITLE_LENGTH_FD] =
+            data[j][flipkarttext.F_PRODUCTNAME_FD].length;
         }
-        if (data[j]["Description"]) {
-          data[j]["Title Length"] = data[j]["ProductName"].length;
-          data[j]["Description Length"] = data[j]["Description"].length;
+        if (data[j][flipkarttext.F_DESCRIPTION_FD]) {
+          data[j][flipkarttext.F_DESCRIPTION_LENGTH_FD] =
+            data[j][flipkarttext.F_DESCRIPTION_FD].length;
         }
 
         let date = new Date();
 
-        data[j]["Date"] = date.toLocaleDateString();
+        data[j][flipkarttext.F_DATE_FD] = date.toLocaleDateString();
 
-        data[j]["Search Term"] = category;
+        data[j][flipkarttext.F_SEARCH_TERM_FD] = category;
         console.log(category);
 
-        data[j]["Position"] = j + 1;
+        data[j][flipkarttext.F_POSITION_FD] = j + 1;
 
         // Separating the amount and unit from the quantity (i.e.,100ml->100 and ml)
         if (data[j].Quantity) {
           const quantity = data[j].Quantity;
           const ar = quantity.split(" ");
           data[j].Quantity = Number(ar[0]);
-          data[j]["Quantity unit"] = ar[1];
-          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
+          data[j][flipkarttext.F_PRICE_PER_UNIT_FD] = ar[1];
+          data[j][flipkarttext.F_QUANTITY_UNIT_FD] =
+            data[j].price / data[j].Quantity;
         } else {
           data[j].Quantity = 1;
-          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
-          data[j]["Quantity unit"] = "NA";
+          data[j][flipkarttext.F_PRICE_PER_UNIT_FD] =
+            data[j].price / data[j].Quantity;
+          data[j][flipkarttext.F_QUANTITY_UNIT_FD] = "NA";
         }
 
         // Making a new array of product with required fields and in required order
@@ -174,8 +195,8 @@ const flipkart = async (Categories) => {
         // await sql(obj);
 
         delete obj.sellerDetails;
-        delete obj["POSITIVE_FIRST"];
-        delete obj["NEGATIVE_FIRST"];
+        delete obj[flipkarttext.F_POSITIVE_FIRST_FD];
+        delete obj[flipkarttext.F_NEGATIVE_FIRST_FD];
 
         console.log(await save(obj));
 
@@ -183,7 +204,10 @@ const flipkart = async (Categories) => {
 
         console.log(j);
       }
+
       await sql(listofproducts);
+
+      await browser.close();
     }
     return listofproducts;
   } catch (e) {

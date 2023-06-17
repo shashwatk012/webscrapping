@@ -4,7 +4,7 @@ const { nykaafetchUrlDetails } = require("./nykaaurldetails");
 const { nykaafetchUrlDetails1 } = require("./nykaaurldetails1");
 const { nykaafetchReviews } = require("./nykaareviews");
 const { check } = require("./checkformat");
-const { nykaasql, fields, save } = require("../text");
+const { fields, save } = require("../text");
 
 const urlmaking = (category) => {
   const url = `https://www.nykaa.com/search/result/?q=${category}&root=search&searchType=history&suggestionType=query&ssp=2&searchItem=${category}&sourcepage=home&`;
