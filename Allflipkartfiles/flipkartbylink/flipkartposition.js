@@ -2,8 +2,7 @@
 
 const axios = require("axios");
 const cheerio = require("cheerio");
-const puppeteer = require("puppeteer");
-const { headers, replce, allProducts } = require("../text");
+const { headers, allProducts } = require("../text");
 
 const scrapposition = (html, ProductName) => {
   // cheerio nodejs module to load html
@@ -25,7 +24,7 @@ const scrapposition = (html, ProductName) => {
   return obj;
 };
 
-const flipkartPosition = async (url, browser, page, ProductName) => {
+const flipkartPosition = async (url, ProductName) => {
   // function to scrap complete data about one product
   try {
     const response = await axios.get(url, headers);

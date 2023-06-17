@@ -1,7 +1,7 @@
 "use strict";
 
 // This page scrapps the complete product details
-
+const axios = require("axios");
 const cheerio = require("cheerio");
 const { headers, replce } = require("../text");
 const flipkarttext = require("./flipkarttext");
@@ -94,7 +94,6 @@ const scrapdetails = (html) => {
     if (category) {
       Categories.push(category);
     }
-    category = null;
   });
   obj[flipkarttext.F_MOTHER_CATEGORY_FD] = Categories[1];
   obj[flipkarttext.F_CATEGORY_FD] = Categories[2];

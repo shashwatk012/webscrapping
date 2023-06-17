@@ -12,9 +12,17 @@ const { typesOfRatings, fields } = require("../text");
 
 const { flipkartPosition } = require("./flipkartposition");
 
+const puppeteer = require("puppeteer");
+const flipkartbylinktext = require("./flipkartbylinktext");
+
 const flipkartbylink = async (url) => {
   try {
-    let browser, page;
+    let page;
+    let browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     let flag = true;
 
     // Creating an object which is going to be the response of the coming request
@@ -23,7 +31,7 @@ const flipkartbylink = async (url) => {
     };
 
     // scrapping all the required details by going inside every individual products
-    let details = await flipkartfetchIndividualDetails(url, browser, page);
+    let details = await flipkartfetchIndividualDetails(url, { browser }, page);
     if (details.message === "Can not fetch") {
       flag = false;
     }
@@ -43,12 +51,7 @@ const flipkartbylink = async (url) => {
         urls += `&page=${i + 1}`;
 
         //function to scrap the data from the main page
-        const pos = await flipkartPosition(
-          urls,
-          browser,
-          page,
-          details.ProductName
-        );
+        const pos = await flipkartPosition(urls, details.ProductName);
         if (pos.Position) {
           data.Position = res + pos.Position;
           break;
@@ -60,22 +63,25 @@ const flipkartbylink = async (url) => {
       }
     }
 
-    // Checking whether sellers details are present on the page or not
+    // Scrapping the sellers details
     if (details.sellerslink !== undefined) {
       const sellers = await flipkartsellerslist(
         details.sellerslink,
-        browser,
+        { browser },
         page,
-        data["ProductName"]
+        data[flipkartbylinktext.F_PRODUCTNAME_FD]
       );
-      data["NumberofSellers"] = sellers.NumberofSellers;
-      data["sellerDetails"] = sellers.sellersDetails;
-      data["Max Price"] = sellers["Max Price"];
-      data["Min Price"] = sellers["Min Price"];
-      data["St-dev-Price"] = sellers["St-dev-Price"];
+      data[flipkartbylinktext.F_NUMBEROFSELLERS_FD] = sellers.NumberofSellers;
+      data[flipkartbylinktext.F_SELLERDETAILS_FD] = sellers.sellersDetails;
+      data[flipkartbylinktext.F_MAX_PRICE_FD] =
+        sellers[flipkartbylinktext.F_MAX_PRICE_FD];
+      data[flipkartbylinktext.F_MIN_PRICE_FD] =
+        sellers[flipkartbylinktext.F_MIN_PRICE_FD];
+      data[flipkartbylinktext.F_ST_DEV_PRICE_FD] =
+        sellers[flipkartbylinktext.F_ST_DEV_PRICE_FD];
     }
 
-    data["Platform"] = "Flipkart";
+    data[flipkartbylinktext.F_PLATFORM_FD] = "Flipkart";
 
     // Checking whether reviews page is available on the site or not
     if (details.reviewsLink !== undefined) {
@@ -91,44 +97,61 @@ const flipkartbylink = async (url) => {
         const totalReviewsandratings = await flipkartfetchReviews(
           urls,
           key,
-          browser,
+          { browser },
           page,
-          data["ProductName"]
+          data[flipkartbylinktext.F_PRODUCTNAME_FD]
         );
-        for (let key in totalReviewsandratings) {
-          data[key] = totalReviewsandratings[key];
+        if (!totalReviewsandratings.message) {
+          for (let key in totalReviewsandratings) {
+            data[key] = totalReviewsandratings[key];
+          }
         }
       }
+
+      for (let k = 1; k <= 5; k++) {
+        if (!data[`${k} ${flipkartbylinktext.F_STARRATINGS_FD}`]) {
+          data[`${k} ${flipkartbylinktext.F_STARRATINGS_FD}`] = 0;
+        }
+      }
+
       let NetRatingRank =
-        (data["5 star ratings"] +
-          data["4 star ratings"] -
-          (data["2 star ratings"] + data["1 star ratings"])) /
-        (data["5 star ratings"] +
-          data["4 star ratings"] +
-          data["3 star ratings"] +
-          (data["2 star ratings"] + data["1 star ratings"]));
+        (data[`5 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          data[`4 ${flipkartbylinktext.F_STARRATINGS_FD}`] -
+          (data[`2 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
+            data[`1 ${flipkartbylinktext.F_STARRATINGS_FD}`])) /
+        (data[`5 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          data[`4 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          data[`3 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          (data[`2 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
+            data[`1 ${flipkartbylinktext.F_STARRATINGS_FD}`]));
 
-      data["Net Rating Score (NRS)"] = NetRatingRank * 100;
+      data[flipkartbylinktext.F_NET_RATING_SCORE_FD] = NetRatingRank * 100;
     }
-    data["Title Length"] = data["ProductName"].length;
 
-    data["Description Length"] = data["Description"].length;
+    if (data[flipkartbylinktext.F_PRODUCTNAME_FD]) {
+      data[flipkartbylinktext.F_TITLE_LENGTH_FD] =
+        data[flipkartbylinktext.F_PRODUCTNAME_FD].length;
+    }
+    if (data[flipkartbylinktext.F_DESCRIPTION_FD]) {
+      data[flipkartbylinktext.F_DESCRIPTION_LENGTH_FD] =
+        data[flipkartbylinktext.F_DESCRIPTION_FD].length;
+    }
 
     let date = new Date();
 
-    data["Date"] = date.toLocaleDateString();
+    data[flipkartbylinktext.F_DATE_FD] = date.toLocaleDateString();
 
     // Separating the amount and unit from the quantity (i.e.,100ml->100 and ml)
     if (data.Quantity) {
       const quantity = data.Quantity;
       const ar = quantity.split(" ");
       data.Quantity = Number(ar[0]);
-      data["Quantity unit"] = ar[1];
-      data["Price per unit"] = data.price / data.Quantity;
+      data[flipkartbylinktext.F_PRICE_PER_UNIT_FD] = ar[1];
+      data[flipkartbylinktext.F_QUANTITY_UNIT_FD] = data.price / data.Quantity;
     } else {
       data.Quantity = 1;
-      data["Price per unit"] = data.price / data.Quantity;
-      data["Quantity unit"] = "NA";
+      data[flipkartbylinktext.F_PRICE_PER_UNIT_FD] = data.price / data.Quantity;
+      data[flipkartbylinktext.F_QUANTITY_UNIT_FD] = "NA";
     }
 
     // Making a new array of product details with required fields and in required order
@@ -140,14 +163,14 @@ const flipkartbylink = async (url) => {
         obj[fields[k]] = "NA";
       }
     }
-
+    await browser.close();
     if (!flag) {
       return "Something went wrong! Try again";
     } else {
       return obj;
     }
   } catch (e) {
-    console.log(e);
+    return "Something went wrong! Try again";
   }
 };
 

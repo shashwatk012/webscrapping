@@ -147,7 +147,7 @@ const flipkart = async (Categories) => {
               (data[j][`2 ${flipkarttext.F_STARRATINGS_FD}`] +
                 data[j][`1 ${flipkarttext.F_STARRATINGS_FD}`]));
 
-          data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
+          data[j][flipkarttext.F_NET_RATING_SCORE_FD] = NetRatingRank * 100;
         }
 
         if (data[j][flipkarttext.F_PRODUCTNAME_FD]) {

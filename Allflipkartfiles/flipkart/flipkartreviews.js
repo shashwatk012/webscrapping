@@ -72,6 +72,7 @@ const flipkartfetchReviews = async (
   try {
     page = await browser.browser.newPage();
     await page.goto(url);
+    await page.waitForTimeout(1000);
 
     await page.evaluate(() => {
       document
