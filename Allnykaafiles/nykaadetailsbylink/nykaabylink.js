@@ -30,6 +30,12 @@ const nykaabylink = async (body) => {
       for (let key in details) {
         data[key] = details[key];
       }
+      for (let k = 1; k <= 5; k++) {
+        if (!data[`${k} ${nykaatext.N_STARRATINGS_FD}`]) {
+          data[`${k} ${nykaatext.N_STARRATINGS_FD}`] = 0;
+        }
+      }
+
       let NetRatingRank =
         (data[`5 ${nykaatext.N_STARRATINGS_FD}`] +
           data[`4 ${nykaatext.N_STARRATINGS_FD}`] -
@@ -88,6 +94,7 @@ const nykaabylink = async (body) => {
         obj[fields[k]] = null;
       }
     }
+    await browser.close();
     return obj;
   } catch (e) {
     console.log(e);

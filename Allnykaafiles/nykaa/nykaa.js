@@ -24,6 +24,7 @@ const nykaa = async (Categories) => {
 
     let browser = await puppeteer.launch({
       headless: `true`,
+      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
     let page;
@@ -63,7 +64,7 @@ const nykaa = async (Categories) => {
       } else {
         const allProductDetails = await nykaafetchUrlDetails1(
           url,
-          browser,
+          { browser },
           page
         );
         if (!allProductDetails[0].message) {
@@ -92,6 +93,12 @@ const nykaa = async (Categories) => {
           for (let key in details) {
             data[j][key] = details[key];
           }
+          for (let k = 1; k <= 5; k++) {
+            if (!data[`${k} ${nykaatext.N_STARRATINGS_FD}`]) {
+              data[`${k} ${nykaatext.N_STARRATINGS_FD}`] = 0;
+            }
+          }
+
           let NetRatingRank =
             (data[j][`5 ${nykaatext.N_STARRATINGS_FD}`] +
               data[j][`4 ${nykaatext.N_STARRATINGS_FD}`] -
@@ -156,6 +163,7 @@ const nykaa = async (Categories) => {
       }
       // await nykaasql(listofproducts);
     }
+    await browser.close();
     return listofproducts;
   } catch (e) {
     console.log(e);
