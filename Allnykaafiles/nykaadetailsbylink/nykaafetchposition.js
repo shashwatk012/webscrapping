@@ -1,7 +1,7 @@
 const cheerio = require("cheerio");
 const nykaatext = require("./nykaatext");
 
-const fetchPosition = async (url, browser, page, mainurl) => {
+const fetchPosition = async (url, browser, page, ProductName) => {
   // function to scrap complete data about one product
   try {
     page = await browser.browser.newPage();
@@ -20,14 +20,11 @@ const fetchPosition = async (url, browser, page, mainurl) => {
     let flag = true;
     $(nykaatext.N_PRODUCTLINK_CN).each(async (_idx, el) => {
       // selecting the elements to be scrapped
-      const links = $(el);
+      const names = $(el);
 
-      const link = links // scraping the link of the product
-        .find("a")
-        .attr("href");
+      const name = names.find(nykaatext.N_POSITION_NAMES_CN).text(); // scraping the name of the product
 
-      const productlink = `${nykaatext.NYKAA_PAGE_LINK}${link}`;
-      if (mainurl.includes(productlink) || productlink.includes(mainurl)) {
+      if (ProductName.includes(name) || name.includes(ProductName)) {
         flag = false;
         position = _idx + 1;
       }
@@ -66,15 +63,11 @@ const fetchPosition = async (url, browser, page, mainurl) => {
 
       $(nykaatext.N_PRODUCTLINK_CN).each(async (_idx, el) => {
         // selecting the elements to be scrapped
-        const links = $(el);
+        const names = $(el);
 
-        const link = links // scraping the link of the product
-          .find("a")
-          .attr("href");
+        const name = names.find(nykaatext.N_POSITION_NAMES_CN).text(); // scraping the name of the product
 
-        const productlink = `${nykaatext.NYKAA_PAGE_LINK}${link}`;
-
-        if (mainurl.includes(productlink) || productlink.includes(mainurl)) {
+        if (ProductName.includes(name) || name.includes(ProductName)) {
           flag = false;
           position += _idx + 1;
         }

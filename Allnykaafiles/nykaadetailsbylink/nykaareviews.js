@@ -53,7 +53,6 @@ const reviews = (html, ProductName) => {
     summary = null;
   });
   obj[nykaatext.N_MOST_USEFUL_FD] = review;
-  console.log(obj);
   return obj;
 };
 

@@ -24,6 +24,7 @@ const nykaatext = {
   N_REVIEWS_SUMMARY_CN: "p.css-1n0nrdk",
   N_DISCOUNT_CN: "div.css-1d0jf8e>span.css-bhhehx",
   N_POSLINK_CN: "div.css-16kpx0l>ul.css-1uxnb1o>li.last-list.css-hnjjmz>a.name",
+  N_POSITION_NAMES_CN: "div.css-1rd7vky>div.css-xrzmfa",
   N_PRODUCTNAME_FD: "ProductName",
   N_IMAGELINK_FD: "imagelink",
   N_PRICE_FD: "price",

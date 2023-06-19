@@ -59,7 +59,12 @@ const nykaabylink = async (body) => {
     }
 
     if (details.posLink !== undefined) {
-      const pos = await fetchPosition(details.posLink, { browser }, page, url);
+      const pos = await fetchPosition(
+        details.posLink,
+        { browser },
+        page,
+        data[nykaatext.N_PRODUCTNAME_FD]
+      );
       data[nykaatext.N_POSITION_FD] = pos;
     }
 
