@@ -8,6 +8,9 @@ const amazontext = require("./amazontext");
 const amazon = async (Categories) => {
   try {
     console.log(Categories);
+    if (!Categories.length) {
+      Categories = [Categories];
+    }
     // Declaration of an array to store all the product details
     let listofproducts = [];
 
@@ -175,6 +178,7 @@ const amazon = async (Categories) => {
     return listofproducts;
   } catch (e) {
     console.log(e);
+    return { message: "Something went wrong, try again later" };
   }
 };
 
