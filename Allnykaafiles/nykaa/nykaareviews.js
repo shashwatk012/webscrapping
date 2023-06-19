@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const puppeteer = require("puppeteer");
 const { headers, replce } = require("../text");
+const nykaatext = require("./nykaatext");
 
 const reviews = (html, ProductName) => {
   // cheerio nodejs module to load html
@@ -12,12 +12,13 @@ const reviews = (html, ProductName) => {
 
   let obj = {},
     review = [];
+
   // Scraping the reviewS
-  $("div.css-z7l7ua").each(async (_idx, el) => {
+  $(nykaatext.N_REVIEWSLINK_CN).each(async (_idx, el) => {
     const x = $(el);
     let name = x.find("span.css-amd8cf").text();
-    let title = x.find("h4.css-tm4hnq").text();
-    let summary = x.find("p.css-1n0nrdk").text();
+    let title = x.find(nykaatext.N_REVIEWS_TITLE_CN).text();
+    let summary = x.find(nykaatext.N_REVIEWS_SUMMARY_CN).text();
     let type = "Most Useful";
 
     if (title && summary) {
@@ -51,29 +52,22 @@ const reviews = (html, ProductName) => {
     title = null;
     summary = null;
   });
-  obj["MOST_USEFUL"] = review;
+  obj[nykaatext.N_MOST_USEFUL_FD] = review;
   return obj;
 };
 
 const nykaafetchReviews = async (url, browser, page, ProductName) => {
   // function to scrap complete data about one product
   try {
-    // api to get html of the required page
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
-    });
+    page = await browser.browser.newPage();
 
-    page = await browser.newPage();
     await page.goto(url);
+
+    await page.waitForTimeout(1000);
 
     const html = await page.content();
 
     await page.close();
-    await browser.close();
 
     return reviews(html, ProductName);
   } catch (error) {
@@ -81,9 +75,7 @@ const nykaafetchReviews = async (url, browser, page, ProductName) => {
       if (page) {
         await page.close();
       }
-      if (browser) {
-        await browser.close();
-      }
+
       // api to get html of the required page
       const response = await axios.get(url, headers);
 

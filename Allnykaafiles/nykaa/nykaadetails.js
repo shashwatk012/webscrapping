@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const puppeteer = require("puppeteer");
-const { headers, replce, brands } = require("../text");
+const { headers, brands } = require("../text");
+const nykaatext = require("./nykaatext");
 
 const individualdetails = (html) => {
   // cheerio nodejs module to load html
@@ -10,21 +10,19 @@ const individualdetails = (html) => {
   // Declaration of object to store the product details
   let obj = {};
 
-  let a = $("div#brand_arrowUp").text();
+  // let a = $("div#brand_arrowUp").text();
 
   // Scraping the ProductName
-  const ProductName = $("div.css-1d5wdox>h1.css-1gc4x7i").text().trim();
+  const ProductName = $(nykaatext.N_PRODUCTNAME_CN).text().trim();
   if (ProductName !== undefined) {
-    obj["ProductName"] = ProductName;
+    obj[nykaatext.N_PRODUCTNAME_FD] = ProductName;
   }
 
   const pos = ProductName.indexOf("(");
   let pos1 = ProductName.indexOf(")");
   if (pos !== -1) {
     let Quantity = ProductName.substring(pos + 1, pos1);
-    console.log(Quantity);
     const splitArray = Quantity.match(/([\d\.]+)(.*)/);
-    console.log(splitArray);
     let QuantityUnit;
     if (splitArray && splitArray[2]) {
       QuantityUnit = splitArray[2].trim();
@@ -39,48 +37,49 @@ const individualdetails = (html) => {
       QuantityUnit === "ml" ||
       QuantityUnit === "g"
     ) {
-      obj["Quantity"] = Number(Quantity);
-      obj["Quantity unit"] = QuantityUnit;
+      obj[nykaatext.N_QUANTITY_FD] = Number(Quantity);
+      obj[nykaatext.N_QUANTITY_UNIT_FD] = QuantityUnit;
     } else {
-      obj["Quantity"] = 1;
-      obj["Quantity unit"] = "NA";
+      obj[nykaatext.N_QUANTITY_FD] = 1;
+      obj[nykaatext.N_QUANTITY_UNIT_FD] = "NA";
     }
   } else {
-    obj["Quantity"] = 1;
-    obj["Quantity unit"] = "NA";
+    obj[nykaatext.N_QUANTITY_FD] = 1;
+    obj[nykaatext.N_QUANTITY_UNIT_FD] = "NA";
   }
 
-  let imagelink = $("div.css-5n0nl4>div>img").attr("src");
-  obj["imagelink"] = imagelink;
+  let imagelink = $(nykaatext.N_IMAGELINK_CN).attr("src");
+  obj[nykaatext.N_IMAGELINK_FD] = imagelink;
 
-  const price = $("div.css-1d0jf8e>span.css-1jczs19").text();
+  const price = $(nykaatext.N_PRICE_CN).text();
   let arr = [];
 
   if (price) {
     arr = price.split("₹");
   }
-  obj["price"] = Number(arr[1]);
+  obj[nykaatext.N_PRICE_FD] = Number(arr[1]);
 
-  obj["Price per unit"] = obj["price"] / obj["Quantity"];
+  obj[nykaatext.N_PRICE_PER_UNIT_FD] =
+    obj[nykaatext.N_PRICE_FD] / obj[nykaatext.N_QUANTITY_FD];
 
-  const maxretailprice = $("div.css-1d0jf8e>span.css-u05rr>span").text();
+  const maxretailprice = $(nykaatext.N_MAXRETAILPRICE_CN).text();
 
   if (maxretailprice) {
     arr = maxretailprice.split("₹");
   }
 
-  obj["maxretailprice"] = Number(arr[1]);
+  obj[nykaatext.N_MAXRETAILPRICE_FD] = Number(arr[1]);
 
-  const discount = $("div.css-1d0jf8e>span.css-bhhehx").text();
+  const discount = $(nykaatext.N_DISCOUNT_CN).text();
 
   if (discount) {
     arr = discount.split("%");
   }
 
-  obj["Discount%"] = Number(arr[0]);
+  obj[nykaatext.N_DISCOUNT_FD] = Number(arr[0]);
 
   // scraping the number of global ratings and reviews
-  let ratingsandreviews = $("div.css-1hvvm95").text().trim();
+  let ratingsandreviews = $(nykaatext.N_RATINGS_CN).text().trim();
   let ratings, reviews;
   if (ratingsandreviews) {
     arr = ratingsandreviews.split(" ");
@@ -89,76 +88,67 @@ const individualdetails = (html) => {
   }
 
   // scraping the global rating(i.e 4.1)
-  let stars = $("div.css-m6n3ou").text();
+  let stars = $(nykaatext.N_STARS_CN).text();
 
   if (stars) {
     arr = stars.split("/");
     obj.stars = Number(arr[0]);
   }
 
-  obj["Ratings"] = ratings;
-  obj["Reviews"] = reviews;
+  obj[nykaatext.N_RATINGS_FD] = ratings;
+  obj[nykaatext.N_REVIEWS_FD] = reviews;
 
-  // console.log($("div.css-kxc9rx>span").text());
-  $("div.css-kxc9rx>span").each(async (_idx, el) => {
+  $(nykaatext.N_DIFFRATINGS_CN).each(async (_idx, el) => {
     const x = $(el);
     const diffratings = x.text();
-    obj[`${5 - _idx} star ratings`] = Number(diffratings);
+    obj[`${5 - _idx} ${nykaatext.N_STARRATINGS_FD}`] = Number(diffratings);
   });
 
   let categories = [];
-  $("div.css-16kpx0l>ul.css-1uxnb1o>li").each(async (_idx, el) => {
+  $(nykaatext.N_LISTOFCATEGORIES_CN).each(async (_idx, el) => {
     const x = $(el);
-    const category = x.find("a.name").text();
+    const category = x.find(nykaatext.N_CATEGORY_CN).text();
     categories.push(category);
   });
-  obj["Mother Category"] = categories[1];
-  obj["Category"] = categories[2];
-  obj["Sub-Category"] = categories[3];
-  obj["Product"] = categories[categories.length - 1];
+  obj[nykaatext.N_MOTHER_CATEGORY_FD] = categories[1];
+  obj[nykaatext.N_CATEGORY_FD] = categories[2];
+  obj[nykaatext.N_SUB_CATEGORY_FD] = categories[3];
+  obj[nykaatext.N_PRODUCT_FD] = categories[categories.length - 1];
 
   //scraping the pagelink for the reviews
-  const reviewsLink = $("div.css-1ux41ja>a.css-1xv8iu0").attr("href");
+  const reviewsLink = $(nykaatext.N_REVIEWSLINK_CN).attr("href");
   if (reviewsLink !== undefined) {
-    obj["reviewsLink"] = `https://www.nykaa.com${reviewsLink}`;
+    obj[
+      nykaatext.N_REVIEWSLINK_FD
+    ] = `${nykaatext.NYKAA_PAGE_LINK}${reviewsLink}`;
   }
 
-  const posLink = $(
-    "div.css-16kpx0l>ul.css-1uxnb1o>li.last-list.css-hnjjmz>a.name"
-  )
-    .last()
-    .attr("href");
-  obj["posLink"] = `https://www.nykaa.com${posLink}`;
+  const posLink = $(nykaatext.N_POSLINK_CN).last().attr("href");
+  obj[nykaatext.posLink] = `${nykaatext.NYKAA_PAGE_LINK}${posLink}`;
 
+  // Number of images
   let count = 1;
-  $("div.css-qb9x9j").each(async (_idx, el) => {
+  $(nykaatext.N_NUMBEROFIMAGES_CN).each(async (_idx, el) => {
     count++;
   });
-  obj["Number of images"] = count;
+  obj[nykaatext.N_NUMBEROFIMAGES_FD] = count;
 
   if (ProductName) {
     let arr = ProductName.split(" ");
     const index = brands.findIndex((element) => element.includes(arr[0]));
     obj.Brand = brands[index];
   }
-  console.log(obj);
   return obj;
 };
 
 const nykaafetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
-    // api to get html of the required page
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
-    });
+    page = await browser.browser.newPage();
 
-    page = await browser.newPage();
     await page.goto(url);
+
+    await page.waitForTimeout(1000);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
 
@@ -172,12 +162,11 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
       lastHeight = newHeight;
     }
 
-    await page.hover("div.css-1m0y15j");
+    // await page.hover("div.css-1m0y15j");
 
     const html = await page.content();
 
     await page.close();
-    await browser.close();
 
     return individualdetails(html);
   } catch (error) {
@@ -185,10 +174,7 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
       if (page) {
         await page.close();
       }
-      if (browser) {
-        await browser.close();
-      }
-      console.log("error");
+
       // api to get html of the required page
       const response = await axios.get(url, headers);
 
@@ -221,19 +207,18 @@ const nykaafetchIndividualDetails = async (url, browser, page) => {
           QuantityUnit === "ml" ||
           QuantityUnit === "g"
         ) {
-          obj["Quantity"] = Number(Quantity);
-          obj["Quantity unit"] = QuantityUnit;
+          obj[nykaatext.N_QUANTITY_FD] = Number(Quantity);
+          obj[nykaatext.N_QUANTITY_UNIT_FD] = QuantityUnit;
         } else {
-          obj["Quantity"] = 1;
-          obj["Quantity unit"] = "NA";
+          obj[nykaatext.N_QUANTITY_FD] = 1;
+          obj[nykaatext.N_QUANTITY_UNIT_FD] = "NA";
         }
       } else {
-        obj["Quantity"] = 1;
-        obj["Quantity unit"] = "NA";
+        obj[nykaatext.N_QUANTITY_FD] = 1;
+        obj[nykaatext.N_QUANTITY_UNIT_FD] = "NA";
       }
       return obj;
     } catch (e) {
-      console.log(e);
       return { message: "NOT POSSIBLE" };
     }
   }

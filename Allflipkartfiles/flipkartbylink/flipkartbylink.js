@@ -19,7 +19,7 @@ const flipkartbylink = async (url) => {
   try {
     let page;
     let browser = await puppeteer.launch({
-      headless: false,
+      headless: `true`,
       defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });

@@ -1,10 +1,12 @@
 "use strict";
+const puppeteer = require("puppeteer");
 const { nykaafetchIndividualDetails } = require("./nykaadetails");
 const { nykaafetchUrlDetails } = require("./nykaaurldetails");
 const { nykaafetchUrlDetails1 } = require("./nykaaurldetails1");
 const { nykaafetchReviews } = require("./nykaareviews");
 const { check } = require("./checkformat");
 const { fields, save } = require("../text");
+const nykaatext = require("./nykaatext");
 
 const urlmaking = (category) => {
   const url = `https://www.nykaa.com/search/result/?q=${category}&root=search&searchType=history&suggestionType=query&ssp=2&searchItem=${category}&sourcepage=home&`;
@@ -20,20 +22,27 @@ const nykaa = async (Categories) => {
     // Declaration of an array to store all the product details
     let listofproducts = [];
 
+    let browser = await puppeteer.launch({
+      headless: `true`,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    let page;
+
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
       listofproducts = [];
-      let browser, page;
+
       // Storing the number of data to be scraped in numData variable
       let numOfData = Categories[i].data;
       let category = Categories[i].category;
+
       //Creating the link to be scrapped
       let url = urlmaking(Categories[i].category);
 
       let arr = [];
       let data = [];
 
-      const flag = await check(url, browser, page);
+      const flag = await check(url, { browser }, page);
       if (flag === "NOT POSSIBLE") {
         continue;
       }
@@ -42,7 +51,7 @@ const nykaa = async (Categories) => {
       if (flag) {
         const allProductDetails = await nykaafetchUrlDetails(
           url,
-          browser,
+          { browser },
           page
         );
         if (!allProductDetails[0].message) {
@@ -76,7 +85,7 @@ const nykaa = async (Categories) => {
         // scrapping all the required details by going inside every individual products
         let details = await nykaafetchIndividualDetails(
           data[j].productlink,
-          browser,
+          { browser },
           page
         );
         if (details.message !== "NOT POSSIBLE") {
@@ -84,15 +93,17 @@ const nykaa = async (Categories) => {
             data[j][key] = details[key];
           }
           let NetRatingRank =
-            (data[j]["5 star ratings"] +
-              data[j]["4 star ratings"] -
-              (data[j]["2 star ratings"] + data[j]["1 star ratings"])) /
-            (data[j]["5 star ratings"] +
-              data[j]["4 star ratings"] +
-              data[j]["3 star ratings"] +
-              (data[j]["2 star ratings"] + data[j]["1 star ratings"]));
+            (data[j][`5 ${nykaatext.N_STARRATINGS_FD}`] +
+              data[j][`4 ${nykaatext.N_STARRATINGS_FD}`] -
+              (data[j][`2 ${nykaatext.N_STARRATINGS_FD}`] +
+                data[j][`1 ${nykaatext.N_STARRATINGS_FD}`])) /
+            (data[j][`5 ${nykaatext.N_STARRATINGS_FD}`] +
+              data[j][`4 ${nykaatext.N_STARRATINGS_FD}`] +
+              data[j][`3 ${nykaatext.N_STARRATINGS_FD}`] +
+              (data[j][`2 ${nykaatext.N_STARRATINGS_FD}`] +
+                data[j][`5 ${nykaatext.N_STARRATINGS_FD}`]));
 
-          data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
+          data[j][nykaatext.N_NET_RATING_SCORE_FD] = NetRatingRank * 100;
         }
 
         // if (details.reviewsLink !== undefined) {
@@ -109,21 +120,20 @@ const nykaa = async (Categories) => {
         //   }
         // }
 
-        data[j]["Platform"] = "nykaa";
+        data[j][nykaatext.N_PLATFORM_FD] = "nykaa";
 
-        if (data[j]["ProductName"]) {
-          data[j]["Title Length"] = data[j]["ProductName"].length;
+        if (data[j][nykaatext.N_PRODUCTNAME_FD]) {
+          data[j][nykaatext.N_TITLE_LENGTH_FD] =
+            data[j][nykaatext.N_PRODUCTNAME_FD].length;
         }
-
-        // data[j]["Description Length"] = data[j]["Description"].length;
 
         let date = new Date();
 
-        data[j]["Date"] = date.toLocaleDateString();
+        data[j][nykaatext.N_DATE_FD] = date.toLocaleDateString();
 
-        data[j]["Search Term"] = category;
+        data[j][nykaatext.N_SEARCH_TERM_FD] = category;
 
-        data[j]["Position"] = j + 1;
+        data[j][nykaatext.N_POSITION_FD] = j + 1;
 
         // Making a new array of product with required fields
         let obj = {};
@@ -134,19 +144,17 @@ const nykaa = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        delete obj["MOST_USEFUL"];
-        delete obj["POSITIVE_FIRST"];
-        delete obj["NEGATIVE_FIRST"];
-        delete obj["sellerDetails"];
+        delete obj[nykaatext.N_MOST_USEFUL_FD];
+        delete obj[nykaatext.N_MOST_POSITIVE_FD];
+        delete obj[nykaatext.N_MOST_NEGATIVE_FD];
+        delete obj[nykaatext.N_SELLERDETAILS_FD];
+
         listofproducts.push(obj);
+
         console.log(await save(obj));
         console.log(j);
       }
       // await nykaasql(listofproducts);
-      numOfData = null;
-      url = null;
-      arr.length = 0;
-      data.length = 0;
     }
     return listofproducts;
   } catch (e) {

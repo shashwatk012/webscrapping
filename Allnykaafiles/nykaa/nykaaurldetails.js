@@ -1,22 +1,37 @@
 "use strict";
 const axios = require("axios");
-const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const { headers, replce } = require("../text");
+const nykaatext = require("./nykaatext");
+
+const fetchUrl = (html) => {
+  let $ = cheerio.load(html);
+
+  const nykaa = [];
+
+  $(nykaatext.N_PRODUCTLINK_CN).each(async (_idx, el) => {
+    // selecting the elements to be scrapped
+    const links = $(el);
+
+    const link = links // scraping the link of the product
+      .find("a")
+      .attr("href");
+
+    let element = {
+      productlink: `${nykaatext.NYKAA_PAGE_LINK}${link}`,
+    };
+
+    nykaa.push(element); //storing the details in an array
+  });
+  return nykaa;
+};
 
 const nykaafetchUrlDetails = async (url, browser, page) => {
   try {
-    // api to get html of the required page
-    browser = await puppeteer.launch({
-      // headless: "new",
-      headless: `true`,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      // `headless: 'new'` enables new Headless;
-      // `headless: false` enables “headful” mode.
-    });
-
-    page = await browser.newPage();
+    page = await browser.browser.newPage();
     await page.goto(url);
+
+    await page.waitForTimeout(1000);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
 
@@ -30,72 +45,23 @@ const nykaafetchUrlDetails = async (url, browser, page) => {
       lastHeight = newHeight;
     }
 
-    // await page.waitForSelector("button.load-more-button");
-
     let html = await page.content();
 
-    let $ = cheerio.load(html);
-
     await page.close();
-    await browser.close();
 
-    const nykaa = [];
-
-    $("div#product-list-wrap>div.productWrapper.css-xin9gt").each(
-      async (_idx, el) => {
-        // selecting the elements to be scrapped
-        const links = $(el);
-
-        // let imagelink = links.find(imglink).attr("src"); // scraping the image
-
-        const link = links // scraping the link of the product
-          .find("a")
-          .attr("href");
-
-        let element = {
-          // imagelink,
-          productlink: `https://www.nykaa.com${link}`,
-        };
-        nykaa.push(element); //storing the details in an array
-      }
-    );
-    return nykaa;
+    return fetchUrl(html);
   } catch (error) {
     try {
       if (page) {
         await page.close();
       }
-      if (browser) {
-        await browser.close();
-      }
+
       // api to get html of the required page
       const response = await axios.get(url, headers);
 
       const html = response.data;
 
-      $ = cheerio.load(html);
-
-      const nykaa = [];
-
-      $("div#product-list-wrap>div.productWrapper.css-xin9gt").each(
-        async (_idx, el) => {
-          // selecting the elements to be scrapped
-          const links = $(el);
-
-          // let imagelink = links.find(imglink).attr("src"); // scraping the image
-
-          const link = links // scraping the link of the product
-            .find("a")
-            .attr("href");
-
-          let element = {
-            // imagelink,
-            productlink: `https://www.nykaa.com${link}`,
-          };
-          nykaa.push(element); //storing the details in an array
-        }
-      );
-      return nykaa;
+      return fetchUrl(html);
     } catch (e) {
       return [{ message: "Can not fetch" }];
     }
