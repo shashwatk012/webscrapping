@@ -1,44 +1,31 @@
 const cheerio = require("cheerio");
-const puppeteer = require("puppeteer");
+const amazontext = require("./amazontext");
 
 const amazonfetchUrlDetails = async (url, browser, page) => {
   try {
     page = await browser.browser.newPage();
     await page.goto(url);
 
-    // let lastHeight = await page.evaluate("document.body.scrollHeight");
-
-    // while (true) {
-    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-    //   await page.waitForTimeout(1000); // sleep a bit
-    //   let newHeight = await page.evaluate("document.body.scrollHeight");
-    //   if (newHeight === lastHeight) {
-    //     break;
-    //   }
-    //   lastHeight = newHeight;
-    // }
+    await page.waitForTimeout(1000);
 
     const html = await page.content();
 
     await page.close();
-    // await browser.close();
+
     const $ = cheerio.load(html);
 
     const products = [];
 
-    $(
-      "div.s-result-item.s-asin.sg-col.s-widget-spacing-small" // selecting the elements to be scrapped
-    ).each(async (_idx, el) => {
+    $(amazontext.A_ALLPRODUCTLINK_CN).each(async (_idx, el) => {
+      // selecting the elements to be scrapped
       const product = $(el);
 
       let productlink = product // scraping the link of the product
-        .find(
-          "a.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
-        )
+        .find(amazontext.A_PRODUCTLINK_CN)
         .attr("href");
 
       let element = {
-        productlink: `https://amazon.in${productlink}`,
+        productlink: `${amazontext.AMAZON_PAGE_LINK}${productlink}`,
       };
 
       products.push(element); //storing the details in an array
@@ -48,55 +35,8 @@ const amazonfetchUrlDetails = async (url, browser, page) => {
     if (page) {
       await page.close();
     }
-    // if (browser) {
-    //   await browser.close();
-    // }
     return [];
   }
 };
 
 module.exports = { amazonfetchUrlDetails };
-
-// let ProductName = product // scraping the product name
-//         .find("span.a-color-base.a-text-normal")
-//         .text();
-
-//       const imagelink = product.find("img.s-image").attr("src"); // scraping the image
-
-// let Ratings = product // scraping the number of global ratings
-// .find(
-//   "div.a-section.a-spacing-none.a-spacing-top-micro > div.a-row.a-size-small"
-// )
-// .children("span")
-// .last()
-// .attr("aria-label");
-
-// let stars = product // scraping the ratings
-// .find("div.a-section.a-spacing-none.a-spacing-top-micro > div > span")
-// .attr("aria-label");
-
-// let price = product.find("span.a-price-whole").text();
-// price = Number(price);
-
-// let maxretailprice = product
-// .find("span.a-price.a-text-price>span.a-offscreen")
-// .text();
-
-// if (maxretailprice === "") {
-// maxretailprice = price;
-// } else {
-// maxretailprice = maxretailprice.substring(1);
-// maxretailprice = Number(maxretailprice);
-// }
-
-// if (stars) {
-//   stars = stars.substring(0, 3);
-//   stars = Number(stars);
-//   element.stars = stars;
-// }
-
-// if (Ratings) {
-//   let result = Ratings.replace(/\D/g, "");
-//   result = Number(result);
-//   element.Ratings = result;
-// }

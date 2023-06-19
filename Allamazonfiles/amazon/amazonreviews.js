@@ -1,11 +1,12 @@
 const cheerio = require("cheerio");
-const scrapingbee = require("scrapingbee");
-const puppeteer = require("puppeteer");
+const amazontext = require("./amazontext");
 
 const amazonfetchReviews = async (url, browser, page) => {
   try {
     page = await browser.browser.newPage();
     await page.goto(url);
+
+    await page.waitForTimeout(1000);
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
 
@@ -22,13 +23,12 @@ const amazonfetchReviews = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
-    // await browser.close();
 
     const $ = cheerio.load(html);
 
     let obj = {};
     // Scraping the Global number of reviews
-    const noReviews = $(".a-row.a-spacing-base.a-size-base");
+    const noReviews = $(amazontext.A_NUM_REVIEWS_CN);
     numberReviews = noReviews.html();
     if (numberReviews) {
       numberReviews = numberReviews.trim();
@@ -37,13 +37,11 @@ const amazonfetchReviews = async (url, browser, page) => {
     }
 
     //Scraping the number of all type of ratings such as 5 star, 4 star
-    $("tr.a-histogram-row.a-align-center").each(async (_idx, el) => {
+    $(amazontext.A_ALLRATINGS_CN).each(async (_idx, el) => {
       // selecting the ratings element and the looping to get the different ratings
       const x = $(el);
-      let key = x.find("td.aok-nowrap>span.a-size-base>a.a-link-normal").text();
-      let value = x
-        .find("td.a-text-right.a-nowrap>span.a-size-base>a.a-link-normal")
-        .text();
+      let key = x.find(amazontext.A_ALLRATINGS_key_CN).text();
+      let value = x.find(amazontext.A_ALLRATINGS_value_CN).text();
       if (key) {
         key = key.trim();
       }
@@ -53,34 +51,17 @@ const amazonfetchReviews = async (url, browser, page) => {
 
       if (key !== "" && value !== "") {
         const result = value.replace(/\D/g, "");
-        obj[`${key} ratings`] = result; // saving the scraped data in an object
+        obj[`${key} ${amazontext.A_STARRATINGS_FD}`] = result; // saving the scraped data in an object
       }
     });
 
-    // Scraping the reviews
-    // const reviews1 = [];
-    // $("div.a-section.review.aok-relative").each(async (_idx, el) => {
-    //   const reviews = $(el);
-    //   const name = reviews.find("span.a-profile-name").text();
-    //   const review = reviews
-    //     .find("span.a-size-base.review-text.review-text-content>span")
-    //     .text();
-    //   reviews1.push({
-    //     name: name,
-    //     review: review,
-    //   });
-    // });
-    obj["Reviews"] = Number(numberReviews);
-    // obj["top10reviews"] = reviews1;
+    obj[amazontext.A_REVIEWS_FD] = Number(numberReviews);
     return obj;
   } catch (error) {
     try {
       if (page) {
         await page.close();
       }
-      // if (browser) {
-      //   await browser.close();
-      // }
       return {};
     } catch (e) {
       return {};

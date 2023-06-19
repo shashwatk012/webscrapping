@@ -2,48 +2,51 @@ const cheerio = require("cheerio");
 const puppeteer = require("puppeteer");
 const { replce } = require("../text");
 const math = require("mathjs");
+const amazontext = require("./amazontext");
 
 const amazonfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
   try {
     page = await browser.browser.newPage();
+
     await page.goto(url);
+
+    await page.waitForTimeout(1000);
 
     let html = await page.content();
 
-    // cheerio nodejs module to load html
     let $ = cheerio.load(html);
 
     let captchalink = $("div.a-row.a-text-center>img").attr("src");
-
-    console.log(captchalink);
-
     let captcha = undefined;
-    const readline = require("readline").createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
 
-    readline.question("Who are you?", (name) => {
-      console.log(`Captcha is ${name}!`);
-      captcha = name;
-      readline.close();
-    });
+    if (captchalink) {
+      console.log(captchalink);
 
-    await page.waitForTimeout(20000);
+      const readline = require("readline").createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
 
-    console.log(captcha);
+      readline.question("Type the captcha", (name) => {
+        console.log(`Captcha is ${name}!`);
+        captcha = name;
+        readline.close();
+      });
 
-    await page.type("input#captchacharacters", captcha);
+      await page.waitForTimeout(20000);
 
-    await page.click(
-      "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
-    );
+      await page.type("input#captchacharacters", captcha);
 
-    await page.waitForTimeout(5000);
+      await page.click(
+        "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
+      );
+
+      await page.waitForTimeout(5000);
+    }
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
-    //
+
     while (true) {
       await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
       await page.waitForTimeout(1000); // sleep a bit
@@ -53,12 +56,10 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       }
       lastHeight = newHeight;
     }
-    // await page.screenshot({ path: "screenshot.png" });
 
     html = await page.content();
 
     await page.close();
-    // await browser.close();
 
     // cheerio nodejs module to load html
     $ = cheerio.load(html);
@@ -67,55 +68,45 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     let obj = {};
 
     // ProductName
-    let ProductName = $("span#productTitle").text();
+    let ProductName = $(amazontext.A_PRODUCTNAME_CN).text();
 
     // stars
-    let star = $(
-      "a.a-popover-trigger.a-declarative>span.a-size-base.a-color-base"
-    ).text();
+    let star = $(amazontext.A_STARS_CN).text();
 
     // number of ratings
-    let numratings = $("span#acrCustomerReviewText").text();
+    let numratings = $(amazontext.A_RATINGS_CN).text();
 
     // Link for the images
-    let imagelink = $("div.imgTagWrapper>img").attr("src");
+    let imagelink = $(amazontext.A_IMAGELINK_CN).attr("src");
     if (!imagelink) {
-      imagelink = $("div.imgTagWrapper>div#unrolledImgNo0>div>img").attr("src");
+      imagelink = $(amazontext.A_IMAGELINK_ALTERNATIVE_CN).attr("src");
     }
 
     // price
-    let price = $(
-      "span.a-price.aok-align-center.reinventPricePriceToPayMargin.priceToPay>span.a-offscreen"
-    ).text();
+    let price = $(amazontext.A_PRICE_CN).text();
     price = replce(price);
 
     if (!price) {
-      price = $(
-        "span.a-price.a-text-price.a-size-medium.apexPriceToPay>span.a-offscreen"
-      ).text();
+      price = $(amazontext.A_PRICE_ALTERNATIVE_CN).text();
       price = replce(price);
     }
 
     // maxretailprice
-    let maxretailprice = $(
-      "div.a-section.a-spacing-small.aok-align-center>span>span>span>span.a-price.a-text-price>span.a-offscreen"
-    ).text();
+    let maxretailprice = $(amazontext.A_MAXRETAILPRICE_CN).text();
     maxretailprice = replce(maxretailprice);
 
     if (!maxretailprice) {
-      maxretailprice = $(
-        "td.a-span12.a-color-secondary.a-size-base>span.a-price.a-text-price.a-size-base>span.a-offscreen"
-      ).text();
+      maxretailprice = $(amazontext.A_MAXRETAILPRICE_ALTERNATIVE_CN).text();
       maxretailprice = replce(maxretailprice);
     }
 
     if (ProductName) {
-      obj["ProductName"] = ProductName.trim();
+      obj[amazontext.A_PRODUCTNAME_FD] = ProductName.trim();
     }
 
     if (star) {
       let stararr = star.split(" ");
-      obj["stars"] = Number(stararr[1]);
+      obj[amazontext.A_STARS_FD] = Number(stararr[1]);
     }
 
     if (numratings) {
@@ -123,30 +114,28 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       let size = numratings.length;
       const st = numratings.substring(0, size / 2);
       // const st1 = numratings.substring(size / 2, size);
-      obj["Ratings"] = Number(st);
+      obj[amazontext.A_RATINGS_FD] = Number(st);
     }
 
     if (imagelink) {
-      obj["imagelink"] = imagelink;
+      obj[amazontext.A_IMAGELINK_FD] = imagelink;
     }
 
     if (price) {
-      obj["price"] = price;
+      obj[amazontext.A_PRICE_FD] = price;
     }
 
     if (maxretailprice) {
-      obj["maxretailprice"] = maxretailprice;
+      obj[amazontext.A_MAXRETAILPRICE_FD] = maxretailprice;
     } else {
-      obj["maxretailprice"] = price;
+      obj[amazontext.A_MAXRETAILPRICE_FD] = price;
     }
 
     //Scraping the Best Sellers Rank in different Sub-Categories
-    $(
-      ".a-section.feature.detail-bullets-wrapper.bucket>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
-    ).each(async (_idx, el) => {
+    $(amazontext.A_LISTOFCATEGORIES_CN).each(async (_idx, el) => {
       const x = $(el);
       if (_idx === 0) {
-        let p = x.find("span.a-list-item").text();
+        let p = x.find(amazontext.A_CATEGORY_CN).text();
         if (p) {
           p = p.trim();
         }
@@ -189,23 +178,22 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
             }
           }
           if (i == num.length - 1) {
-            obj["Position"] = q[0];
+            obj[amazontext.A_POSITION_FD] = q[0];
           }
           st.push(s);
         }
-        console.log(st);
 
         // saving the scraped data in an object
-        if (st.length) {
-          obj["Mother Category"] = st[0];
-          obj["Category"] = st[1];
-          obj["BSR in Mother Category"] = rank[0];
-          obj["BSR in Category"] = rank[1];
-          if (st[2]) {
-            obj["Sub-Category"] = st[2];
-            obj["Product"] = st[2];
+        if (st.length > 1) {
+          obj[amazontext.A_MOTHER_CATEGORY_FD] = st[0];
+          obj[amazontext.A_CATEGORY_FD] = st[1];
+          obj[amazontext.A_BSR_IN_MOTHER_CATEGORY] = rank[0];
+          obj[amazontext.A_BSR_IN_CATEGORY] = rank[1];
+          if (st.length > 2) {
+            obj[amazontext.A_SUB_CATEGORY_FD] = st[2];
+            obj[amazontext.A_PRODUCT_FD] = st[2];
           } else {
-            obj["Product"] = st[1];
+            obj[amazontext.A_PRODUCT_FD] = st[1];
           }
         }
       }
@@ -213,13 +201,11 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
 
     // Number of images
     let count = 1;
-    $("li.a-spacing-small.item.imageThumbnail.a-declarative").each(
-      async (_idx, el) => {
-        const x = $(el);
-        count++;
-      }
-    );
-    obj["Number of images"] = count;
+    $(amazontext.A_NUMBEROFIMAGES_CN).each(async (_idx, el) => {
+      const x = $(el);
+      count++;
+    });
+    obj[amazontext.A_NUMBEROFIMAGES_FD] = count;
 
     // Sellerdetails
     count = 1;
@@ -227,66 +213,64 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       mx = price,
       pricearr = [price],
       sellerdetails = [];
-    $("div.a-box.mbc-offer-row.pa_mbc_on_amazon_offer").each(
-      async (_idx, el) => {
-        const x = $(el);
-        let price = x.find(`span#mbc-price-${_idx + 1}`).text();
-        let deliveryCharges = x.find(`span#mbc-delivery-${_idx + 1}`).text();
-        let soldBy = x
-          .find(`div#mbc-sold-by-${_idx + 1}>span.mbcMerchantName`)
-          .text();
+    $(amazontext.A_SELLERS_CN).each(async (_idx, el) => {
+      const x = $(el);
+      let price = x.find(`${amazontext.A_SELLERSPRICE_CN}${_idx + 1}`).text();
+      let deliveryCharges = x
+        .find(`${amazontext.A_SELLERSDELIVERYCHARGES_CN}${_idx + 1}`)
+        .text();
+      let soldBy = x
+        .find(`div#mbc-sold-by-${_idx + 1}>span.mbcMerchantName`)
+        .text();
 
-        price = replce(price);
-        pricearr.push(price);
+      price = replce(price);
+      pricearr.push(price);
 
-        mx = Math.max(mx, price);
-        mn = Math.min(mn, price);
+      mx = Math.max(mx, price);
+      mn = Math.min(mn, price);
 
-        // matching all numbers
-        deliveryCharges = deliveryCharges.match(/[.0-9]+/);
+      // matching all numbers
+      deliveryCharges = deliveryCharges.match(/[.0-9]+/);
 
-        if (!deliveryCharges || !deliveryCharges.length) {
-          deliveryCharges = [0];
-        }
-
-        sellerdetails.push({
-          SoldBy: soldBy,
-          Price: price,
-          "Delivery charges": Number(deliveryCharges[0]),
-        });
-        count++;
+      if (!deliveryCharges || !deliveryCharges.length) {
+        deliveryCharges = [0];
       }
-    );
+
+      sellerdetails.push({
+        SoldBy: soldBy,
+        Price: price,
+        "Delivery charges": Number(deliveryCharges[0]),
+      });
+      count++;
+    });
     let stDev;
     if (pricearr.length) {
       stDev = math.std(pricearr);
     }
-    obj["St-dev-Price"] = stDev;
-    obj["Min Price"] = mn;
-    obj["Max Price"] = mx;
-    obj["NumberofSellers"] = count;
-    obj["sellerDetails"] = sellerdetails;
+    obj[amazontext.A_ST_DEV_PRICE_FD] = stDev;
+    obj[amazontext.A_MIN_PRICE_FD] = mn;
+    obj[amazontext.A_MAX_PRICE_FD] = mx;
+    obj[amazontext.A_NUMBEROFSELLERS_FD] = count;
+    obj[amazontext.A_SELLERDETAILS_FD] = sellerdetails;
 
     // Product description
-    const description = $("div#productDescription>p").text();
-    obj["Description"] = description;
+    const description = $(amazontext.A_DESCRIPTION_CN).text();
+    obj[amazontext.A_DESCRIPTION_FD] = description;
 
     // Scraping the brand
-    let brand = $("a#bylineInfo").text();
+    let brand = $(amazontext.A_BRAND_CN).text();
     let brandarr = [];
-    console.log(brand);
+
     if (brand) {
       brandarr = brand.split(":");
-      obj["Brand"] = brandarr[1];
+      obj[amazontext.A_BRAND_FD] = brandarr[1];
     }
 
     // selecting the ratings element and the looping to get the different ratings percentage
-    $("tr.a-histogram-row.a-align-center").each(async (_idx, el) => {
+    $(amazontext.A_ALLRATINGS_CN).each(async (_idx, el) => {
       const x = $(el);
-      let key = x.find("td.aok-nowrap>span.a-size-base>a.a-link-normal").text();
-      let value = x
-        .find("td.a-text-right.a-nowrap>span.a-size-base>a.a-link-normal")
-        .text();
+      let key = x.find(amazontext.A_ALLRATINGS_key_CN).text();
+      let value = x.find(amazontext.A_ALLRATINGS_value_CN).text();
       if (key) {
         key = key.trim();
       }
@@ -296,73 +280,65 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
 
       if (key !== "" && value !== "") {
         const result = value.replace(/\D/g, "");
-        obj[`${key} ratings`] = result; // saving the scraped data in an object
+        obj[`${key} ${amazontext.A_STARRATINGS_FD}`] = result; // saving the scraped data in an object
       }
     });
 
     //scraping the pagelink for the reviews
-    const reviewsLink = $("a.a-link-emphasis.a-text-bold").attr("href");
-    obj["reviewsLink"] = `https://amazon.in${reviewsLink}`;
-
-    // Scraping the package size
-    const packageSize = $(
-      "div.a-row.a-spacing-micro.singleton>span.selection"
-    ).html();
-    if (packageSize) {
-      obj["packageSize"] = packageSize;
-    } else {
-      obj["packageSize"] = "Not available";
-    }
+    const reviewsLink = $(amazontext.A_REVIEWSLINK_CN).attr("href");
+    obj[
+      amazontext.A_REVIEWSLINK_FD
+    ] = `${amazontext.AMAZON_PAGE_LINK}${reviewsLink}`;
 
     //selecting the product details element and the looping to get the complete product details
-    $("tr.a-spacing-small").each(async (_idx, el) => {
+    $(amazontext.A_PRODUCTDETAILS1_CN).each(async (_idx, el) => {
       const x = $(el);
-      const key = x.find("td.a-span3>span.a-size-base.a-text-bold").text();
-      const value = x.find("td.a-span9>span.a-size-base.po-break-word").text();
+      const key = x.find(amazontext.A_PRODUCTDETAILS_KEY_CN).text();
+      const value = x.find(amazontext.A_PRODUCTDETAILS_VALUE_CN).text();
       if (key && value) {
         obj[key] = value;
       }
     });
 
     //selecting the product details element and the looping to get the complete product details
-    $(
-      ".a-section.feature.detail-bullets-wrapper.bucket>div#detailBullets_feature_div>ul.a-unordered-list.a-nostyle.a-vertical.a-spacing-none.detail-bullet-list"
-    )
+    $(amazontext.A_PRODUCTDETAILS2_CN)
       .children()
       .each(async (_idx, el) => {
         const x = $(el);
-        let key = x.find("span.a-text-bold").text();
+        let key = x.find(amazontext.A_PRODUCTDETAILS2_KEY_CN).text();
         for (let i = 0; i < key.length - 1; i++) {
           if (key[i] === " " && key[i + 1] === " ") {
             key = key.substring(0, i - 1);
             break;
           }
         }
-        const value = x.find("span.a-list-item").children("span").last().text();
+        const value = x
+          .find(amazontext.A_PRODUCTDETAILS2_VALUE_CN)
+          .children("span")
+          .last()
+          .text();
         if (key && value) {
           obj[key] = value;
         }
       });
 
-    //selecting the product details element and the looping to get the complete product details
-    $("table#productDetails_detailBullets_sections1>tbody>tr").each(
-      async (_idx, el) => {
-        const x = $(el);
-        let key = x.find("th").text();
-        for (let i = 0; i < key.length - 1; i++) {
-          if (key[i] === " " && key[i + 1] === " ") {
-            key = key.substring(0, i - 1);
-            break;
-          }
-        }
-        const value = x.find("td").text();
-        if (key && value) {
-          obj[key.trim()] = value.trim();
+    //selecting the product details element and the looping to get the complete product details in case of electronics
+    $(amazontext.A_PRODUCTDETAILS3_CN).each(async (_idx, el) => {
+      const x = $(el);
+      let key = x.find("th").text();
+      for (let i = 0; i < key.length - 1; i++) {
+        if (key[i] === " " && key[i + 1] === " ") {
+          key = key.substring(0, i - 1);
+          break;
         }
       }
-    );
+      const value = x.find("td").text();
+      if (key && value) {
+        obj[key.trim()] = value.trim();
+      }
+    });
 
-    if (!obj["Mother Category"]) {
+    if (!obj[amazontext.A_MOTHER_CATEGORY_FD]) {
       let p = obj["Best Sellers Rank"];
       let ranks,
         num = [];
@@ -403,40 +379,39 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
           }
         }
         if (i == num.length - 1) {
-          obj["Position"] = Number(q[0]);
+          obj[amazontext.A_POSITION_FD] = Number(q[0]);
         }
         st.push(s);
       }
-      console.log(st);
 
       // saving the scraped data in an object
-      if (st.length) {
-        obj["Mother Category"] = st[0];
-        obj["Category"] = st[1];
-        obj["BSR in Mother Category"] = rank[0];
-        obj["BSR in Category"] = rank[1];
-        if (st[2]) {
-          obj["Sub-Category"] = st[2];
-          obj["Product"] = st[2];
+      if (st.length > 1) {
+        obj[amazontext.A_MOTHER_CATEGORY_FD] = st[0];
+        obj[amazontext.A_CATEGORY_FD] = st[1];
+        obj[amazontext.A_BSR_IN_MOTHER_CATEGORY] = rank[0];
+        obj[amazontext.A_BSR_IN_CATEGORY] = rank[1];
+        if (st.length > 2) {
+          obj[amazontext.A_SUB_CATEGORY_FD] = st[2];
+          obj[amazontext.A_PRODUCT_FD] = st[2];
         } else {
-          obj["Product"] = st[1];
+          obj[amazontext.A_PRODUCT_FD] = st[1];
         }
       }
     }
 
-    // sellerdetails
-
     return obj;
   } catch (error) {
-    if (page) {
-      await page.close();
+    try {
+      console.log(error);
+      if (page) {
+        await page.close();
+      }
+      console.log("Some thing Went Wrong on details.js");
+      return {};
+    } catch (e) {
+      console.log("Some thing Went Wrong on details1.js");
+      return {};
     }
-    // if (browser) {
-    //   await browser.close();
-    // }
-    console.log(error);
-    console.log("Some thing Went Wrong on details.js");
-    return {};
   }
 };
 

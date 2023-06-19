@@ -2,7 +2,8 @@ const puppeteer = require("puppeteer");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
-const { typesOfRatings, fields, save } = require("../text");
+const { fields, save } = require("../text");
+const amazontext = require("./amazontext");
 
 const amazon = async (Categories) => {
   try {
@@ -81,80 +82,75 @@ const amazon = async (Categories) => {
           for (const key in totalReviewsandratings) {
             data[j][key] = totalReviewsandratings[key];
           }
-
-          //   // looping to scrap the different kinds of reviews such as "MOST_RECENT", "POSITIVE", "NEGATIVE"
-          //   for (const element of typesOfRatings) {
-          //     const str =
-          //       details.reviewsLink + `&pageNumber=1&filterByStar=${element}`;
-          //     const data1 = await amazonfetchReviews(str);
-          //     if (data1[0]) {
-          //       data[j][`${element} reviews and ratings`] = data1[0];
-          //     }
-          //     if (data1[1]) {
-          //       data[j][`${element}`] = data1[1];
-          //     }
-          //   }
         }
-        data[j]["Platform"] = "Amazon";
+
+        data[j][amazontext.A_PLATFORM_FD] = "Amazon";
 
         // Number of reviews is in percentage so converting in the numbers
         for (let k = 1; k <= 5; k++) {
-          if (data[j][`${k} star ratings`]) {
-            data[j][`${k} star ratings`] = Math.floor(
-              (Number(data[j][`${k} star ratings`]) *
-                Number(data[j]["Ratings"])) /
+          if (data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`]) {
+            data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`] = Math.floor(
+              (Number(data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`]) *
+                Number(data[j][amazontext.A_RATINGS_FD])) /
                 100
             );
           } else {
-            data[j][`${k} star ratings`] = 0;
+            data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`] = 0;
           }
         }
 
         let NetRatingRank =
-          (data[j]["5 star ratings"] +
-            data[j]["4 star ratings"] -
-            (data[j]["2 star ratings"] + data[j]["1 star ratings"])) /
-          (data[j]["5 star ratings"] +
-            data[j]["4 star ratings"] +
-            data[j]["3 star ratings"] +
-            (data[j]["2 star ratings"] + data[j]["1 star ratings"]));
+          (data[j][`5 ${amazontext.A_STARRATINGS1_FD}`] +
+            data[j][`4 ${amazontext.A_STARRATINGS1_FD}`] -
+            (data[j][`2 ${amazontext.A_STARRATINGS1_FD}`] +
+              data[j][`1 ${amazontext.A_STARRATINGS1_FD}`])) /
+          (data[j][`5 ${amazontext.A_STARRATINGS1_FD}`] +
+            data[j][`4 ${amazontext.A_STARRATINGS1_FD}`] +
+            data[j][`3 ${amazontext.A_STARRATINGS1_FD}`] +
+            (data[j][`2 ${amazontext.A_STARRATINGS1_FD}`] +
+              data[j][`1 ${amazontext.A_STARRATINGS1_FD}`]));
 
-        data[j]["Net Rating Score (NRS)"] = NetRatingRank * 100;
+        data[j][amazontext.A_NET_RATING_SCORE_FD] = NetRatingRank * 100;
 
         if (data[j].ProductName) {
-          data[j]["Title Length"] = data[j]["ProductName"].length;
+          data[j][amazontext.A_TITLE_LENGTH_FD] =
+            data[j][amazontext.A_PRODUCTNAME_FD].length;
         }
 
-        if (data[j]["Description"]) {
-          data[j]["Description Length"] = data[j]["Description"].length;
+        if (data[j][amazontext.A_DESCRIPTION_FD]) {
+          data[j][amazontext.A_DESCRIPTION_LENGTH_FD] =
+            data[j][amazontext.A_DESCRIPTION_FD].length;
         }
 
         let date = new Date();
 
-        data[j]["Date"] = date.toLocaleDateString();
+        data[j][amazontext.A_DATE_FD] = date.toLocaleDateString();
 
-        data[j]["Search Term"] = category;
+        data[j][amazontext.A_SEARCH_TERM_FD] = category;
         console.log(category);
 
-        data[j]["Position"] = j + 1;
+        data[j][amazontext.A_POSITION_FD] = j + 1;
 
         let discount =
           (data[j].maxretailprice - data[j].price) / data[j].maxretailprice;
-        data[j]["Discount%"] = Math.floor(discount * 100);
+        data[j][amazontext.A_DISCOUNT_FD] = Math.floor(discount * 100);
 
-        data[j]["Quantity"] = data[j]["Net Quantity"];
+        data[j][amazontext.A_QUANTITY_FD] =
+          data[j][amazontext.A_QUANTITY_UNIT_FD];
 
         // Separating the amount and unit from the quantity (i.e.,100ml->100 and ml)
         if (data[j].Quantity) {
           const quantity = data[j].Quantity;
           const ar = quantity.split(" ");
           data[j].Quantity = Number(ar[0]);
-          data[j]["Quantity unit"] = ar[1];
-          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
+          data[j][amazontext.A_QUANTITY_UNIT_FD] = ar[1];
+          data[j][amazontext.A_PRICE_PER_UNIT_FD] =
+            data[j].price / data[j].Quantity;
         } else {
           data[j].Quantity = 1;
-          data[j]["Price per unit"] = data[j].price / data[j].Quantity;
-          data[j]["Quantity unit"] = "NA";
+          data[j][amazontext.A_PRICE_PER_UNIT_FD] =
+            data[j].price / data[j].Quantity;
+          data[j][amazontext.A_QUANTITY_UNIT_FD] = "NA";
         }
 
         // Making a new array of product with required fields
@@ -166,9 +162,9 @@ const amazon = async (Categories) => {
             obj[fields[k]] = null;
           }
         }
-        delete obj["sellerDetails"];
-        delete obj["POSITIVE_FIRST"];
-        delete obj["NEGATIVE_FIRST"];
+        delete obj[amazontext.A_SELLERDETAILS_FD];
+        delete obj[amazontext.A_POSITIVE_FIRST_FD];
+        delete obj[amazontext.A_NEGATIVE_FIRST_FD];
 
         console.log(await save(obj));
         listofproducts.push(obj);
