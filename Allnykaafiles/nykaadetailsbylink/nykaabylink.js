@@ -17,12 +17,12 @@ const nykaabylink = async (body) => {
     let url = body.link;
 
     const data = {
-      productlink: url,
+      Productlink: url,
     };
 
     // scrapping all the required details by going inside every individual products
     let details = await nykaafetchIndividualDetails(
-      data.productlink,
+      data.Productlink,
       { browser },
       page
     );
@@ -37,15 +37,15 @@ const nykaabylink = async (body) => {
       }
 
       let NetRatingRank =
-        (data[`5 ${nykaatext.N_STARRATINGS_FD}`] +
-          data[`4 ${nykaatext.N_STARRATINGS_FD}`] -
-          (data[`2 ${nykaatext.N_STARRATINGS_FD}`] +
-            data[`1 ${nykaatext.N_STARRATINGS_FD}`])) /
-        (data[`5 ${nykaatext.N_STARRATINGS_FD}`] +
-          data[`4 ${nykaatext.N_STARRATINGS_FD}`] +
-          data[`3 ${nykaatext.N_STARRATINGS_FD}`] +
-          (data[`2 ${nykaatext.N_STARRATINGS_FD}`] +
-            data[`5 ${nykaatext.N_STARRATINGS_FD}`]));
+        (data[`Num_5_${nykaatext.N_STARRATINGS_FD}`] +
+          data[`Num_4_${nykaatext.N_STARRATINGS_FD}`] -
+          (data[`Num_2_${nykaatext.N_STARRATINGS_FD}`] +
+            data[`Num_1_${nykaatext.N_STARRATINGS_FD}`])) /
+        (data[`Num_5_${nykaatext.N_STARRATINGS_FD}`] +
+          data[`Num_4_${nykaatext.N_STARRATINGS_FD}`] +
+          data[`Num_3_${nykaatext.N_STARRATINGS_FD}`] +
+          (data[`Num_2_${nykaatext.N_STARRATINGS_FD}`] +
+            data[`Num_5_${nykaatext.N_STARRATINGS_FD}`]));
 
       data[nykaatext.N_NET_RATING_SCORE_FD] = NetRatingRank * 100;
     }

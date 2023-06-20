@@ -85,7 +85,7 @@ const nykaa = async (Categories) => {
       for (let j = 0; j < data.length; j++) {
         // scrapping all the required details by going inside every individual products
         let details = await nykaafetchIndividualDetails(
-          data[j].productlink,
+          data[j].Productlink,
           { browser },
           page
         );
@@ -94,21 +94,21 @@ const nykaa = async (Categories) => {
             data[j][key] = details[key];
           }
           for (let k = 1; k <= 5; k++) {
-            if (!data[`${k} ${nykaatext.N_STARRATINGS_FD}`]) {
-              data[`${k} ${nykaatext.N_STARRATINGS_FD}`] = 0;
+            if (!data[`Num_${k}_${nykaatext.N_STARRATINGS_FD}`]) {
+              data[`Num_${k}_${nykaatext.N_STARRATINGS_FD}`] = 0;
             }
           }
 
           let NetRatingRank =
-            (data[j][`5 ${nykaatext.N_STARRATINGS_FD}`] +
-              data[j][`4 ${nykaatext.N_STARRATINGS_FD}`] -
-              (data[j][`2 ${nykaatext.N_STARRATINGS_FD}`] +
-                data[j][`1 ${nykaatext.N_STARRATINGS_FD}`])) /
-            (data[j][`5 ${nykaatext.N_STARRATINGS_FD}`] +
-              data[j][`4 ${nykaatext.N_STARRATINGS_FD}`] +
-              data[j][`3 ${nykaatext.N_STARRATINGS_FD}`] +
-              (data[j][`2 ${nykaatext.N_STARRATINGS_FD}`] +
-                data[j][`5 ${nykaatext.N_STARRATINGS_FD}`]));
+            (data[j][`Num_5_${nykaatext.N_STARRATINGS_FD}`] +
+              data[j][`Num_4_${nykaatext.N_STARRATINGS_FD}`] -
+              (data[j][`Num_2_${nykaatext.N_STARRATINGS_FD}`] +
+                data[j][`Num_1_${nykaatext.N_STARRATINGS_FD}`])) /
+            (data[j][`Num_5_${nykaatext.N_STARRATINGS_FD}`] +
+              data[j][`Num_4_${nykaatext.N_STARRATINGS_FD}`] +
+              data[j][`Num_3_${nykaatext.N_STARRATINGS_FD}`] +
+              (data[j][`Num_2_${nykaatext.N_STARRATINGS_FD}`] +
+                data[j][`Num_5_${nykaatext.N_STARRATINGS_FD}`]));
 
           data[j][nykaatext.N_NET_RATING_SCORE_FD] = NetRatingRank * 100;
         }
@@ -158,7 +158,7 @@ const nykaa = async (Categories) => {
 
         listofproducts.push(obj);
 
-        console.log(await save(obj));
+        // console.log(await save(obj));
         console.log(j);
       }
       // await nykaasql(listofproducts);

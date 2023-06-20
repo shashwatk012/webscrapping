@@ -92,7 +92,7 @@ const individualdetails = (html) => {
 
   if (stars) {
     arr = stars.split("/");
-    obj.stars = Number(arr[0]);
+    obj[nykaatext.N_STARS_FD] = Number(arr[0]);
   }
 
   obj[nykaatext.N_RATINGS_FD] = ratings;
@@ -101,7 +101,7 @@ const individualdetails = (html) => {
   $(nykaatext.N_DIFFRATINGS_CN).each(async (_idx, el) => {
     const x = $(el);
     const diffratings = x.text();
-    obj[`${5 - _idx} ${nykaatext.N_STARRATINGS_FD}`] = Number(diffratings);
+    obj[`Num_${5 - _idx}_${nykaatext.N_STARRATINGS_FD}`] = Number(diffratings);
   });
 
   let categories = [];

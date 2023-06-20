@@ -18,7 +18,7 @@ const fetchUrl = (html) => {
       .attr("href");
 
     let element = {
-      productlink: `${nykaatext.NYKAA_PAGE_LINK}${link}`,
+      Productlink: `${nykaatext.NYKAA_PAGE_LINK}${link}`,
     };
 
     nykaa.push(element); //storing the details in an array
