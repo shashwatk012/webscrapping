@@ -63,7 +63,9 @@ const sellers = (html, ProductName) => {
 const flipkartsellerslist = async (url, browser, page, ProductName) => {
   try {
     page = await browser.browser.newPage();
+
     await page.goto(url, { timeout: 60000 });
+
     await page.waitForTimeout(1000);
 
     await page.waitForSelector("div._2Y3EWJ");
