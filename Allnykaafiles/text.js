@@ -104,7 +104,7 @@ const replce = (str) => {
 let nykaasql = async (listofproducts) => {
   // Inserting the data into database
   let Product =
-    "INSERT INTO NYKAA_PRODUCT_TABLE (imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_per_unit, maxretailprice , stars, Num_Ratings , Num_Reviews , Mother_Category , Category ,Sub_Category,num_1_star_ratings ,num_2_star_ratings ,num_3_star_ratings ,num_4_star_ratings ,num_5_star_ratings,Platform,Quantity ,Quantity_unit, Num_Images , Discount ,Search_Term  , Title_Length ,Net_Rating_Score_NRS,  Date) VALUES ?";
+    "INSERT INTO NYKAA_PRODUCT_TABLE (Imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_Per_Unit, Max_Retail_Price , Stars, Ratings , Reviews , Mother_Category , Category ,Sub_Category,Num_1_Star_Ratings ,Num_2_Star_Ratings ,Num_3_Star_Ratings ,Num_4_Star_Ratings ,Num_5_Star_Ratings ,Platform,Quantity ,Quantity_Unit, Number_Of_Sellers , Description, Number_Of_Images ,IsAds,Net_Rating_Score_NRS, Discount ,Search_Term ,Min_Price , Max_Price , St_Dev_Price, Title_Length , Description_Length , Date) VALUES ?";
 
   let values = [];
   //Make an array of values:

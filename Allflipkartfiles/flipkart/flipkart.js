@@ -4,7 +4,13 @@ const { flipkartfetchUrlDetails } = require("./flipkarturlDetails");
 const { flipkartfetchReviews } = require("./flipkartreviews");
 const { flipkartfetchIndividualDetails } = require("./flipkartdetails");
 const { flipkartsellerslist } = require("./flipkartsellerslist");
-const { typesOfRatings, fields, urlmaking, sql, save } = require("../text");
+const {
+  typesOfRatings,
+  fields,
+  urlmaking,
+  flipkartsql,
+  save,
+} = require("../text");
 const puppeteer = require("puppeteer");
 const flipkarttext = require("./flipkarttext");
 
@@ -195,7 +201,7 @@ const flipkart = async (Categories) => {
         }
         // await sql(obj);
 
-        delete obj.sellerDetails;
+        delete obj[flipkarttext.F_SELLERDETAILS_FD];
         delete obj[flipkarttext.F_POSITIVE_FIRST_FD];
         delete obj[flipkarttext.F_NEGATIVE_FIRST_FD];
 
@@ -205,10 +211,8 @@ const flipkart = async (Categories) => {
 
         console.log(j);
       }
-
-      // await sql(listofproducts);
-
       await browser.close();
+      await flipkartsql(listofproducts);
     }
     return listofproducts;
   } catch (e) {

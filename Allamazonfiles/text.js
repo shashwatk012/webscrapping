@@ -102,10 +102,10 @@ const replce = (str) => {
 };
 
 // Saving the data to the flipkartdatabase
-let sql = async (listofproducts) => {
+let amazonsql = async (listofproducts) => {
   // Inserting the data into database
   let Product =
-    "INSERT INTO FLIPKART_PRODUCT_TABLE (imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_per_unit, maxretailprice , stars, Num_Ratings , Num_Reviews , Mother_Category , Category ,Sub_Category,num_1_star_ratings ,num_2_star_ratings ,num_3_star_ratings ,num_4_star_ratings ,num_5_star_ratings ,Platform,Quantity ,Quantity_unit, Num_sellers , Description, Num_Images ,Is_Ads,Net_Rating_Score_NRS, Discount ,Search_Term ,Min_Price , Max_Price , St_dev_Price, Title_Length , Description_Length , Date) VALUES ?";
+    "INSERT INTO AMAZON_PRODUCT_TABLE (Imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_Per_Unit, Max_Retail_Price , Stars, Ratings , Reviews , Mother_Category , Category ,Sub_Category,Num_1_Star_Ratings ,Num_2_Star_Ratings ,Num_3_Star_Ratings ,Num_4_Star_Ratings ,Num_5_Star_Ratings ,Platform,Quantity ,Quantity_Unit, Number_Of_Sellers , Description, Number_Of_Images ,IsAds,Net_Rating_Score_NRS, Discount ,Search_Term ,Min_Price , Max_Price , St_Dev_Price, Title_Length , Description_Length , Date,BSR_in_Mother_Category,BSR_in_Category) VALUES ?";
 
   let values = [];
 
@@ -148,6 +148,6 @@ module.exports = {
   typesOfRatings,
   fields,
   replce,
-  sql,
+  amazonsql,
   save,
 };

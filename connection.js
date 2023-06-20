@@ -2,7 +2,6 @@
 
 // Importing mysql module to connect to the database
 const mysql = require("mysql2");
-const { convertJSONtoCSV } = require("./csv");
 
 // Connecting to the database through host,user,password,port
 const connection = mysql.createConnection({
@@ -49,7 +48,7 @@ module.exports = connection;
 //   console.log("Table created");
 // });
 // var sql =
-//       "CREATE TABLE NYKAA_PRODUCT_TABLE (imagelink VARCHAR(2000),Productlink VARCHAR(2000), Position INTEGER,Product VARCHAR(500), ProductName VARCHAR(500), Brand VARCHAR(255), Price INTEGER,Price_per_unit FLOAT, maxretailprice INTEGER, stars FLOAT, Num_Ratings INTEGER, Num_Reviews INTEGER, Mother_Category VARCHAR(255), Category VARCHAR(255),Sub_Category VARCHAR(500),num_1_star_ratings INTEGER  ,num_2_star_ratings INTEGER,num_3_star_ratings INTEGER,num_4_star_ratings INTEGER,num_5_star_ratings INTEGER,Platform VARCHAR(255),Quantity INTEGER,Quantity_unit VARCHAR(10), Num_Images INTEGER, Discount INTEGER,Search_Term VARCHAR(255), St_dev_Price FLOAT, Title_Length INTEGER,Net_Rating_Score_NRS FLOAT, Date VARCHAR(255))";
+//       "CREATE TABLE AMAZON_PRODUCT_TABLE (Imagelink VARCHAR(2000),Productlink VARCHAR(2000), Position INTEGER,Product VARCHAR(500), ProductName VARCHAR(500), Brand VARCHAR(255), Price INTEGER,Price_Per_Unit FLOAT, Max_Retail_Price INTEGER, Stars FLOAT, Ratings INTEGER, Reviews INTEGER, Mother_Category VARCHAR(255), Category VARCHAR(255),Sub_Category VARCHAR(500),Num_1_Star_Ratings INTEGER  ,Num_2_Star_Ratings INTEGER,Num_3_Star_Ratings INTEGER,Num_4_Star_Ratings INTEGER,Num_5_Star_Ratings INTEGER,Platform VARCHAR(255),Quantity INTEGER,Quantity_Unit VARCHAR(10),Number_Of_Sellers INTEGER,Description VARCHAR(5000), Number_Of_Images INTEGER,IsAds VARCHAR(20),Net_Rating_Score_NRS FLOAT, Discount INTEGER,Search_Term VARCHAR(255),Min_Price FLOAT,Max_Price FLOAT, St_Dev_Price FLOAT, Title_Length INTEGER, Description_Length INTEGER,Date VARCHAR(255),BSR_in_Mother_Category INTEGER,BSR_in_Category INTEGER)";
 //     connection.query(sql, function (err, result) {
 //       if (err) throw err;
 //       console.log("Table created");

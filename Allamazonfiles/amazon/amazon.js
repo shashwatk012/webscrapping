@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
-const { fields, save } = require("../text");
+const { fields, save,amazonsql } = require("../text");
 const amazontext = require("./amazontext");
 
 const amazon = async (Categories) => {
@@ -176,6 +176,7 @@ const amazon = async (Categories) => {
         console.log(j);
       }
       await browser.close();
+      await amazonsql(listofproducts);
     }
     return listofproducts;
   } catch (e) {

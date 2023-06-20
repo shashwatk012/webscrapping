@@ -5,7 +5,7 @@ const { nykaafetchUrlDetails } = require("./nykaaurldetails");
 const { nykaafetchUrlDetails1 } = require("./nykaaurldetails1");
 const { nykaafetchReviews } = require("./nykaareviews");
 const { check } = require("./checkformat");
-const { fields, save } = require("../text");
+const { fields, save, nykaasql } = require("../text");
 const nykaatext = require("./nykaatext");
 
 const urlmaking = (category) => {
@@ -161,7 +161,7 @@ const nykaa = async (Categories) => {
         // console.log(await save(obj));
         console.log(j);
       }
-      // await nykaasql(listofproducts);
+      await nykaasql(listofproducts);
     }
     await browser.close();
     return listofproducts;
