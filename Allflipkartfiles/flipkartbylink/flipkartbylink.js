@@ -27,7 +27,7 @@ const flipkartbylink = async (url) => {
 
     // Creating an object which is going to be the response of the coming request
     const data = {
-      productlink: url,
+      Productlink: url,
     };
 
     // scrapping all the required details by going inside every individual products
@@ -109,21 +109,21 @@ const flipkartbylink = async (url) => {
       }
 
       for (let k = 1; k <= 5; k++) {
-        if (!data[`${k} ${flipkartbylinktext.F_STARRATINGS_FD}`]) {
-          data[`${k} ${flipkartbylinktext.F_STARRATINGS_FD}`] = 0;
+        if (!data[`Num_${k}_${flipkartbylinktext.F_STARRATINGS_FD}`]) {
+          data[`Num_${k}_${flipkartbylinktext.F_STARRATINGS_FD}`] = 0;
         }
       }
 
       let NetRatingRank =
-        (data[`5 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
-          data[`4 ${flipkartbylinktext.F_STARRATINGS_FD}`] -
-          (data[`2 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
-            data[`1 ${flipkartbylinktext.F_STARRATINGS_FD}`])) /
-        (data[`5 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
-          data[`4 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
-          data[`3 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
-          (data[`2 ${flipkartbylinktext.F_STARRATINGS_FD}`] +
-            data[`1 ${flipkartbylinktext.F_STARRATINGS_FD}`]));
+        (data[`Num_5_${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          data[`Num_4_${flipkartbylinktext.F_STARRATINGS_FD}`] -
+          (data[`Num_2_${flipkartbylinktext.F_STARRATINGS_FD}`] +
+            data[`Num_1_${flipkartbylinktext.F_STARRATINGS_FD}`])) /
+        (data[`Num_5_${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          data[`Num_4_${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          data[`Num_3_${flipkartbylinktext.F_STARRATINGS_FD}`] +
+          (data[`Num_2_${flipkartbylinktext.F_STARRATINGS_FD}`] +
+            data[`Num_1_${flipkartbylinktext.F_STARRATINGS_FD}`]));
 
       data[flipkartbylinktext.F_NET_RATING_SCORE_FD] = NetRatingRank * 100;
     }
@@ -146,11 +146,13 @@ const flipkartbylink = async (url) => {
       const quantity = data.Quantity;
       const ar = quantity.split(" ");
       data.Quantity = Number(ar[0]);
-      data[flipkartbylinktext.F_PRICE_PER_UNIT_FD] = ar[1];
-      data[flipkartbylinktext.F_QUANTITY_UNIT_FD] = data.price / data.Quantity;
+      data[flipkartbylinktext.F_QUANTITY_UNIT_FD] = ar[1];
+      data[flipkartbylinktext.F_PRICE_PER_UNIT_FD] =
+        data[flipkartbylinktext.F_PRICE_FD] / data.Quantity;
     } else {
       data.Quantity = 1;
-      data[flipkartbylinktext.F_PRICE_PER_UNIT_FD] = data.price / data.Quantity;
+      data[flipkartbylinktext.F_PRICE_PER_UNIT_FD] =
+        data[flipkartbylinktext.F_PRICE_FD] / data.Quantity;
       data[flipkartbylinktext.F_QUANTITY_UNIT_FD] = "NA";
     }
 

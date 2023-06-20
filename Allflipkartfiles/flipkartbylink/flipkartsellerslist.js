@@ -52,9 +52,9 @@ const sellers = (html, ProductName) => {
   const stDev = math.std(pricearr);
 
   return {
-    "St-dev-Price": stDev,
-    "Min Price": mn,
-    "Max Price": mx,
+    St_Dev_Price: stDev,
+    Min_Price: mn,
+    Max_Price: mx,
     NumberofSellers: count,
     sellersDetails,
   };

@@ -48,7 +48,7 @@ const scrapdetails = (html) => {
 
   if (stars && ratings) {
     stars = replce(stars);
-    obj.stars = stars;
+    obj[flipkartbylinktext.F_STARS_FD] = stars;
     let p = ratings.indexOf("and");
     if (p === -1) {
       p = ratings.indexOf("&");
@@ -69,7 +69,7 @@ const scrapdetails = (html) => {
     // scraping the global ratings(i.e 4.1)
     let stars = $(flipkartbylinktext.F_STARS_ALTERNATIVE_CN).text();
     stars = replce(stars);
-    obj.stars = stars;
+    obj[flipkartbylinktext.F_STARS_FD] = stars;
     let p = ratings.indexOf("and");
     if (p === -1) {
       p = ratings.indexOf("&");

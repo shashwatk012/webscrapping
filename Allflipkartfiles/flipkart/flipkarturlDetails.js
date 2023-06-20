@@ -30,7 +30,7 @@ const flipkartfetchUrlDetails = async (url) => {
       }
 
       let element = {
-        productlink: `${flipkarttext.FLIPKART_PAGE_LINK}${link}`,
+        Productlink: `${flipkarttext.FLIPKART_PAGE_LINK}${link}`,
         IsAds: ads,
       };
       allLink.push(element); //storing the details in an array

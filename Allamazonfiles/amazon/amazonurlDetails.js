@@ -25,7 +25,7 @@ const amazonfetchUrlDetails = async (url, browser, page) => {
         .attr("href");
 
       let element = {
-        productlink: `${amazontext.AMAZON_PAGE_LINK}${productlink}`,
+        Productlink: `${amazontext.AMAZON_PAGE_LINK}${productlink}`,
       };
 
       products.push(element); //storing the details in an array

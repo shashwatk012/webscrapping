@@ -71,7 +71,7 @@ const flipkart = async (Categories) => {
       for (let j = 0; j < data.length; j++) {
         // scrapping all the required details by going inside every individual products
         let details = await flipkartfetchIndividualDetails(
-          data[j].productlink,
+          data[j].Productlink,
           { browser },
           page
         );
@@ -92,8 +92,9 @@ const flipkart = async (Categories) => {
           if (sellers.message === "Can not fetch") {
             continue;
           }
-          data[j][flipkarttext.F_NUMBEROFSELLERS_FD] = sellers.NumberofSellers;
-          data[j][flipkarttext.F_SELLERDETAILS_FD] = sellers.sellersDetails;
+          data[j][flipkarttext.F_NUMBEROFSELLERS_FD] =
+            sellers.Number_Of_Sellers;
+          data[j][flipkarttext.F_SELLERDETAILS_FD] = sellers.SellersDetails;
           data[j][flipkarttext.F_MAX_PRICE_FD] =
             sellers[flipkarttext.F_MAX_PRICE_FD];
           data[j][flipkarttext.F_MIN_PRICE_FD] =
@@ -131,21 +132,21 @@ const flipkart = async (Categories) => {
           }
 
           for (let k = 1; k <= 5; k++) {
-            if (!data[j][`${k} ${flipkarttext.F_STARRATINGS_FD}`]) {
-              data[j][`${k} ${flipkarttext.F_STARRATINGS_FD}`] = 0;
+            if (!data[j][`Num_${k}_${flipkarttext.F_STARRATINGS_FD}`]) {
+              data[j][`Num_${k}_${flipkarttext.F_STARRATINGS_FD}`] = 0;
             }
           }
 
           let NetRatingRank =
-            (data[j][`5 ${flipkarttext.F_STARRATINGS_FD}`] +
-              data[j][`4 ${flipkarttext.F_STARRATINGS_FD}`] -
-              (data[j][`2 ${flipkarttext.F_STARRATINGS_FD}`] +
-                data[j][`1 ${flipkarttext.F_STARRATINGS_FD}`])) /
-            (data[j][`5 ${flipkarttext.F_STARRATINGS_FD}`] +
-              data[j][`4 ${flipkarttext.F_STARRATINGS_FD}`] +
-              data[j][`3 ${flipkarttext.F_STARRATINGS_FD}`] +
-              (data[j][`2 ${flipkarttext.F_STARRATINGS_FD}`] +
-                data[j][`1 ${flipkarttext.F_STARRATINGS_FD}`]));
+            (data[j][`Num_5_${flipkarttext.F_STARRATINGS_FD}`] +
+              data[j][`Num_4_${flipkarttext.F_STARRATINGS_FD}`] -
+              (data[j][`Num_2_${flipkarttext.F_STARRATINGS_FD}`] +
+                data[j][`Num_1_${flipkarttext.F_STARRATINGS_FD}`])) /
+            (data[j][`Num_5_${flipkarttext.F_STARRATINGS_FD}`] +
+              data[j][`Num_4_${flipkarttext.F_STARRATINGS_FD}`] +
+              data[j][`Num_3_${flipkarttext.F_STARRATINGS_FD}`] +
+              (data[j][`Num_2_${flipkarttext.F_STARRATINGS_FD}`] +
+                data[j][`Num_1_${flipkarttext.F_STARRATINGS_FD}`]));
 
           data[j][flipkarttext.F_NET_RATING_SCORE_FD] = NetRatingRank * 100;
         }
@@ -173,13 +174,13 @@ const flipkart = async (Categories) => {
           const quantity = data[j].Quantity;
           const ar = quantity.split(" ");
           data[j].Quantity = Number(ar[0]);
-          data[j][flipkarttext.F_PRICE_PER_UNIT_FD] = ar[1];
-          data[j][flipkarttext.F_QUANTITY_UNIT_FD] =
-            data[j].price / data[j].Quantity;
+          data[j][flipkarttext.F_QUANTITY_UNIT_FD] = ar[1];
+          data[j][flipkarttext.F_PRICE_PER_UNIT_FD] =
+            data[j][flipkarttext.F_PRICE_FD] / data[j].Quantity;
         } else {
           data[j].Quantity = 1;
           data[j][flipkarttext.F_PRICE_PER_UNIT_FD] =
-            data[j].price / data[j].Quantity;
+            data[j][flipkarttext.F_PRICE_FD] / data[j].Quantity;
           data[j][flipkarttext.F_QUANTITY_UNIT_FD] = "NA";
         }
 
@@ -198,14 +199,14 @@ const flipkart = async (Categories) => {
         delete obj[flipkarttext.F_POSITIVE_FIRST_FD];
         delete obj[flipkarttext.F_NEGATIVE_FIRST_FD];
 
-        console.log(await save(obj));
+        // console.log(await save(obj));
 
         listofproducts.push(obj);
 
         console.log(j);
       }
 
-      await sql(listofproducts);
+      // await sql(listofproducts);
 
       await browser.close();
     }

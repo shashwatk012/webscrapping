@@ -51,7 +51,7 @@ const amazonfetchReviews = async (url, browser, page) => {
 
       if (key !== "" && value !== "") {
         const result = value.replace(/\D/g, "");
-        obj[`${key} ${amazontext.A_STARRATINGS_FD}`] = result; // saving the scraped data in an object
+        obj[`Num_${5 - _idx}_${amazontext.A_STARRATINGS1_FD}`] = result; // saving the scraped data in an object
       }
     });
 

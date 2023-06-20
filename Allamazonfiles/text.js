@@ -45,55 +45,49 @@ const imglink = "img._396cs4";
 // Types of rating we want to scrap
 const typesOfRatings = ["POSITIVE_FIRST", "NEGATIVE_FIRST"];
 
-// function to convert the given category into url in order to scrap the data.
-const urlmaking = (category) => {
-  const url = `https://www.flipkart.com/search?q=${category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
-  return url;
-};
-
 //Order of fields we want in the final output
 const fields = [
-  "imagelink",
-  "productlink",
+  "Imagelink",
+  "Productlink",
   "Position",
   "Product",
   "ProductName",
   "Brand",
-  "price",
-  "Price per unit",
-  "maxretailprice",
-  "stars",
+  "Price",
+  "Price_Per_Unit",
+  "Max_Retail_Price",
+  "Stars",
   "Ratings",
   "Reviews",
-  "Mother Category",
+  "Mother_Category",
   "Category",
-  "Sub-Category",
-  "5 star ratings",
-  "4 star ratings",
-  "3 star ratings",
-  "2 star ratings",
-  "1 star ratings",
+  "Sub_Category",
+  "Num_5_Star_Ratings",
+  "Num_4_Star_Ratings",
+  "Num_3_Star_Ratings",
+  "Num_2_Star_Ratings",
+  "Num_1_Star_Ratings",
   "Platform",
   "Quantity",
-  "Quantity unit",
-  "NumberofSellers",
-  "sellerDetails",
+  "Quantity_Unit",
+  "Number_Of_Sellers",
+  "SellerDetails",
   "Description",
-  "Number of images",
+  "Number_Of_Images",
   "IsAds",
   "POSITIVE_FIRST",
   "NEGATIVE_FIRST",
-  "Net Rating Score (NRS)",
+  "Net_Rating_Score_NRS",
   "Discount%",
-  "Search Term",
-  "Min Price",
-  "Max Price",
-  "St-dev-Price",
-  "Title Length",
-  "Description Length",
+  "Search_Term",
+  "Min_Price",
+  "Max_Price",
+  "St_Dev_Price",
+  "Title_Length",
+  "Description_Length",
   "Date",
-  "BSR in Mother Category",
-  "BSR in Category",
+  "BSR_in_Mother_Category",
+  "BSR_in_Category",
 ];
 
 // function to convert the string into Number by removing the unwanted symbols.
@@ -113,15 +107,8 @@ let sql = async (listofproducts) => {
   let Product =
     "INSERT INTO FLIPKART_PRODUCT_TABLE (imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_per_unit, maxretailprice , stars, Num_Ratings , Num_Reviews , Mother_Category , Category ,Sub_Category,num_1_star_ratings ,num_2_star_ratings ,num_3_star_ratings ,num_4_star_ratings ,num_5_star_ratings ,Platform,Quantity ,Quantity_unit, Num_sellers , Description, Num_Images ,Is_Ads,Net_Rating_Score_NRS, Discount ,Search_Term ,Min_Price , Max_Price , St_dev_Price, Title_Length , Description_Length , Date) VALUES ?";
 
-  // let Seller =
-  //   "INSERT INTO FLIPKART_SELLERS_TABLE (SellersName , Price,Ratings,Flipkart_Assured , ProductName , Date ) VALUES ?";
+  let values = [];
 
-  // let Reviews =
-  //   "INSERT INTO FLIPKART_REVIEWS_TABLE (Title,Summary,Type,ProductName,Date) VALUES ?";
-
-  let values = [],
-    values1 = [],
-    values2 = [];
   //Make an array of values:
   for (let i = 0; i < listofproducts.length; i++) {
     let keys = [];
@@ -132,22 +119,6 @@ let sql = async (listofproducts) => {
     values.push(keys);
   }
 
-  // for (let i = 0; i < listofsellers.length; i++) {
-  //   let keys1 = [];
-
-  //   for (let value in listofsellers[i]) {
-  //     keys1.push(listofsellers[i][value]);
-  //   }
-  //   values1.push(keys1);
-  // }
-  // for (let i = 0; i < listofreviews.length; i++) {
-  //   let keys1 = [];
-
-  //   for (let value in listofreviews[i]) {
-  //     keys1.push(listofreviews[i][value]);
-  //   }
-  //   values2.push(keys1);
-  // }
   //Execute the SQL statement, with the value array:
   if (values.length > 0) {
     connection.query(Product, [values], function (err, result) {
@@ -175,7 +146,6 @@ module.exports = {
   allProducts,
   imglink,
   typesOfRatings,
-  urlmaking,
   fields,
   replce,
   sql,

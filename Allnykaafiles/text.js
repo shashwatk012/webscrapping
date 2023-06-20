@@ -45,12 +45,6 @@ const imglink = "img._396cs4";
 // Types of rating we want to scrap
 const typesOfRatings = ["POSITIVE_FIRST", "NEGATIVE_FIRST"];
 
-// function to convert the given category into url in order to scrap the data.
-const urlmaking = (category) => {
-  const url = `https://www.flipkart.com/search?q=${category}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off`;
-  return url;
-};
-
 //Order of fields we want in the final output
 const fields = [
   "imagelink",
@@ -104,68 +98,6 @@ const replce = (str) => {
     str = str.replace("₹", "");
   }
   return Number(str);
-};
-
-// Saving the data to the flipkartdatabase
-let sql = async (listofproducts) => {
-  // Inserting the data into database
-  let Product =
-    "INSERT INTO FLIPKART_PRODUCT_TABLE (imagelink,Productlink, Position,Product, ProductName , Brand , Price ,Price_per_unit, maxretailprice , stars, Num_Ratings , Num_Reviews , Mother_Category , Category ,Sub_Category,num_1_star_ratings ,num_2_star_ratings ,num_3_star_ratings ,num_4_star_ratings ,num_5_star_ratings ,Platform,Quantity ,Quantity_unit, Num_sellers , Description, Num_Images ,Is_Ads,Net_Rating_Score_NRS, Discount ,Search_Term ,Min_Price , Max_Price , St_dev_Price, Title_Length , Description_Length , Date) VALUES ?";
-
-  // let Seller =
-  //   "INSERT INTO FLIPKART_SELLERS_TABLE (SellersName , Price,Ratings,Flipkart_Assured , ProductName , Date ) VALUES ?";
-
-  // let Reviews =
-  //   "INSERT INTO FLIPKART_REVIEWS_TABLE (Title,Summary,Type,ProductName,Date) VALUES ?";
-
-  let values = [],
-    values1 = [],
-    values2 = [];
-  //Make an array of values:
-  for (let i = 0; i < listofproducts.length; i++) {
-    let keys = [];
-
-    for (let value in listofproducts[i]) {
-      keys.push(listofproducts[i][value]);
-    }
-    values.push(keys);
-  }
-
-  // for (let i = 0; i < listofsellers.length; i++) {
-  //   let keys1 = [];
-
-  //   for (let value in listofsellers[i]) {
-  //     keys1.push(listofsellers[i][value]);
-  //   }
-  //   values1.push(keys1);
-  // }
-  // for (let i = 0; i < listofreviews.length; i++) {
-  //   let keys1 = [];
-
-  //   for (let value in listofreviews[i]) {
-  //     keys1.push(listofreviews[i][value]);
-  //   }
-  //   values2.push(keys1);
-  // }
-  //Execute the SQL statement, with the value array:
-  if (values.length > 0) {
-    connection.query(Product, [values], function (err, result) {
-      if (err) throw err;
-      console.log("Number of reco rds inserted: " + result.affectedRows);
-    });
-  }
-  // if (values1.length > 0) {
-  //   connection.query(Seller, [values1], function (err, result) {
-  //     if (err) throw err;
-  //     console.log("Number of reco rds inserted: " + result.affectedRows);
-  //   });
-  // }
-  // if (values2.length > 0) {
-  //   connection.query(Reviews, [values2], function (err, result) {
-  //     if (err) throw err;
-  //     console.log("Number of reco rds inserted: " + result.affectedRows);
-  //   });
-  // }
 };
 
 // Saving the data to the flipkartdatabase
@@ -2585,11 +2517,9 @@ module.exports = {
   allProducts,
   imglink,
   typesOfRatings,
-  urlmaking,
   fields,
   replce,
   brands,
-  sql,
   nykaasql,
   save,
 };

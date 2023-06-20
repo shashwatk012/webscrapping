@@ -12,7 +12,7 @@ const sellers = (html, ProductName) => {
   let count = 0,
     mn = 1000000,
     mx = 0;
-  let sellersDetails = [],
+  let SellersDetails = [],
     pricearr = [];
   $(flipkarttext.F_SELLERS_CN).each(async (_idx, el) => {
     const x = $(el);
@@ -39,7 +39,7 @@ const sellers = (html, ProductName) => {
     let date = new Date();
 
     date = date.toLocaleDateString();
-    sellersDetails.push({
+    SellersDetails.push({
       sellersName,
       price,
       Ratings,
@@ -52,11 +52,11 @@ const sellers = (html, ProductName) => {
   const stDev = math.std(pricearr);
 
   return {
-    "St-dev-Price": stDev,
-    "Min Price": mn,
-    "Max Price": mx,
-    NumberofSellers: count,
-    sellersDetails,
+    St_Dev_Price: stDev,
+    Min_Price: mn,
+    Max_Price: mx,
+    Number_Of_Sellers: count,
+    SellersDetails,
   };
 };
 

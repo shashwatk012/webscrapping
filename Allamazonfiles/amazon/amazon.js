@@ -67,7 +67,7 @@ const amazon = async (Categories) => {
       for (let j = 0; j < data.length; j++) {
         // scrapping all the required details by going inside every individual products
         let details = await amazonfetchIndividualDetails(
-          data[j].productlink,
+          data[j].Productlink,
           { browser },
           page
         );
@@ -91,27 +91,27 @@ const amazon = async (Categories) => {
 
         // Number of reviews is in percentage so converting in the numbers
         for (let k = 1; k <= 5; k++) {
-          if (data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`]) {
-            data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`] = Math.floor(
-              (Number(data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`]) *
+          if (data[j][`Num_${k}_${amazontext.A_STARRATINGS1_FD}`]) {
+            data[j][`Num_${k}_${amazontext.A_STARRATINGS1_FD}`] = Math.floor(
+              (Number(data[j][`Num_${k}_${amazontext.A_STARRATINGS1_FD}`]) *
                 Number(data[j][amazontext.A_RATINGS_FD])) /
                 100
             );
           } else {
-            data[j][`${k} ${amazontext.A_STARRATINGS1_FD}`] = 0;
+            data[j][`Num_${k}_${amazontext.A_STARRATINGS1_FD}`] = 0;
           }
         }
 
         let NetRatingRank =
-          (data[j][`5 ${amazontext.A_STARRATINGS1_FD}`] +
-            data[j][`4 ${amazontext.A_STARRATINGS1_FD}`] -
-            (data[j][`2 ${amazontext.A_STARRATINGS1_FD}`] +
-              data[j][`1 ${amazontext.A_STARRATINGS1_FD}`])) /
-          (data[j][`5 ${amazontext.A_STARRATINGS1_FD}`] +
-            data[j][`4 ${amazontext.A_STARRATINGS1_FD}`] +
-            data[j][`3 ${amazontext.A_STARRATINGS1_FD}`] +
-            (data[j][`2 ${amazontext.A_STARRATINGS1_FD}`] +
-              data[j][`1 ${amazontext.A_STARRATINGS1_FD}`]));
+          (data[j][`Num_5_${amazontext.A_STARRATINGS1_FD}`] +
+            data[j][`Num_4_${amazontext.A_STARRATINGS1_FD}`] -
+            (data[j][`Num_2_${amazontext.A_STARRATINGS1_FD}`] +
+              data[j][`Num_1_${amazontext.A_STARRATINGS1_FD}`])) /
+          (data[j][`Num_5_${amazontext.A_STARRATINGS1_FD}`] +
+            data[j][`Num_4_${amazontext.A_STARRATINGS1_FD}`] +
+            data[j][`Num_3_${amazontext.A_STARRATINGS1_FD}`] +
+            (data[j][`Num_2_${amazontext.A_STARRATINGS1_FD}`] +
+              data[j][`Num_1_${amazontext.A_STARRATINGS1_FD}`]));
 
         data[j][amazontext.A_NET_RATING_SCORE_FD] = NetRatingRank * 100;
 
@@ -135,24 +135,26 @@ const amazon = async (Categories) => {
         data[j][amazontext.A_POSITION_FD] = j + 1;
 
         let discount =
-          (data[j].maxretailprice - data[j].price) / data[j].maxretailprice;
+          (data[j][amazontext.A_MAXRETAILPRICE_FD] -
+            data[j][amazontext.A_PRICE_FD]) /
+          data[j][amazontext.A_MAXRETAILPRICE_FD];
         data[j][amazontext.A_DISCOUNT_FD] = Math.floor(discount * 100);
 
         data[j][amazontext.A_QUANTITY_FD] =
-          data[j][amazontext.A_QUANTITY_UNIT_FD];
+          data[j][amazontext.A_NET_QUANTITY_FD];
 
         // Separating the amount and unit from the quantity (i.e.,100ml->100 and ml)
-        if (data[j].Quantity) {
-          const quantity = data[j].Quantity;
+        if (data[j][amazontext.A_QUANTITY_FD]) {
+          const quantity = data[j][amazontext.A_QUANTITY_FD];
           const ar = quantity.split(" ");
           data[j].Quantity = Number(ar[0]);
           data[j][amazontext.A_QUANTITY_UNIT_FD] = ar[1];
           data[j][amazontext.A_PRICE_PER_UNIT_FD] =
-            data[j].price / data[j].Quantity;
+            data[j][amazontext.A_PRICE_FD] / data[j][amazontext.A_QUANTITY_FD];
         } else {
-          data[j].Quantity = 1;
+          data[j][amazontext.A_QUANTITY_FD] = 1;
           data[j][amazontext.A_PRICE_PER_UNIT_FD] =
-            data[j].price / data[j].Quantity;
+            data[j][amazontext.A_PRICE_FD] / data[j][amazontext.A_QUANTITY_FD];
           data[j][amazontext.A_QUANTITY_UNIT_FD] = "NA";
         }
 
@@ -169,7 +171,7 @@ const amazon = async (Categories) => {
         delete obj[amazontext.A_POSITIVE_FIRST_FD];
         delete obj[amazontext.A_NEGATIVE_FIRST_FD];
 
-        console.log(await save(obj));
+        // console.log(await save(obj));
         listofproducts.push(obj);
         console.log(j);
       }

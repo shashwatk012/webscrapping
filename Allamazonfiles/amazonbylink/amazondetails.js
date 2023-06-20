@@ -212,7 +212,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     let mn = price,
       mx = price,
       pricearr = [price],
-      sellerdetails = [];
+      Sellerdetails = [];
     $(amazontext.A_SELLERS_CN).each(async (_idx, el) => {
       const x = $(el);
       let price = x.find(`${amazontext.A_SELLERSPRICE_CN}${_idx + 1}`).text();
@@ -236,7 +236,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
         deliveryCharges = [0];
       }
 
-      sellerdetails.push({
+      Sellerdetails.push({
         SoldBy: soldBy,
         Price: price,
         "Delivery charges": Number(deliveryCharges[0]),
@@ -251,7 +251,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     obj[amazontext.A_MIN_PRICE_FD] = mn;
     obj[amazontext.A_MAX_PRICE_FD] = mx;
     obj[amazontext.A_NUMBEROFSELLERS_FD] = count;
-    obj[amazontext.A_SELLERDETAILS_FD] = sellerdetails;
+    obj[amazontext.A_SELLERDETAILS_FD] = Sellerdetails;
 
     // Product description
     const description = $(amazontext.A_DESCRIPTION_CN).text();
@@ -280,7 +280,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
 
       if (key !== "" && value !== "") {
         const result = value.replace(/\D/g, "");
-        obj[`${key} ${amazontext.A_STARRATINGS_FD}`] = result; // saving the scraped data in an object
+        obj[`Num_${5 - _idx}_${amazontext.A_STARRATINGS1_FD}`] = result; // saving the scraped data in an object
       }
     });
 

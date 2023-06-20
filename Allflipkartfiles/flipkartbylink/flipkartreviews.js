@@ -15,7 +15,7 @@ const scrapreviews = (html, typeofreviews, ProductName) => {
   // Scraping the number of all type of ratings such as 5 star, 4 star
   $(flipkartbylinktext.F_ALLRATINGS_CN).each(async (_idx, el) => {
     const x = $(el);
-    obj[`${5 - _idx} ${flipkartbylinktext.F_STARRATINGS_FD}`] = replce(
+    obj[`Num_${5 - _idx}_${flipkartbylinktext.F_STARRATINGS_FD}`] = replce(
       x.text()
     );
   });
