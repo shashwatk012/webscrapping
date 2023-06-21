@@ -10,6 +10,8 @@ const amazonfetchUrlDetails = async (url, browser, page) => {
 
     let html = await page.content();
 
+    console.log(html);
+
     let $ = cheerio.load(html);
 
     let captchalink = $("div.a-row.a-text-center>img").attr("src");
