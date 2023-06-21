@@ -400,6 +400,28 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       }
     }
 
+    if (!obj[amazontext.A_MOTHER_CATEGORY_FD]) {
+      let Categories = [];
+      $("div#wayfinding-breadcrumbs_feature_div>ul>li").each(
+        async (_idx, el) => {
+          const x = $(el);
+          let category = x.find("a").text();
+          if (category && category != "") {
+            Categories.push(category.trim());
+          }
+        }
+      );
+      // saving the scraped data in an object
+      if (Categories.length) {
+        obj[amazontext.A_MOTHER_CATEGORY_FD] = Categories[0];
+        obj[amazontext.A_CATEGORY_FD] = Categories[1];
+        obj[amazontext.A_PRODUCT_FD] = Categories[Categories.length - 1];
+        if (Categories.length > 2) {
+          obj[amazontext.A_SUB_CATEGORY_FD] = Categories[2];
+        }
+      }
+    }
+
     return obj;
   } catch (error) {
     try {
