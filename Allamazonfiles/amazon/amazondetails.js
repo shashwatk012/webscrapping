@@ -70,7 +70,6 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
 
     // ProductName
     let ProductName = $(amazontext.A_PRODUCTNAME_CN).text();
-    console.log(ProductName);
 
     // stars
     let star = $(amazontext.A_STARS_CN).text();
