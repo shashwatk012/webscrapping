@@ -13,6 +13,39 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
 
     await page.waitForTimeout(1000);
 
+    let html = await page.content();
+
+    let $ = cheerio.load(html);
+
+    let captchalink = $("div.a-row.a-text-center>img").attr("src");
+
+    let captcha = undefined;
+
+    if (captchalink) {
+      console.log(captchalink);
+
+      const readline = require("readline").createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+
+      readline.question("Type the captcha", (name) => {
+        console.log(`Captcha is ${name}!`);
+        captcha = name;
+        readline.close();
+      });
+
+      await page.waitForTimeout(20000);
+
+      await page.type("input#captchacharacters", captcha);
+
+      await page.click(
+        "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
+      );
+
+      await page.waitForTimeout(5000);
+    }
+
     let lastHeight = await page.evaluate("document.body.scrollHeight");
 
     while (true) {
@@ -25,12 +58,12 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       lastHeight = newHeight;
     }
 
-    const html = await page.content();
+    html = await page.content();
 
     await page.close();
 
     // cheerio nodejs module to load html
-    const $ = cheerio.load(html);
+    $ = cheerio.load(html);
 
     // Declaration of object to store the product details
     let obj = {};
