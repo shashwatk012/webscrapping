@@ -9,6 +9,10 @@ const amazonfetchUrlDetails = async (url, browser, page) => {
     await page.waitForTimeout(1000);
 
     let html = await page.content();
+    console.log(html.substring(1, 100));
+    await page.screenshot({
+      path: "screenshot.jpg",
+    });
 
     let $ = cheerio.load(html);
 
@@ -66,6 +70,7 @@ const amazonfetchUrlDetails = async (url, browser, page) => {
     });
     return products;
   } catch (error) {
+    console.log(error);
     if (page) {
       await page.close();
     }

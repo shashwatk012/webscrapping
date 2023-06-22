@@ -1,12 +1,31 @@
-const puppeteer = require("puppeteer");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { fields, save, amazonsql } = require("../text");
 const amazontext = require("./amazontext");
+const puppeteer = require("puppeteer-extra");
+
+// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
+
+const { executablePath } = require("puppeteer");
+
+// Add adblocker plugin to block all ads and trackers (saves bandwidth)
+const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const amazon = async (Categories) => {
   try {
+    let page;
+    let browser = await puppeteer.launch({
+      headless: `true`, // indicates that we want the browser visible
+      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+      // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: executablePath(),
+      // devtools: true,
+    });
     console.log(Categories);
     if (!Categories.length) {
       Categories = [Categories];
@@ -17,14 +36,7 @@ const amazon = async (Categories) => {
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
       listofproducts = [];
-      let page;
-      let browser = await puppeteer.launch({
-        headless: `true`, // indicates that we want the browser visible
-        defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
-        userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        // devtools: true,
-      });
+
       //Creating the link to be scrapped
       let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
 
