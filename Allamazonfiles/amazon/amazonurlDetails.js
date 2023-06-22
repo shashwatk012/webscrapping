@@ -1,90 +1,70 @@
 const cheerio = require("cheerio");
 const amazontext = require("./amazontext");
 const scrapingbee = require("scrapingbee");
-const puppeteer = require("puppeteer-extra");
-
-// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-puppeteer.use(StealthPlugin());
-
-const { executablePath } = require("puppeteer");
-
-// Add adblocker plugin to block all ads and trackers (saves bandwidth)
-const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
-puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const amazonfetchUrlDetails = async (url) => {
   try {
-    // var client = new scrapingbee.ScrapingBeeClient(
-    //   "I1VKMCIP31YMI7PKCT2R2WXO6D3UY5OW59GPK6IKOWYKAXIHLA585HLENJ0CZ51SFMTTYIGRAW7ONVZG"
-    // );
-    // var response = await client.get({
-    //   url: url,
-    //   params: {
-    //     // premium_proxy: "True",
-    //     block_ads: "True",
-    //     block_resources: "True",
-    //   },
-    // });
-
-    // var decoder = new TextDecoder();
-    // var html = decoder.decode(response.data);
-
-    let browser = await puppeteer.launch({
-      headless: `true`, // indicates that we want the browser visible
-      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
-      // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: executablePath(),
+    var client = new scrapingbee.ScrapingBeeClient(
+      "I1VKMCIP31YMI7PKCT2R2WXO6D3UY5OW59GPK6IKOWYKAXIHLA585HLENJ0CZ51SFMTTYIGRAW7ONVZG"
+    );
+    var response = await client.get({
+      url: url,
+      params: {
+        // premium_proxy: "True",
+        block_ads: "True",
+        block_resources: "True",
+      },
     });
-    let page = await browser.newPage();
+
+    var decoder = new TextDecoder();
+    var html = decoder.decode(response.data);
+    // page = await browser.browser.newPage();
 
     // await page.authenticate();
-    await page.goto(url);
+    // await page.goto("http://httpbin.org/ip");
 
-    await page.waitForTimeout(1000);
+    // await page.waitForTimeout(1000);
 
-    let html = await page.content();
-    console.log(html.substring(1, 100));
-    await page.screenshot({
-      path: "screenshot.jpg",
-    });
+    // let html = await page.content();
+    // console.log(html);
+    // await page.screenshot({
+    //   path: "screenshot.jpg",
+    // });
 
-    let $ = cheerio.load(html);
+    // let $ = cheerio.load(html);
 
-    let captchalink = $("div.a-row.a-text-center>img").attr("src");
+    // let captchalink = $("div.a-row.a-text-center>img").attr("src");
 
-    let captcha = undefined;
+    // let captcha = undefined;
 
-    if (captchalink) {
-      console.log(captchalink);
+    // if (captchalink) {
+    //   console.log(captchalink);
 
-      const readline = require("readline").createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
+    //   const readline = require("readline").createInterface({
+    //     input: process.stdin,
+    //     output: process.stdout,
+    //   });
 
-      readline.question("Type the captcha", (name) => {
-        console.log(`Captcha is ${name}!`);
-        captcha = name;
-        readline.close();
-      });
+    //   readline.question("Type the captcha", (name) => {
+    //     console.log(`Captcha is ${name}!`);
+    //     captcha = name;
+    //     readline.close();
+    //   });
 
-      await page.waitForTimeout(20000);
+    //   await page.waitForTimeout(20000);
 
-      await page.type("input#captchacharacters", captcha);
+    //   await page.type("input#captchacharacters", captcha);
 
-      await page.click(
-        "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
-      );
+    //   await page.click(
+    //     "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
+    //   );
 
-      await page.waitForTimeout(5000);
-    }
+    //   await page.waitForTimeout(5000);
+    // }
 
-    html = await page.content();
+    // html = await page.content();
 
-    await page.close();
-    await browser.close();
+    // await page.close();
 
     // cheerio nodejs module to load html
     $ = cheerio.load(html);
@@ -110,9 +90,6 @@ const amazonfetchUrlDetails = async (url) => {
     console.log(error);
     if (page) {
       await page.close();
-    }
-    if (browser) {
-      await browser.close();
     }
     return [];
   }
