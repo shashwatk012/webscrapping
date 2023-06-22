@@ -3,7 +3,18 @@ const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { fields, save, amazonsql } = require("../text");
 const amazontext = require("./amazontext");
-const puppeteer = require("puppeteer");
+// const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-extra");
+
+// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
+
+const { executablePath } = require("puppeteer");
+
+// Add adblocker plugin to block all ads and trackers (saves bandwidth)
+const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const amazon = async (Categories) => {
   try {
@@ -13,7 +24,9 @@ const amazon = async (Categories) => {
       defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
       userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: executablePath(),
     });
+
     console.log(Categories);
     if (!Categories.length) {
       Categories = [Categories];
@@ -41,11 +54,7 @@ const amazon = async (Categories) => {
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
 
         //function to scrap the data from the main page
-        const allProductDetails = await amazonfetchUrlDetails(
-          url,
-          { browser },
-          page
-        );
+        const allProductDetails = await amazonfetchUrlDetails(url);
 
         //storing the coming data in arr
         if (allProductDetails && allProductDetails.length) {
@@ -66,11 +75,7 @@ const amazon = async (Categories) => {
       // looping to go inside the individual products
       for (let j = 0; j < data.length; j++) {
         // scrapping all the required details by going inside every individual products
-        let details = await amazonfetchIndividualDetails(
-          data[j].Productlink,
-          { browser },
-          page
-        );
+        let details = await amazonfetchIndividualDetails(data[j].Productlink);
         for (const key in details) {
           data[j][key] = details[key];
         }
