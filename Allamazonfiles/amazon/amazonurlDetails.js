@@ -4,15 +4,16 @@ const amazontext = require("./amazontext");
 const amazonfetchUrlDetails = async (url, browser, page) => {
   try {
     page = await browser.browser.newPage();
+
     await page.goto(url);
 
     await page.waitForTimeout(1000);
 
     let html = await page.content();
     console.log(html.substring(1, 100));
-    await page.screenshot({
-      path: "screenshot.jpg",
-    });
+    // await page.screenshot({
+    //   path: "screenshot.jpg",
+    // });
 
     let $ = cheerio.load(html);
 

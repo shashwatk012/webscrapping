@@ -150,6 +150,7 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
             if (item !== " ") return item;
           });
           ranks = ranks.join(" ");
+          console.log(122);
           ranks = ranks.replaceAll("#", " ");
 
           num = ranks.split("  ");
