@@ -18,15 +18,6 @@ puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const amazon = async (Categories) => {
   try {
-    let page;
-    let browser = await puppeteer.launch({
-      headless: `true`, // indicates that we want the browser visible
-      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
-      userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: executablePath(),
-    });
-
     console.log(Categories);
     if (!Categories.length) {
       Categories = [Categories];
@@ -83,9 +74,7 @@ const amazon = async (Categories) => {
         // Checking whether reviews page is available on the site or not
         if (details.reviewsLink !== "https://amazon.inundefined") {
           const totalReviewsandratings = await amazonfetchReviews(
-            details.reviewsLink,
-            { browser },
-            page
+            details.reviewsLink
           );
           for (const key in totalReviewsandratings) {
             data[j][key] = totalReviewsandratings[key];
@@ -180,7 +169,6 @@ const amazon = async (Categories) => {
         listofproducts.push(obj);
         console.log(j);
       }
-      await browser.close();
       await amazonsql(listofproducts);
     }
     return listofproducts;

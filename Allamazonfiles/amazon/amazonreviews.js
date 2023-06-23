@@ -1,9 +1,28 @@
 const cheerio = require("cheerio");
 const amazontext = require("./amazontext");
+const puppeteer = require("puppeteer-extra");
 
-const amazonfetchReviews = async (url, browser, page) => {
+// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
+
+const { executablePath } = require("puppeteer");
+
+// Add adblocker plugin to block all ads and trackers (saves bandwidth)
+const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
+
+const amazonfetchReviews = async (url) => {
   try {
-    page = await browser.browser.newPage();
+    let browser = await puppeteer.launch({
+      headless: `true`, // indicates that we want the browser visible
+      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+      userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: executablePath(),
+    });
+
+    page = await browser.newPage();
     await page.goto(url);
 
     await page.waitForTimeout(1000);
@@ -23,6 +42,7 @@ const amazonfetchReviews = async (url, browser, page) => {
     const html = await page.content();
 
     await page.close();
+    await browser.close();
 
     const $ = cheerio.load(html);
 
@@ -61,6 +81,9 @@ const amazonfetchReviews = async (url, browser, page) => {
     try {
       if (page) {
         await page.close();
+      }
+      if (browser) {
+        await browser.close();
       }
       return {};
     } catch (e) {

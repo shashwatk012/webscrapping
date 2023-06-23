@@ -1,86 +1,159 @@
 const cheerio = require("cheerio");
 // const puppeteer = require("puppeteer");
-const { replce } = require("../text");
+const { replce, headers } = require("../text");
 const math = require("mathjs");
 const amazontext = require("./amazontext");
-const puppeteer = require("puppeteer-extra");
+const request = require("request-promise");
+const https = require("https");
+const axios = require("axios-https-proxy-fix");
+// const puppeteer = require("puppeteer-extra");
 
-// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-puppeteer.use(StealthPlugin());
+// // Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
+// const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+// puppeteer.use(StealthPlugin());
 
-const { executablePath } = require("puppeteer");
+// const { executablePath } = require("puppeteer");
 
-// Add adblocker plugin to block all ads and trackers (saves bandwidth)
-const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
-puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
+// // Add adblocker plugin to block all ads and trackers (saves bandwidth)
+// const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
+// puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const amazonfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
-    let browser = await puppeteer.launch({
-      headless: `true`, // indicates that we want the browser visible
-      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
-      userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: executablePath(),
+    const headers = {
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
+      "Sec-Ch-Ua":
+        '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
+      "Sec-Fetch-Dest": "document",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-Site": "cross-site",
+      "Sec-Fetch-User": "?1",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+      "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
+    };
+
+    proxies_list = [
+      "128.199.109.241:8080",
+      "113.53.230.195:3128",
+      "125.141.200.53:80",
+      "125.141.200.14:80",
+      "128.199.200.112:138",
+      "149.56.123.99:3128",
+      "128.199.200.112:80",
+      "125.141.200.39:80",
+      "134.213.29.202:4444",
+    ];
+
+    // const proxy = proxies_list[Math.floor(Math.random() * 8)];
+    // console.log(proxy);
+
+    const agentOptions = {
+      host: "103.231.78.36",
+      port: "80",
+      path: "/",
+      rejectUnauthorized: false,
+    };
+
+    const agent = new https.Agent(agentOptions);
+    const html = await request({
+      url: "http://httpbin.org/ip",
+      method: "GET",
+      agent,
     });
+    // const html = await request.get({
+    //   url: "http://httpbin.org/ip",
+    //   proxy: "191.102.157.91:8080",
+    //   tunnel: false,
+    //   Accept:
+    //     "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    //   "Accept-Encoding": "gzip, deflate, br",
+    //   "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
+    //   "Sec-Ch-Ua":
+    //     '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+    //   "Sec-Ch-Ua-Mobile": "?0",
+    //   "Sec-Ch-Ua-Platform": '"Windows"',
+    //   "Sec-Fetch-Dest": "document",
+    //   "Sec-Fetch-Mode": "navigate",
+    //   "Sec-Fetch-Site": "cross-site",
+    //   "Sec-Fetch-User": "?1",
+    //   "Upgrade-Insecure-Requests": "1",
+    //   "User-Agent":
+    //     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+    //   "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
+    // });
+    // console.log(response);
+    console.log(html);
+    // let browser = await puppeteer.launch({
+    //   headless: `true`, // indicates that we want the browser visible
+    //   defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+    //   userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
+    //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    //   executablePath: executablePath(),
+    // });
 
-    let page = await browser.newPage();
+    // let page = await browser.newPage();
 
-    await page.goto(url);
+    // await page.goto(url);
 
-    await page.waitForTimeout(1000);
+    // await page.waitForTimeout(1000);
 
-    let html = await page.content();
+    // let html = await page.content();
 
-    let $ = cheerio.load(html);
+    // let $ = cheerio.load(html);
 
-    let captchalink = $("div.a-row.a-text-center>img").attr("src");
+    // let captchalink = $("div.a-row.a-text-center>img").attr("src");
 
-    let captcha = undefined;
+    // let captcha = undefined;
 
-    if (captchalink) {
-      console.log(captchalink);
+    // if (captchalink) {
+    //   console.log(captchalink);
 
-      const readline = require("readline").createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
+    //   const readline = require("readline").createInterface({
+    //     input: process.stdin,
+    //     output: process.stdout,
+    //   });
 
-      readline.question("Type the captcha", (name) => {
-        console.log(`Captcha is ${name}!`);
-        captcha = name;
-        readline.close();
-      });
+    //   readline.question("Type the captcha", (name) => {
+    //     console.log(`Captcha is ${name}!`);
+    //     captcha = name;
+    //     readline.close();
+    //   });
 
-      await page.waitForTimeout(20000);
+    //   await page.waitForTimeout(20000);
 
-      await page.type("input#captchacharacters", captcha);
+    //   await page.type("input#captchacharacters", captcha);
 
-      await page.click(
-        "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
-      );
+    //   await page.click(
+    //     "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
+    //   );
 
-      await page.waitForTimeout(5000);
-    }
+    //   await page.waitForTimeout(5000);
+    // }
 
-    let lastHeight = await page.evaluate("document.body.scrollHeight");
+    // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
-    while (true) {
-      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-      await page.waitForTimeout(1000); // sleep a bit
-      let newHeight = await page.evaluate("document.body.scrollHeight");
-      if (newHeight === lastHeight) {
-        break;
-      }
-      lastHeight = newHeight;
-    }
+    // while (true) {
+    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+    //   await page.waitForTimeout(1000); // sleep a bit
+    //   let newHeight = await page.evaluate("document.body.scrollHeight");
+    //   if (newHeight === lastHeight) {
+    //     break;
+    //   }
+    //   lastHeight = newHeight;
+    // }
 
-    html = await page.content();
+    // html = await page.content();
 
-    await page.close();
-    await browser.close();
+    // await page.close();
+    // await browser.close();
 
     // cheerio nodejs module to load html
     $ = cheerio.load(html);

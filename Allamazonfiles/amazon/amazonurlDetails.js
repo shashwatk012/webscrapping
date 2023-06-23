@@ -1,23 +1,39 @@
 const cheerio = require("cheerio");
 const amazontext = require("./amazontext");
 const scrapingbee = require("scrapingbee");
+const request = require("request-promise");
+const http = require("http");
 
 const amazonfetchUrlDetails = async (url) => {
   try {
-    var client = new scrapingbee.ScrapingBeeClient(
-      "I1VKMCIP31YMI7PKCT2R2WXO6D3UY5OW59GPK6IKOWYKAXIHLA585HLENJ0CZ51SFMTTYIGRAW7ONVZG"
-    );
-    var response = await client.get({
-      url: url,
-      params: {
-        // premium_proxy: "True",
-        block_ads: "True",
-        block_resources: "True",
-      },
-    });
+    const agentOptions = {
+      host: "103.231.78.36",
+      port: "80",
+      path: "/",
+      rejectUnauthorized: false,
+    };
 
-    var decoder = new TextDecoder();
-    var html = decoder.decode(response.data);
+    const agent = new http.Agent(agentOptions);
+    const html = await request({
+      url: "http://httpbin.org/ip",
+      method: "GET",
+      agent,
+    });
+    console.log(html);
+    // var client = new scrapingbee.ScrapingBeeClient(
+    //   "I1VKMCIP31YMI7PKCT2R2WXO6D3UY5OW59GPK6IKOWYKAXIHLA585HLENJ0CZ51SFMTTYIGRAW7ONVZG"
+    // );
+    // var response = await client.get({
+    //   url: url,
+    //   params: {
+    //     // premium_proxy: "True",
+    //     block_ads: "True",
+    //     block_resources: "True",
+    //   },
+    // });
+
+    // var decoder = new TextDecoder();
+    // var html = decoder.decode(response.data);
     // page = await browser.browser.newPage();
 
     // await page.authenticate();
@@ -88,9 +104,9 @@ const amazonfetchUrlDetails = async (url) => {
     return products;
   } catch (error) {
     console.log(error);
-    if (page) {
-      await page.close();
-    }
+    // if (page) {
+    //   await page.close();
+    // }
     return [];
   }
 };
