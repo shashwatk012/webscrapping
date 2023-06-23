@@ -574,10 +574,7 @@ const amazonfetchIndividualDetails = async (url, num_proxies) => {
     return obj;
   } catch (error) {
     try {
-      console.log(error);
-      if (page) {
-        await page.close();
-      }
+      // console.log(error);
       console.log("Some thing Went Wrong on details.js");
       return {};
     } catch (e) {

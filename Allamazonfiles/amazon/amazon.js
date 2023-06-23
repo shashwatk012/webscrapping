@@ -61,7 +61,7 @@ const amazon = async (Categories) => {
 
       // looping to go inside the individual products
       for (let j = 0; j < data.length; j++) {
-        wait.for.time(2);
+        wait.for.time(5);
         console.log(num_proxies);
         // scrapping all the required details by going inside every individual products
         let details = await amazonfetchIndividualDetails(data[j].Productlink, {
@@ -72,14 +72,14 @@ const amazon = async (Categories) => {
         }
 
         // Checking whether reviews page is available on the site or not
-        if (details.reviewsLink !== "https://amazon.inundefined") {
-          const totalReviewsandratings = await amazonfetchReviews(
-            details.reviewsLink
-          );
-          for (const key in totalReviewsandratings) {
-            data[j][key] = totalReviewsandratings[key];
-          }
-        }
+        // if (details.reviewsLink !== "https://amazon.inundefined") {
+        //   const totalReviewsandratings = await amazonfetchReviews(
+        //     details.reviewsLink
+        //   );
+        //   for (const key in totalReviewsandratings) {
+        //     data[j][key] = totalReviewsandratings[key];
+        //   }
+        // }
 
         data[j][amazontext.A_PLATFORM_FD] = "Amazon";
 
