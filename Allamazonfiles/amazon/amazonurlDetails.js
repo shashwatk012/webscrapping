@@ -1,3 +1,4 @@
+const wait = require("wait-for-stuff");
 const cheerio = require("cheerio");
 const amazontext = require("./amazontext");
 const scrapingbee = require("scrapingbee");
@@ -5,8 +6,14 @@ const request = require("request-promise");
 const axios = require("axios");
 const http = require("http");
 const https = require("https");
+const { proxies_list } = require("../text");
 
-const amazonfetchUrlDetails = async (url, num_proxies) => {
+let num = 0;
+let num_proxies = [];
+for (let i = 0; i < 993; i++) {
+  num_proxies.push(0);
+}
+const amazonfetchUrlDetails = async (url) => {
   try {
     const headers = {
       Accept:
@@ -27,59 +34,14 @@ const amazonfetchUrlDetails = async (url, num_proxies) => {
       "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
     };
 
-    proxies_list = [
-      "20.44.206.138:80",
-      "185.211.57.74:4002",
-      "211.138.6.37:9091",
-      "168.187.72.71:80",
-      "111.40.116.212:9091",
-      "120.82.174.128:9091",
-      "168.187.72.71:8080",
-      "35.240.219.50:8080",
-      "183.237.47.54:9091",
-      "167.71.5.83:8080",
-      "218.57.210.186:9002",
-      "161.35.70.249:8080",
-      "41.76.145.136:3128",
-      "202.86.138.18:8080",
-      "117.160.250.131:80",
-      "112.19.214.109:9002",
-      "183.230.162.122:9091",
-      "112.35.204.111:80",
-      "66.85.129.220:8080",
-      "185.211.133.36:80",
-      "185.211.133.108:80",
-      "168.138.55.196:80",
-      "109.238.208.138:21231",
-      "92.63.168.248:80",
-      "116.198.48.6:8080",
-      "139.144.24.46:8080",
-      "203.89.126.250:80",
-      "110.185.164.20:9091",
-      "185.211.133.110:80",
-      "42.248.122.147:1080",
-      "47.100.201.85:80",
-      "60.12.168.114:9002",
-      "103.77.60.14:80",
-      "103.3.246.215:3128",
-      "158.69.212.254:80",
-      "117.160.250.132:8899",
-      "124.131.219.94:9091",
-      "112.16.127.69:9002",
-      "185.211.57.74:4040",
-      "117.160.250.134:80",
-      "120.234.203.171:9002",
-      "58.20.184.187:9091",
-      "51.15.242.202:8888",
-      "45.71.36.67:3128",
-      "223.210.2.228:9091",
-      "203.19.38.114:1080",
-      "61.53.66.116:9091",
-    ];
-
-    const random = Math.floor(Math.random() * 46);
-    num_proxies.num_proxies[random]++;
-    const [host, port] = proxies_list[random].split(":");
+    // const random = Math.floor(Math.random() * 46);
+    // num_proxies.num_proxies[random]++;
+    const [host, port] = proxies_list[num].split(":");
+    num_proxies[num]++;
+    num++;
+    if (num == proxies_list.length) {
+      num = 0;
+    }
     console.log(host, port);
 
     const targetUrl = url;
@@ -203,10 +165,9 @@ const amazonfetchUrlDetails = async (url, num_proxies) => {
     });
     return products;
   } catch (error) {
-    console.log(error);
-    // if (page) {
-    //   await page.close();
-    // }
+    // console.log(error);
+    wait.for.time(3);
+    return await amazonfetchUrlDetails(url);
     return [];
   }
 };

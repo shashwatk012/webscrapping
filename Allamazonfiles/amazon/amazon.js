@@ -5,11 +5,6 @@ const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { fields, save, amazonsql } = require("../text");
 const amazontext = require("./amazontext");
 
-let num_proxies = [];
-for (let i = 0; i < 47; i++) {
-  num_proxies.push(0);
-}
-
 const amazon = async (Categories) => {
   try {
     console.log(Categories);
@@ -39,9 +34,7 @@ const amazon = async (Categories) => {
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
 
         //function to scrap the data from the main page
-        const allProductDetails = await amazonfetchUrlDetails(url, {
-          num_proxies,
-        });
+        const allProductDetails = await amazonfetchUrlDetails(url);
 
         //storing the coming data in arr
         if (allProductDetails && allProductDetails.length) {
@@ -61,25 +54,22 @@ const amazon = async (Categories) => {
 
       // looping to go inside the individual products
       for (let j = 0; j < data.length; j++) {
-        wait.for.time(5);
-        console.log(num_proxies);
+        wait.for.time(8);
         // scrapping all the required details by going inside every individual products
-        let details = await amazonfetchIndividualDetails(data[j].Productlink, {
-          num_proxies,
-        });
+        let details = await amazonfetchIndividualDetails(data[j].Productlink);
         for (const key in details) {
           data[j][key] = details[key];
         }
 
         // Checking whether reviews page is available on the site or not
-        // if (details.reviewsLink !== "https://amazon.inundefined") {
-        //   const totalReviewsandratings = await amazonfetchReviews(
-        //     details.reviewsLink
-        //   );
-        //   for (const key in totalReviewsandratings) {
-        //     data[j][key] = totalReviewsandratings[key];
-        //   }
-        // }
+        if (details.reviewsLink !== "https://amazon.inundefined") {
+          const totalReviewsandratings = await amazonfetchReviews(
+            details.reviewsLink
+          );
+          for (const key in totalReviewsandratings) {
+            data[j][key] = totalReviewsandratings[key];
+          }
+        }
 
         data[j][amazontext.A_PLATFORM_FD] = "Amazon";
 
