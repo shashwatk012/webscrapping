@@ -5,6 +5,11 @@ const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { fields, save, amazonsql } = require("../text");
 const amazontext = require("./amazontext");
 
+let num_proxies = [];
+for (let i = 0; i < 47; i++) {
+  num_proxies.push(0);
+}
+
 const amazon = async (Categories) => {
   try {
     console.log(Categories);
@@ -13,10 +18,7 @@ const amazon = async (Categories) => {
     }
     // Declaration of an array to store all the product details
     let listofproducts = [];
-    let num_proxies = [];
-    for (let i = 0; i < 47; i++) {
-      num_proxies.push(0);
-    }
+
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
       listofproducts = [];
