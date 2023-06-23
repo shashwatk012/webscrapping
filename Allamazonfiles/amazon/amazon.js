@@ -1,20 +1,9 @@
+const wait = require("wait-for-stuff");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
 const { fields, save, amazonsql } = require("../text");
 const amazontext = require("./amazontext");
-// const puppeteer = require("puppeteer");
-const puppeteer = require("puppeteer-extra");
-
-// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-puppeteer.use(StealthPlugin());
-
-const { executablePath } = require("puppeteer");
-
-// Add adblocker plugin to block all ads and trackers (saves bandwidth)
-const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
-puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const amazon = async (Categories) => {
   try {
@@ -24,7 +13,10 @@ const amazon = async (Categories) => {
     }
     // Declaration of an array to store all the product details
     let listofproducts = [];
-
+    let num_proxies = [];
+    for (let i = 0; i < 47; i++) {
+      num_proxies.push(0);
+    }
     // Running a loop to scrap each product
     for (let i = 0; i < Categories.length; i++) {
       listofproducts = [];
@@ -45,7 +37,9 @@ const amazon = async (Categories) => {
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
 
         //function to scrap the data from the main page
-        const allProductDetails = await amazonfetchUrlDetails(url);
+        const allProductDetails = await amazonfetchUrlDetails(url, {
+          num_proxies,
+        });
 
         //storing the coming data in arr
         if (allProductDetails && allProductDetails.length) {
@@ -65,8 +59,12 @@ const amazon = async (Categories) => {
 
       // looping to go inside the individual products
       for (let j = 0; j < data.length; j++) {
+        wait.for.time(2);
+        console.log(num_proxies);
         // scrapping all the required details by going inside every individual products
-        let details = await amazonfetchIndividualDetails(data[j].Productlink);
+        let details = await amazonfetchIndividualDetails(data[j].Productlink, {
+          num_proxies,
+        });
         for (const key in details) {
           data[j][key] = details[key];
         }

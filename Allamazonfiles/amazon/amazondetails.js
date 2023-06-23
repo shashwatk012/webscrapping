@@ -4,8 +4,9 @@ const { replce, headers } = require("../text");
 const math = require("mathjs");
 const amazontext = require("./amazontext");
 const request = require("request-promise");
+const axios = require("axios");
+const http = require("http");
 const https = require("https");
-const axios = require("axios-https-proxy-fix");
 // const puppeteer = require("puppeteer-extra");
 
 // // Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
@@ -18,7 +19,7 @@ const axios = require("axios-https-proxy-fix");
 // const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
 // puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
-const amazonfetchIndividualDetails = async (url) => {
+const amazonfetchIndividualDetails = async (url, num_proxies) => {
   // function to scrap complete data about one product
   try {
     const headers = {
@@ -41,33 +42,87 @@ const amazonfetchIndividualDetails = async (url) => {
     };
 
     proxies_list = [
-      "128.199.109.241:8080",
-      "113.53.230.195:3128",
-      "125.141.200.53:80",
-      "125.141.200.14:80",
-      "128.199.200.112:138",
-      "149.56.123.99:3128",
-      "128.199.200.112:80",
-      "125.141.200.39:80",
-      "134.213.29.202:4444",
+      "20.44.206.138:80",
+      "185.211.57.74:4002",
+      "211.138.6.37:9091",
+      "168.187.72.71:80",
+      "111.40.116.212:9091",
+      "120.82.174.128:9091",
+      "168.187.72.71:8080",
+      "35.240.219.50:8080",
+      "183.237.47.54:9091",
+      "167.71.5.83:8080",
+      "218.57.210.186:9002",
+      "161.35.70.249:8080",
+      "41.76.145.136:3128",
+      "202.86.138.18:8080",
+      "117.160.250.131:80",
+      "112.19.214.109:9002",
+      "183.230.162.122:9091",
+      "112.35.204.111:80",
+      "66.85.129.220:8080",
+      "185.211.133.36:80",
+      "185.211.133.108:80",
+      "168.138.55.196:80",
+      "109.238.208.138:21231",
+      "92.63.168.248:80",
+      "116.198.48.6:8080",
+      "139.144.24.46:8080",
+      "203.89.126.250:80",
+      "110.185.164.20:9091",
+      "185.211.133.110:80",
+      "42.248.122.147:1080",
+      "47.100.201.85:80",
+      "60.12.168.114:9002",
+      "103.77.60.14:80",
+      "103.3.246.215:3128",
+      "158.69.212.254:80",
+      "117.160.250.132:8899",
+      "124.131.219.94:9091",
+      "112.16.127.69:9002",
+      "185.211.57.74:4040",
+      "117.160.250.134:80",
+      "120.234.203.171:9002",
+      "58.20.184.187:9091",
+      "51.15.242.202:8888",
+      "45.71.36.67:3128",
+      "223.210.2.228:9091",
+      "203.19.38.114:1080",
+      "61.53.66.116:9091",
     ];
 
-    // const proxy = proxies_list[Math.floor(Math.random() * 8)];
-    // console.log(proxy);
+    const random = Math.floor(Math.random() * 46);
+    num_proxies.num_proxies[random]++;
+    const [host, port] = proxies_list[random].split(":");
+    console.log(host, port);
 
-    const agentOptions = {
-      host: "103.231.78.36",
-      port: "80",
+    const targetUrl = url;
+
+    const agent = new http.Agent({
+      host: host,
+      port: port,
       path: "/",
-      rejectUnauthorized: false,
-    };
-
-    const agent = new https.Agent(agentOptions);
-    const html = await request({
-      url: "http://httpbin.org/ip",
-      method: "GET",
-      agent,
+      rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
     });
+
+    headers.httpAgent = agent;
+
+    const response = await axios.get(targetUrl, headers);
+    const html = response.data;
+    // console.log(html);
+    // const agentOptions = {
+    //   host: "103.231.78.36",
+    //   port: 80,
+    //   path: "/",
+    //   rejectUnauthorized: false,
+    // };
+
+    // const agent = new http.Agent(agentOptions);
+    // const html = await request({
+    //   url: "http://amazon.in/Pampers-Diapers-Pants-Medium-Count/dp/B07DP24NSR/ref=sr_1_1?crid=1EAMOLVYHA0EG&keywords=Diaper&qid=1687527727&sprefix=suncream%2Caps%2C303&sr=8-1",
+    //   method: "GET",
+    //   agent,
+    // });
     // const html = await request.get({
     //   url: "http://httpbin.org/ip",
     //   proxy: "191.102.157.91:8080",
@@ -90,7 +145,7 @@ const amazonfetchIndividualDetails = async (url) => {
     //   "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
     // });
     // console.log(response);
-    console.log(html);
+    // console.log(html);
     // let browser = await puppeteer.launch({
     //   headless: `true`, // indicates that we want the browser visible
     //   defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
