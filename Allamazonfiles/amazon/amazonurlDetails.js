@@ -2,23 +2,47 @@ const cheerio = require("cheerio");
 const amazontext = require("./amazontext");
 const scrapingbee = require("scrapingbee");
 const request = require("request-promise");
-const http = require("http");
+const axios = require("axios");
+const https = require("https");
 
 const amazonfetchUrlDetails = async (url) => {
   try {
-    const agentOptions = {
-      host: "103.231.78.36",
-      port: "80",
-      path: "/",
-      rejectUnauthorized: false,
-    };
+    const proxyHost = "67.205.162.65";
+    const proxyPort = 3128;
 
-    const agent = new http.Agent(agentOptions);
-    const html = await request({
-      url: "http://httpbin.org/ip",
-      method: "GET",
-      agent,
+    const targetUrl = url;
+
+    const agent = new https.Agent({
+      host: proxyHost,
+      port: proxyPort,
+      path: targetUrl,
+      rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
     });
+
+    const html = await axios.get(targetUrl, { httpsAgent: agent });
+    // const agentOptions = {
+    //   host: "67.205.162.65",
+    //   port: "3128",
+    //   path: "/",
+    //   rejectUnauthorized: false,
+    // };
+
+    // const agent = new https.Agent(agentOptions);
+    // const html = await request({
+    //   url,
+    //   method: "GET",
+    //   agent,
+    // });
+    // const proxyHost = "67.205.162.65";
+    // const proxyPort = "3128";
+
+    // const proxyOptions = {
+    //   proxy: `https://${proxyHost}:${proxyPort}`,
+    //   // strictSSL: false, // Only if the proxy uses a self-signed SSL certificate
+    // };
+    // const targetUrl = url;
+
+    // const html = await request.get(targetUrl, { proxy: proxyOptions });
     console.log(html);
     // var client = new scrapingbee.ScrapingBeeClient(
     //   "I1VKMCIP31YMI7PKCT2R2WXO6D3UY5OW59GPK6IKOWYKAXIHLA585HLENJ0CZ51SFMTTYIGRAW7ONVZG"
