@@ -55,7 +55,7 @@ const amazonfetchUrlDetails = async (url) => {
 
     headers.httpAgent = agent;
 
-    const response = await axios.get(targetUrl, headers);
+    const response = await axios.get(targetUrl, { httpAgent: agent });
     const html = response.data;
     // console.log(html);
     // const agentOptions = {
@@ -166,7 +166,7 @@ const amazonfetchUrlDetails = async (url) => {
     return products;
   } catch (error) {
     // console.log(error);
-    wait.for.time(3);
+    // wait.for.time(3);
     return await amazonfetchUrlDetails(url);
     return [];
   }
