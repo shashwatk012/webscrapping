@@ -1,4 +1,4 @@
-const wait = require("wait-for-stuff");
+// const wait = require("wait-for-stuff");
 const cheerio = require("cheerio");
 const amazontext = require("./amazontext");
 const scrapingbee = require("scrapingbee");
@@ -54,95 +54,10 @@ const amazonfetchUrlDetails = async (url) => {
     });
 
     headers.httpAgent = agent;
+    headers.timeout = 3000;
 
-    const response = await axios.get(targetUrl, { httpAgent: agent });
+    const response = await axios.get(targetUrl, headers);
     const html = response.data;
-    // console.log(html);
-    // const agentOptions = {
-    //   host: "67.205.162.65",
-    //   port: "3128",
-    //   path: "/",
-    //   rejectUnauthorized: false,
-    // };
-
-    // const agent = new https.Agent(agentOptions);
-    // const html = await request({
-    //   url,
-    //   method: "GET",
-    //   agent,
-    // });
-    // const proxyHost = "67.205.162.65";
-    // const proxyPort = "3128";
-
-    // const proxyOptions = {
-    //   proxy: `https://${proxyHost}:${proxyPort}`,
-    //   // strictSSL: false, // Only if the proxy uses a self-signed SSL certificate
-    // };
-    // const targetUrl = url;
-
-    // const html = await request.get(targetUrl, { proxy: proxyOptions });
-    // console.log(html);
-    // var client = new scrapingbee.ScrapingBeeClient(
-    //   "I1VKMCIP31YMI7PKCT2R2WXO6D3UY5OW59GPK6IKOWYKAXIHLA585HLENJ0CZ51SFMTTYIGRAW7ONVZG"
-    // );
-    // var response = await client.get({
-    //   url: url,
-    //   params: {
-    //     // premium_proxy: "True",
-    //     block_ads: "True",
-    //     block_resources: "True",
-    //   },
-    // });
-
-    // var decoder = new TextDecoder();
-    // var html = decoder.decode(response.data);
-    // page = await browser.browser.newPage();
-
-    // await page.authenticate();
-    // await page.goto("http://httpbin.org/ip");
-
-    // await page.waitForTimeout(1000);
-
-    // let html = await page.content();
-    // console.log(html);
-    // await page.screenshot({
-    //   path: "screenshot.jpg",
-    // });
-
-    // let $ = cheerio.load(html);
-
-    // let captchalink = $("div.a-row.a-text-center>img").attr("src");
-
-    // let captcha = undefined;
-
-    // if (captchalink) {
-    //   console.log(captchalink);
-
-    //   const readline = require("readline").createInterface({
-    //     input: process.stdin,
-    //     output: process.stdout,
-    //   });
-
-    //   readline.question("Type the captcha", (name) => {
-    //     console.log(`Captcha is ${name}!`);
-    //     captcha = name;
-    //     readline.close();
-    //   });
-
-    //   await page.waitForTimeout(20000);
-
-    //   await page.type("input#captchacharacters", captcha);
-
-    //   await page.click(
-    //     "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
-    //   );
-
-    //   await page.waitForTimeout(5000);
-    // }
-
-    // html = await page.content();
-
-    // await page.close();
 
     // cheerio nodejs module to load html
     $ = cheerio.load(html);
@@ -165,9 +80,6 @@ const amazonfetchUrlDetails = async (url) => {
     });
     return products;
   } catch (error) {
-    // console.log(error);
-    // wait.for.time(3);
-    return await amazonfetchUrlDetails(url);
     return [];
   }
 };

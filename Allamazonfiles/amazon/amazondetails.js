@@ -1,5 +1,5 @@
 const cheerio = require("cheerio");
-const wait = require("wait-for-stuff");
+// const wait = require("wait-for-stuff");
 const { replce, proxies_list } = require("../text");
 const math = require("mathjs");
 const amazontext = require("./amazontext");
@@ -55,8 +55,9 @@ const amazonfetchIndividualDetails = async (url) => {
     });
 
     headers.httpAgent = agent;
+    headers.timeout = 3000;
 
-    const response = await axios.get(targetUrl, { httpAgent: agent });
+    const response = await axios.get(targetUrl, headers);
     const html = response.data;
 
     // cheerio nodejs module to load html
@@ -426,9 +427,7 @@ const amazonfetchIndividualDetails = async (url) => {
       // let $ = cheerio.load(html);
 
       // let captchalink = $("div.a-row.a-text-center>img").attr("src");
-      // wait.for.time(3);
-      return await amazonfetchIndividualDetails(url);
-      // console.log(error);
+
       console.log("Some thing Went Wrong on details.js");
       return {};
     } catch (e) {
