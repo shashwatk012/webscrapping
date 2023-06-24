@@ -8,11 +8,11 @@ const http = require("http");
 const https = require("https");
 const { proxies_list } = require("../text");
 
-let num = 0;
-let num_proxies = [];
-for (let i = 0; i < 993; i++) {
-  num_proxies.push(0);
-}
+// let num = 0;
+// let num_proxies = [];
+// for (let i = 0; i < 993; i++) {
+//   num_proxies.push(0);
+// }
 const amazonfetchUrlDetails = async (url) => {
   try {
     const headers = {
@@ -30,19 +30,19 @@ const amazonfetchUrlDetails = async (url) => {
       "Sec-Fetch-User": "?1",
       "Upgrade-Insecure-Requests": "1",
       "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
       "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
     };
 
-    // const random = Math.floor(Math.random() * 46);
+    const num = Math.floor(Math.random() * 993);
     // num_proxies.num_proxies[random]++;
     const [host, port] = proxies_list[num].split(":");
-    num_proxies[num]++;
-    num++;
-    if (num == proxies_list.length) {
-      num = 0;
-    }
-    console.log(host, port);
+    // num_proxies[num]++;
+    // num++;
+    // if (num == proxies_list.length) {
+    //   num = 0;
+    // }
+    console.log(host, port, num);
 
     const targetUrl = url;
 
