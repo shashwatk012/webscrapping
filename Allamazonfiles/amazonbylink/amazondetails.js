@@ -3,6 +3,7 @@ const puppeteer = require("puppeteer");
 const { replce } = require("../text");
 const math = require("mathjs");
 const amazontext = require("./amazontext");
+const { proxyReq } = require("./proxyreq");
 
 const amazonfetchIndividualDetails = async (url, browser, page) => {
   // function to scrap complete data about one product
@@ -12,41 +13,6 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
     await page.goto(url);
 
     await page.waitForTimeout(1000);
-
-    let html = await page.content();
-
-    console.log(html.substring(1, 100));
-
-    let $ = cheerio.load(html);
-
-    let captchalink = $("div.a-row.a-text-center>img").attr("src");
-
-    let captcha = undefined;
-
-    if (captchalink) {
-      console.log(captchalink);
-
-      const readline = require("readline").createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-
-      readline.question("Type the captcha", (name) => {
-        console.log(`Captcha is ${name}!`);
-        captcha = name;
-        readline.close();
-      });
-
-      await page.waitForTimeout(20000);
-
-      await page.type("input#captchacharacters", captcha);
-
-      await page.click(
-        "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
-      );
-
-      await page.waitForTimeout(5000);
-    }
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
 
@@ -60,9 +26,25 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
       lastHeight = newHeight;
     }
 
-    html = await page.content();
+    let html = await page.content();
 
     await page.close();
+
+    let $ = cheerio.load(html);
+
+    console.log(html.substring(1, 100));
+
+    let captchalink = $("div.a-row.a-text-center>img").attr("src");
+
+    if (captchalink) {
+      console.log(captchalink);
+      while (true) {
+        html = await proxyReq(url);
+        if (html !== "") {
+          break;
+        }
+      }
+    }
 
     // cheerio nodejs module to load html
     $ = cheerio.load(html);
@@ -152,8 +134,10 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
             if (item !== " ") return item;
           });
           ranks = ranks.join(" ");
-          console.log(122);
-          ranks = ranks.replaceAll("#", " ");
+          while (ranks.includes("#")) {
+            ranks = ranks.replace("#", " ");
+          }
+          // ranks = ranks.replaceAll("#", " ");
 
           num = ranks.split("  ");
         }
@@ -442,3 +426,24 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
 };
 
 module.exports = { amazonfetchIndividualDetails };
+
+// const readline = require("readline").createInterface({
+//   input: process.stdin,
+//   output: process.stdout,
+// });
+
+// readline.question("Type the captcha", (name) => {
+//   console.log(`Captcha is ${name}!`);
+//   captcha = name;
+//   readline.close();
+// });
+
+// await page.waitForTimeout(20000);
+
+// await page.type("input#captchacharacters", captcha);
+
+// await page.click(
+//   "span.a-button.a-button-primary.a-span12>span.a-button-inner>button.a-button-text"
+// );
+
+// await page.waitForTimeout(5000);
