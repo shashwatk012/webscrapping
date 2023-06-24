@@ -19,7 +19,7 @@ const amazon = async (Categories) => {
       listofproducts = [];
 
       //Creating the link to be scrapped
-      let url = `http://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
+      let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
 
       // Storing the number of data to be scraped in numData variable
       let numOfData = Categories[i].data;
@@ -69,7 +69,7 @@ const amazon = async (Categories) => {
         }
 
         // Checking whether reviews page is available on the site or not
-        if (details.reviewsLink !== "http://amazon.inundefined") {
+        if (details.reviewsLink !== "https://amazon.inundefined") {
           const totalReviewsandratings = await amazonfetchReviews(
             details.reviewsLink
           );
