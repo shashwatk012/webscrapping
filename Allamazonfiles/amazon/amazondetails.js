@@ -6,6 +6,19 @@ const amazontext = require("./amazontext");
 const axios = require("axios");
 const http = require("http");
 const https = require("https");
+const { proxyReq } = require("./proxyreq");
+
+const puppeteer = require("puppeteer-extra");
+
+// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
+
+const { executablePath } = require("puppeteer");
+
+// Add adblocker plugin to block all ads and trackers (saves bandwidth)
+const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 // let num = 10;
 // let num_proxies = [];
@@ -15,52 +28,106 @@ const https = require("https");
 const amazonfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
-    const headers = {
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
-      "Sec-Ch-Ua":
-        '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
-      "Sec-Ch-Ua-Mobile": "?0",
-      "Sec-Ch-Ua-Platform": '"Windows"',
-      "Sec-Fetch-Dest": "document",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Site": "cross-site",
-      "Sec-Fetch-User": "?1",
-      "Upgrade-Insecure-Requests": "1",
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-      "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
-    };
+    let browser = await puppeteer.launch({
+      headless: `true`, // indicates that we want the browser visible
+      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+      // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: executablePath(),
+    });
 
-    const num = Math.floor(Math.random() * 993);
+    page = await browser.newPage();
+    await page.goto(url);
 
-    // console.log(num_proxies, " ", num);
-    const [host, port] = proxies_list[num].split(":");
-    // num_proxies[num]++;
-    // num++;
-    // if (num == proxies_list.length) {
-    //   num = 0;
-    // }
-    console.log(host, port, num);
+    await page.waitForTimeout(1000);
 
-    const targetUrl = url;
+    let lastHeight = await page.evaluate("document.body.scrollHeight");
 
-    // const agent = new http.Agent({
-    //   host: host,
-    //   port: port,
-    //   path: "/",
-    //   rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
-    // });
+    while (true) {
+      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      await page.waitForTimeout(1000); // sleep a bit
+      let newHeight = await page.evaluate("document.body.scrollHeight");
+      if (newHeight === lastHeight) {
+        break;
+      }
+      lastHeight = newHeight;
+    }
 
-    // headers.httpAgent = agent;
-    // headers.timeout = 3000;
+    const html = await page.content();
 
-    const response = await axios.get(targetUrl);
-    const html = response.data;
+    await page.close();
+    await browser.close();
+    // const headers = {
+    //   Accept:
+    //     "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    //   "Accept-Encoding": "gzip, deflate, br",
+    //   "Accept-Language": "en-US,en;q=0.9,la;q=0.8",
+    //   "Sec-Ch-Ua":
+    //     '"Google Chrome";v="113", "Chromium";v="113", "Not-A.Brand";v="24"',
+    //   "Sec-Ch-Ua-Mobile": "?0",
+    //   "Sec-Ch-Ua-Platform": '"Windows"',
+    //   "Sec-Fetch-Dest": "document",
+    //   "Sec-Fetch-Mode": "navigate",
+    //   "Sec-Fetch-Site": "cross-site",
+    //   "Sec-Fetch-User": "?1",
+    //   "Upgrade-Insecure-Requests": "1",
+    //   "User-Agent":
+    //     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    //   "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
+    // };
+
+    // const num = Math.floor(Math.random() * 993);
+
+    // // console.log(num_proxies, " ", num);
+    // const [host, port] = proxies_list[num].split(":");
+    // // num_proxies[num]++;
+    // // num++;
+    // // if (num == proxies_list.length) {
+    // //   num = 0;
+    // // }
+    // console.log(host, port, num);
+
+    // const targetUrl = url;
+
+    // // const agent = new http.Agent({
+    // //   host: host,
+    // //   port: port,
+    // //   path: "/",
+    // //   rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
+    // // });
+
+    // // headers.httpAgent = agent;
+    // // headers.timeout = 3000;
+
+    // const response = await axios.get(targetUrl);
+    // const html = response.data;
 
     // cheerio nodejs module to load html
+    let $ = cheerio.load(html);
+
+    console.log(html.substring(1, 100));
+
+    let captchalink = $("div.a-row.a-text-center>img").attr("src");
+    let title = $("title").text();
+
+    if (captchalink) {
+      console.log(captchalink);
+      while (true) {
+        html = await proxyReq(url);
+        if (html !== "") {
+          break;
+        }
+      }
+    } else if (title === "503 - Service Unavailable Error") {
+      console.log(title);
+      while (true) {
+        html = await proxyReq(url);
+        if (html !== "") {
+          break;
+        }
+      }
+    }
+
     $ = cheerio.load(html);
 
     // Declaration of object to store the product details
