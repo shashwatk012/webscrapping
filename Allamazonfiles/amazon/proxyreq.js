@@ -43,7 +43,7 @@ const proxyReq = async (url) => {
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
-    console.log(html.substring(1, 100));
+    console.log(html.substring(1, 10000));
 
     return html;
   } catch (error) {

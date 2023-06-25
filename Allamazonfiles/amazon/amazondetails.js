@@ -467,7 +467,7 @@ const amazonfetchIndividualDetails = async (url) => {
     // cheerio nodejs module to load html
     let $ = cheerio.load(html);
 
-    console.log(html.substring(1, 100));
+    console.log(html.substring(1, 10000));
 
     let captchalink = $("div.a-row.a-text-center>img").attr("src");
     let title = $("title").text();
@@ -493,6 +493,7 @@ const amazonfetchIndividualDetails = async (url) => {
     return scrapamazon(html);
   } catch (error) {
     try {
+      console.log(error);
       if (page) {
         await page.close();
       }
@@ -507,6 +508,7 @@ const amazonfetchIndividualDetails = async (url) => {
       console.log("Some thing Went Wrong on details.js");
       return scrapamazon(html);
     } catch (e) {
+      console.log(e);
       let html;
       while (true) {
         html = await proxyReq(url);
@@ -514,9 +516,8 @@ const amazonfetchIndividualDetails = async (url) => {
           break;
         }
       }
-      console.log("Some thing Went Wrong on details.js");
-      return scrapamazon(html);
       console.log("Some thing Went Wrong on details1.js");
+      return scrapamazon(html);
     }
   }
 };

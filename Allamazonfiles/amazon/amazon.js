@@ -1,4 +1,4 @@
-// const wait = require("wait-for-stuff");
+const wait = require("wait-for-stuff");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
@@ -56,11 +56,14 @@ const amazon = async (Categories) => {
 
       // looping to go inside the individual products
       for (let j = 0; j < data.length; j++) {
-        // wait.for.time(8);
+        if (j % 50 === 0 && j !== 0) {
+          wait.for.time(600);
+        }
+
         // scrapping all the required details by going inside every individual products
         let details = await amazonfetchIndividualDetails(data[j].Productlink);
 
-        if (!details.ProductName) {
+        if (details === {}) {
           j--;
           continue;
         }
