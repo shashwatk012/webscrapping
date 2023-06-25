@@ -69,14 +69,14 @@ const amazon = async (Categories) => {
         }
 
         // Checking whether reviews page is available on the site or not
-        if (details.reviewsLink !== "https://amazon.inundefined") {
-          const totalReviewsandratings = await amazonfetchReviews(
-            details.reviewsLink
-          );
-          for (const key in totalReviewsandratings) {
-            data[j][key] = totalReviewsandratings[key];
-          }
-        }
+        // if (details.reviewsLink !== "https://amazon.inundefined") {
+        //   const totalReviewsandratings = await amazonfetchReviews(
+        //     details.reviewsLink
+        //   );
+        //   for (const key in totalReviewsandratings) {
+        //     data[j][key] = totalReviewsandratings[key];
+        //   }
+        // }
 
         data[j][amazontext.A_PLATFORM_FD] = "Amazon";
 

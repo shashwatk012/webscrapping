@@ -46,15 +46,15 @@ const amazonfetchUrlDetails = async (url) => {
 
     const targetUrl = url;
 
-    const agent = new http.Agent({
-      host: host,
-      port: port,
-      path: "/",
-      rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
-    });
+    // const agent = new http.Agent({
+    //   host: host,
+    //   port: port,
+    //   path: "/",
+    //   rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
+    // });
 
-    headers.httpAgent = agent;
-    headers.timeout = 3000;
+    // headers.httpAgent = agent;
+    // headers.timeout = 3000;
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
