@@ -47,7 +47,7 @@ const amazonfetchUrlDetails = async (url) => {
     // }
     console.log(host, port, num);
 
-    const targetUrl = "http://httpbin.org/ip";
+    const targetUrl = url;
 
     const agent = new http.Agent({
       host: host,
