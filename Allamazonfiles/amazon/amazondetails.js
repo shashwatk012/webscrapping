@@ -391,66 +391,46 @@ const scrapamazon = (html) => {
 const amazonfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
-    let browser = await puppeteer.launch({
-      headless: `true`, // indicates that we want the browser visible
-      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
-      // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: executablePath(),
-    });
+    // let browser = await puppeteer.launch({
+    //   headless: `true`, // indicates that we want the browser visible
+    //   defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+    //   // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
+    //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    //   executablePath: executablePath(),
+    // });
 
-    page = await browser.newPage();
-    await page.goto(url);
+    // page = await browser.newPage();
+    // await page.goto(url);
 
-    await page.waitForTimeout(1000);
+    // await page.waitForTimeout(1000);
 
-    let lastHeight = await page.evaluate("document.body.scrollHeight");
+    // let lastHeight = await page.evaluate("document.body.scrollHeight");
 
+    // while (true) {
+    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+    //   await page.waitForTimeout(1000); // sleep a bit
+    //   let newHeight = await page.evaluate("document.body.scrollHeight");
+    //   if (newHeight === lastHeight) {
+    //     break;
+    //   }
+    //   lastHeight = newHeight;
+    // }
+
+    // let html = await page.content();
+
+    // await page.close();
+    // await browser.close();
+    let html;
     while (true) {
-      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-      await page.waitForTimeout(1000); // sleep a bit
-      let newHeight = await page.evaluate("document.body.scrollHeight");
-      if (newHeight === lastHeight) {
+      html = await proxyReq(url);
+      if (html !== "") {
         break;
       }
-      lastHeight = newHeight;
     }
 
-    let html = await page.content();
-
-    await page.close();
-    await browser.close();
-
-    // cheerio nodejs module to load html
-    let $ = cheerio.load(html);
-
-    // console.log(html.substring(1, 1000));
-
-    let captchalink = $("div.a-row.a-text-center>img").attr("src");
-    let title = $("title").text();
-    // console.log(captchalink, title);
-
-    if (captchalink) {
-      console.log(captchalink);
-      while (true) {
-        html = await proxyReq(url);
-        if (html !== "") {
-          break;
-        }
-      }
-    } else if (title === "503 - Service Unavailable Error") {
-      console.log(title);
-      while (true) {
-        html = await proxyReq(url);
-        if (html !== "") {
-          break;
-        }
-      }
-    }
     return scrapamazon(html);
   } catch (error) {
     try {
-      console.log(error);
       if (page) {
         await page.close();
       }
@@ -465,7 +445,6 @@ const amazonfetchIndividualDetails = async (url) => {
       console.log("Some thing Went Wrong on details.js");
       return scrapamazon(html);
     } catch (e) {
-      console.log(e);
       let html;
       while (true) {
         html = await proxyReq(url);

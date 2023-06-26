@@ -1,6 +1,8 @@
 const { proxies_list } = require("../text");
 const http = require("http");
 const axios = require("axios");
+const cheerio = require("cheerio");
+const amazontext = require("./amazontext");
 
 const proxyReq = async (url) => {
   try {
@@ -43,9 +45,15 @@ const proxyReq = async (url) => {
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
-    console.log(html.substring(1, 1000));
 
-    return html;
+    // cheerio nodejs module to load html
+    let $ = cheerio.load(html);
+
+    let ProductName = $(amazontext.A_PRODUCTNAME_CN).text();
+    if (ProductName) {
+      return html;
+    }
+    return "";
   } catch (error) {
     return "";
   }
