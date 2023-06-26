@@ -17,7 +17,6 @@ const { proxies_list } = require("../text");
 // let num = 0;
 const amazonfetchUrlDetails = async (url) => {
   try {
-    console.log(proxies_list.length);
     const headers = {
       Accept:
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -48,7 +47,7 @@ const amazonfetchUrlDetails = async (url) => {
     // }
     console.log(host, port, num);
 
-    const targetUrl = url;
+    const targetUrl = "http://httpbin.org/ip";
 
     const agent = new http.Agent({
       host: host,
@@ -62,7 +61,7 @@ const amazonfetchUrlDetails = async (url) => {
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
-    // console.log(html);
+    console.log(html);
     // proxy.push(host + ":" + port);
     // console.log(proxy);
 

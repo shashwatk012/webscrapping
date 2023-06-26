@@ -9,17 +9,17 @@ const https = require("https");
 const { proxyReq } = require("./proxyreq");
 const scrapingbee = require("scrapingbee");
 
-// const puppeteer = require("puppeteer-extra");
+const puppeteer = require("puppeteer-extra");
 
-// // Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
-// const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-// puppeteer.use(StealthPlugin());
+// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
 
-// const { executablePath } = require("puppeteer");
+const { executablePath } = require("puppeteer");
 
-// // Add adblocker plugin to block all ads and trackers (saves bandwidth)
-// const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
-// puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
+// Add adblocker plugin to block all ads and trackers (saves bandwidth)
+const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const scrapamazon = (html) => {
   let $ = cheerio.load(html);
@@ -391,46 +391,35 @@ const scrapamazon = (html) => {
 const amazonfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
-    // let browser = await puppeteer.launch({
-    //   headless: `true`, // indicates that we want the browser visible
-    //   defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
-    //   // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
-    //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    //   executablePath: executablePath(),
-    // });
-
-    // page = await browser.newPage();
-    // await page.goto(url);
-
-    // await page.waitForTimeout(1000);
-
-    // let lastHeight = await page.evaluate("document.body.scrollHeight");
-
-    // while (true) {
-    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-    //   await page.waitForTimeout(1000); // sleep a bit
-    //   let newHeight = await page.evaluate("document.body.scrollHeight");
-    //   if (newHeight === lastHeight) {
-    //     break;
-    //   }
-    //   lastHeight = newHeight;
-    // }
-
-    // let html = await page.content();
-
-    // await page.close();
-    // await browser.close();
-
-    let client = new scrapingbee.ScrapingBeeClient(
-      "QJ8DIOH5Y3J38NCZ9OECF8QVE9CRD6MATJT1NIL36TRSZW5EWHBM3QSTC8W4Y0QQ0G8QPAB0UEZNX5A3"
-    );
-    let response = await client.get({
-      url: url,
-      params: {},
+    let browser = await puppeteer.launch({
+      headless: `true`, // indicates that we want the browser visible
+      defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
+      // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: executablePath(),
     });
 
-    let decoder = new TextDecoder();
-    let html = decoder.decode(response.data);
+    page = await browser.newPage();
+    await page.goto(url);
+
+    await page.waitForTimeout(1000);
+
+    let lastHeight = await page.evaluate("document.body.scrollHeight");
+
+    while (true) {
+      await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
+      await page.waitForTimeout(1000); // sleep a bit
+      let newHeight = await page.evaluate("document.body.scrollHeight");
+      if (newHeight === lastHeight) {
+        break;
+      }
+      lastHeight = newHeight;
+    }
+
+    let html = await page.content();
+
+    await page.close();
+    await browser.close();
 
     // cheerio nodejs module to load html
     let $ = cheerio.load(html);

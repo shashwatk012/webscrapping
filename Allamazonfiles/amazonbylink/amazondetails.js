@@ -10,9 +10,13 @@ const amazonfetchIndividualDetails = async (url, browser, page) => {
   try {
     page = await browser.browser.newPage();
 
-    await page.goto(url);
+    await page.goto("https://bot.sannysoft.com/");
 
     await page.waitForTimeout(1000);
+
+    await page.screenshot({
+      path: "./sreenshot.jpg",
+    });
 
     let lastHeight = await page.evaluate("document.body.scrollHeight");
 
