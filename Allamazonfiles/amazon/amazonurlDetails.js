@@ -61,7 +61,7 @@ const amazonfetchUrlDetails = async (url) => {
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
-    console.log(html);
+    // console.log(html);
     // proxy.push(host + ":" + port);
     // console.log(proxy);
 
