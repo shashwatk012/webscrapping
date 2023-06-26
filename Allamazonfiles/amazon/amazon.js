@@ -19,7 +19,7 @@ const amazon = async (Categories) => {
       listofproducts = [];
 
       //Creating the link to be scrapped
-      let url = `https://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
+      let url = `http://www.amazon.in/s?k=${Categories[i].category}&page=0&crid=1EAMOLVYHA0EG&sprefix=suncream%2Caps%2C303&ref=sr_pg_0`;
 
       // Storing the number of data to be scraped in numData variable
       let numOfData = Categories[i].data;
@@ -28,13 +28,15 @@ const amazon = async (Categories) => {
         data = [];
 
       //Scrapping the data from the provided url from all the pages
-      for (let j = 0; j < 6; j++) {
+      for (let j = 0; j < 25; j++) {
         //Changing the page number to scrap data from the next page
         url = url.replace(`page=${j}&crid`, `page=${j + 1}&crid`);
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
 
         //function to scrap the data from the main page
         const allProductDetails = await amazonfetchUrlDetails(url);
+
+        // wait.for.time(5);
 
         if (allProductDetails && allProductDetails.length) {
           //storing the coming data in arr
@@ -72,7 +74,7 @@ const amazon = async (Categories) => {
         }
 
         // Checking whether reviews page is available on the site or not
-        // if (details.reviewsLink !== "https://amazon.inundefined") {
+        // if (details.reviewsLink !== "http://amazon.inundefined") {
         //   const totalReviewsandratings = await amazonfetchReviews(
         //     details.reviewsLink
         //   );

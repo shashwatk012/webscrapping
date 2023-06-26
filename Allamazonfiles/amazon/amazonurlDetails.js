@@ -13,8 +13,11 @@ const { proxies_list } = require("../text");
 // for (let i = 0; i < 993; i++) {
 //   num_proxies.push(0);
 // }
+// let proxy = [];
+// let num = 0;
 const amazonfetchUrlDetails = async (url) => {
   try {
+    console.log(proxies_list.length);
     const headers = {
       Accept:
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -34,9 +37,10 @@ const amazonfetchUrlDetails = async (url) => {
       "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
     };
 
-    const num = Math.floor(Math.random() * 993);
+    const num = Math.floor(Math.random() * proxies_list.length);
     // num_proxies.num_proxies[random]++;
     const [host, port] = proxies_list[num].split(":");
+    // const [host, port] = [proxies_list[num].ip, proxies_list[num].port];
     // num_proxies[num]++;
     // num++;
     // if (num == proxies_list.length) {
@@ -46,18 +50,21 @@ const amazonfetchUrlDetails = async (url) => {
 
     const targetUrl = url;
 
-    // const agent = new http.Agent({
-    //   host: host,
-    //   port: port,
-    //   path: "/",
-    //   rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
-    // });
+    const agent = new http.Agent({
+      host: host,
+      port: port,
+      path: "/",
+      rejectUnauthorized: false, // Set to false if the proxy server has a self-signed SSL certificate
+    });
 
-    // headers.httpAgent = agent;
-    // headers.timeout = 3000;
+    headers.httpAgent = agent;
+    headers.timeout = 5000;
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
+    // console.log(html);
+    // proxy.push(host + ":" + port);
+    // console.log(proxy);
 
     // cheerio nodejs module to load html
     $ = cheerio.load(html);
@@ -80,6 +87,7 @@ const amazonfetchUrlDetails = async (url) => {
     });
     return products;
   } catch (error) {
+    // console.log(error);
     return [];
   }
 };

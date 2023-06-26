@@ -23,7 +23,7 @@ const proxyReq = async (url) => {
       "X-Amzn-Trace-Id": "Root=1-646baec9-23c65be55fbb54967e9160ef",
     };
 
-    const num = Math.floor(Math.random() * 993);
+    const num = Math.floor(Math.random() * proxies_list.length);
 
     const [host, port] = proxies_list[num].split(":");
 
@@ -39,11 +39,11 @@ const proxyReq = async (url) => {
     });
 
     headers.httpAgent = agent;
-    headers.timeout = 3000;
+    headers.timeout = 5000;
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
-    console.log(html.substring(1, 10000));
+    console.log(html.substring(1, 1000));
 
     return html;
   } catch (error) {
