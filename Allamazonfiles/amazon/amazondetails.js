@@ -1,25 +1,9 @@
 const cheerio = require("cheerio");
-// const wait = require("wait-for-stuff");
-const { replce, proxies_list } = require("../text");
+const { replce } = require("../text");
 const math = require("mathjs");
 const amazontext = require("./amazontext");
-const axios = require("axios");
-const http = require("http");
-const https = require("https");
 const { proxyReq } = require("./proxyreq");
 const scrapingbee = require("scrapingbee");
-
-const puppeteer = require("puppeteer-extra");
-
-// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-puppeteer.use(StealthPlugin());
-
-const { executablePath } = require("puppeteer");
-
-// Add adblocker plugin to block all ads and trackers (saves bandwidth)
-const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
-puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const scrapamazon = (html) => {
   let $ = cheerio.load(html);
@@ -383,43 +367,9 @@ const scrapamazon = (html) => {
   return obj;
 };
 
-// let num = 10;
-// let num_proxies = [];
-// for (let i = 0; i < 993; i++) {
-//   num_proxies.push(0);
-// }
 const amazonfetchIndividualDetails = async (url) => {
   // function to scrap complete data about one product
   try {
-    // let browser = await puppeteer.launch({
-    //   headless: `true`, // indicates that we want the browser visible
-    //   defaultViewport: false, // indicates not to use the default viewport size but to adjust to the user's screen resolution instead
-    //   // userDataDir: "./tmp", // caches previous actions for the website. Useful for remembering if we've had to solve captchas in the past so we don't have to resolve them
-    //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    //   executablePath: executablePath(),
-    // });
-
-    // page = await browser.newPage();
-    // await page.goto(url);
-
-    // await page.waitForTimeout(1000);
-
-    // let lastHeight = await page.evaluate("document.body.scrollHeight");
-
-    // while (true) {
-    //   await page.evaluate("window.scrollTo(0, document.body.scrollHeight)");
-    //   await page.waitForTimeout(1000); // sleep a bit
-    //   let newHeight = await page.evaluate("document.body.scrollHeight");
-    //   if (newHeight === lastHeight) {
-    //     break;
-    //   }
-    //   lastHeight = newHeight;
-    // }
-
-    // let html = await page.content();
-
-    // await page.close();
-    // await browser.close();
     let html;
     while (true) {
       html = await proxyReq(url);
@@ -431,10 +381,6 @@ const amazonfetchIndividualDetails = async (url) => {
     return scrapamazon(html);
   } catch (error) {
     try {
-      if (page) {
-        await page.close();
-      }
-      await browser.close();
       let html;
       while (true) {
         html = await proxyReq(url);

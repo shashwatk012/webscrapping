@@ -2,19 +2,10 @@
 const cheerio = require("cheerio");
 const amazontext = require("./amazontext");
 const scrapingbee = require("scrapingbee");
-const request = require("request-promise");
 const axios = require("axios");
 const http = require("http");
-const https = require("https");
 const { proxies_list } = require("../text");
 
-// let num = 0;
-// let num_proxies = [];
-// for (let i = 0; i < 993; i++) {
-//   num_proxies.push(0);
-// }
-// let proxy = [];
-// let num = 0;
 const amazonfetchUrlDetails = async (url) => {
   try {
     const headers = {
@@ -37,14 +28,9 @@ const amazonfetchUrlDetails = async (url) => {
     };
 
     const num = Math.floor(Math.random() * proxies_list.length);
-    // num_proxies.num_proxies[random]++;
+
     const [host, port] = proxies_list[num].split(":");
-    // const [host, port] = [proxies_list[num].ip, proxies_list[num].port];
-    // num_proxies[num]++;
-    // num++;
-    // if (num == proxies_list.length) {
-    //   num = 0;
-    // }
+
     console.log(host, port, num);
 
     const targetUrl = url;
@@ -61,8 +47,6 @@ const amazonfetchUrlDetails = async (url) => {
 
     const response = await axios.get(targetUrl, headers);
     const html = response.data;
-    // proxy.push(host + ":" + port);
-    // console.log(proxy);
 
     // cheerio nodejs module to load html
     $ = cheerio.load(html);
@@ -85,7 +69,6 @@ const amazonfetchUrlDetails = async (url) => {
     });
     return products;
   } catch (error) {
-    // console.log(error);
     return [];
   }
 };

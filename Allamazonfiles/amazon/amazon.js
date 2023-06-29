@@ -1,4 +1,3 @@
-const wait = require("wait-for-stuff");
 const { amazonfetchUrlDetails } = require("./amazonurlDetails");
 const { amazonfetchReviews } = require("./amazonreviews");
 const { amazonfetchIndividualDetails } = require("./amazondetails");
@@ -58,10 +57,6 @@ const amazon = async (Categories) => {
 
       // looping to go inside the individual products
       for (let j = 0; j < data.length; j++) {
-        if (j % 50 === 0 && j !== 0) {
-          wait.for.time(600);
-        }
-
         // scrapping all the required details by going inside every individual products
         let details = await amazonfetchIndividualDetails(data[j].Productlink);
 
@@ -74,14 +69,14 @@ const amazon = async (Categories) => {
         }
 
         // Checking whether reviews page is available on the site or not
-        // if (details.reviewsLink !== "http://amazon.inundefined") {
-        //   const totalReviewsandratings = await amazonfetchReviews(
-        //     details.reviewsLink
-        //   );
-        //   for (const key in totalReviewsandratings) {
-        //     data[j][key] = totalReviewsandratings[key];
-        //   }
-        // }
+        if (details.reviewsLink !== "http://amazon.inundefined") {
+          const totalReviewsandratings = await amazonfetchReviews(
+            details.reviewsLink
+          );
+          for (const key in totalReviewsandratings) {
+            data[j][key] = totalReviewsandratings[key];
+          }
+        }
 
         data[j][amazontext.A_PLATFORM_FD] = "Amazon";
 
