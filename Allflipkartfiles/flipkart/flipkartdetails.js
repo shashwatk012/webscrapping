@@ -168,6 +168,24 @@ const scrapdetails = (html) => {
   }
   obj[flipkarttext.F_DESCRIPTION_FD] = description;
 
+  // 5-1 star ratings
+  $(flipkarttext.F_ALLRATINGS_ALTERNATIVE_CN).each(async (_idx, el) => {
+    const x = $(el);
+    let ratings = x.find("div._1uJVNT").text();
+    ratings = replce(ratings);
+    obj[`Num_${5 - _idx}_${flipkarttext.F_STARRATINGS_FD}`] = ratings;
+    console.log(ratings);
+  });
+
+  // 5-1 star ratings
+  $(flipkarttext.F_ALLRATINGS_ALTERNATIVE2_CN).each(async (_idx, el) => {
+    const x = $(el);
+    let ratings = x.find("div._1uJVNT").text();
+    ratings = replce(ratings);
+    obj[`Num_${5 - _idx}_${flipkarttext.F_STARRATINGS_FD}`] = ratings;
+    console.log(ratings);
+  });
+
   return obj;
 };
 
