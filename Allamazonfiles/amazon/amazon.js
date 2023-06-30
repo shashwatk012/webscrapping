@@ -26,8 +26,9 @@ const amazon = async (Categories) => {
       let arr = [],
         data = [];
 
+      let num = 0;
       //Scrapping the data from the provided url from all the pages
-      for (let j = 0; j < 25; j++) {
+      for (let j = 0; j < 20; j++) {
         //Changing the page number to scrap data from the next page
         url = url.replace(`page=${j}&crid`, `page=${j + 1}&crid`);
         url = url.replace(`sr_pg_${j}`, `sr_pg_${j + 1}`);
@@ -40,8 +41,14 @@ const amazon = async (Categories) => {
         if (allProductDetails && allProductDetails.length) {
           //storing the coming data in arr
           arr = [...arr, ...allProductDetails];
+          num = 0;
         } else {
-          j--;
+          if (num === 20) {
+            num = 0;
+          } else {
+            j--;
+            num++;
+          }
         }
         console.log(arr.length);
 
